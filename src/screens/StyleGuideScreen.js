@@ -79,16 +79,16 @@ export default function StyleGuideScreen() {
             <Label>APP ICONS</Label>
             <View style={styles.logoGrid}>
               <View style={[styles.logoBox, { backgroundColor: colors.orange.light }]}>
-                <HactuallyLogo size={80} useGradient />
+                <HactuallyLogo size={56} useGradient />
               </View>
               <View style={[styles.logoBox, { backgroundColor: colors.blue.light }]}>
-                <HactuallyLogo size={80} color={colors.blue.default} />
+                <HactuallyLogo size={56} color={colors.blue.default} />
               </View>
               <View style={[styles.logoBox, { backgroundColor: colors.brown.light }]}>
-                <HactuallyLogo size={80} color="#6A6B5A" />
+                <HactuallyLogo size={56} color="#6A6B5A" />
               </View>
               <View style={[styles.logoBox, { backgroundColor: colors.green.light }]}>
-                <HactuallyLogo size={80} color="#3A6262" />
+                <HactuallyLogo size={56} color="#3A6262" />
               </View>
             </View>
 
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   divider: { height: 1, backgroundColor: colors.brown.default + '33', marginVertical: 20 },
   // Logo
   logoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  logoBox: { width: 120, height: 120, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  logoBox: { width: 140, height: 140, borderRadius: 28, alignItems: 'center', justifyContent: 'center', padding: 24 },
   logoTextRow: { flexDirection: 'row', gap: 12 },
   logoTextBox: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 16, paddingHorizontal: 20, borderRadius: 16 },
   logoText: { fontSize: 18, fontFamily: fontFamily.black, fontWeight: '900' },
