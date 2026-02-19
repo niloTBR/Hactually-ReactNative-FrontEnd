@@ -1,77 +1,59 @@
 /**
- * Hactually Profile Marquee Component
- * Infinite scrolling profile images
+ * Profile Marquee - Seamless infinite scrolling profile images
  */
-import React, { useEffect, useRef } from 'react';
-import { View, Image, StyleSheet, Animated } from 'react-native';
-import { spacing } from '../theme';
+import React, { useEffect, useRef, memo } from 'react';
+import { View, Image, Animated, StyleSheet } from 'react-native';
 
-const IMAGE_SIZE = 96;
-const IMAGE_GAP = 12;
+const DEFAULT_PROFILES = [
+  require('../../assets/images/profiles/ayo-ogunseinde-6W4F62sN_yI-unsplash.jpg'),
+  require('../../assets/images/profiles/brooke-cagle-Ss3wTFJPAVY-unsplash.jpg'),
+  require('../../assets/images/profiles/daniel-monteiro-uGVqeh27EHE-unsplash.jpg'),
+  require('../../assets/images/profiles/brooke-cagle-KriecpTIWgY-unsplash.jpg'),
+  require('../../assets/images/profiles/natalia-blauth-gw2udfGe_tM-unsplash.jpg'),
+  require('../../assets/images/profiles/jakob-owens-lkMJcGDZLVs-unsplash.jpg'),
+  require('../../assets/images/profiles/rayul-_M6gy9oHgII-unsplash.jpg'),
+  require('../../assets/images/profiles/arrul-lin-sYhUhse5uT8-unsplash.jpg'),
+];
 
-const ProfileMarquee = ({
-  images,
-  reverse = false,
-  duration = 30000,
-  imageSize = IMAGE_SIZE,
-}) => {
-  const animatedValue = useRef(new Animated.Value(0)).current;
-  const singleSetWidth = images.length * (imageSize + IMAGE_GAP);
+const SIZE = 96;
+const GAP = 12;
+
+const ProfileImage = memo(({ source }) => <Image source={source} style={styles.img} />);
+
+const ProfileMarquee = memo(({ images = DEFAULT_PROFILES, reverse = false, speed = 30000 }) => {
+  const setWidth = images.length * (SIZE + GAP);
+  const anim = useRef(new Animated.Value(reverse ? -setWidth : 0)).current;
+  const mounted = useRef(true);
 
   useEffect(() => {
-    animatedValue.setValue(0);
-    Animated.loop(
-      Animated.timing(animatedValue, {
-        toValue: 1,
-        duration: reverse ? duration + 5000 : duration,
+    mounted.current = true;
+    const loop = () => {
+      if (!mounted.current) return;
+      anim.setValue(reverse ? -setWidth : 0);
+      Animated.timing(anim, {
+        toValue: reverse ? 0 : -setWidth,
+        duration: speed,
         useNativeDriver: true,
         isInteraction: false,
-      }),
-      { resetBeforeIteration: true }
-    ).start();
+      }).start(({ finished }) => finished && loop());
+    };
+    loop();
+    return () => { mounted.current = false; anim.stopAnimation(); };
   }, []);
 
-  const translateX = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: reverse ? [-singleSetWidth, 0] : [0, -singleSetWidth],
-  });
-
   return (
-    <View style={[styles.container, { height: imageSize }]}>
-      <Animated.View
-        style={[styles.row, { transform: [{ translateX }] }]}
-      >
-        {[...images, ...images, ...images].map((img, i) => (
-          <Image
-            key={i}
-            source={img}
-            style={[
-              styles.image,
-              {
-                width: imageSize,
-                height: imageSize,
-                borderRadius: imageSize / 2
-              }
-            ]}
-          />
-        ))}
+    <View style={styles.container}>
+      <Animated.View style={[styles.row, { transform: [{ translateX: anim }] }]}>
+        {[...images, ...images].map((img, i) => <ProfileImage key={i} source={img} />)}
       </Animated.View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
-  container: {
-    overflow: 'hidden',
-  },
-  row: {
-    flexDirection: 'row',
-    gap: IMAGE_GAP,
-  },
-  image: {
-    borderWidth: 2,
-    borderColor: 'rgba(200, 227, 244, 0.25)',
-  },
+  container: { overflow: 'hidden', height: SIZE },
+  row: { flexDirection: 'row', gap: GAP },
+  img: { width: SIZE, height: SIZE, borderRadius: SIZE / 2, borderWidth: 2, borderColor: 'rgba(200,227,244,0.25)' },
 });
 
 export default ProfileMarquee;

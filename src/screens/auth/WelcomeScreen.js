@@ -1,28 +1,15 @@
 /**
  * Welcome Screen - Onboarding with video carousel
  */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  View, Text, StyleSheet, Pressable, Dimensions, Animated, Image, Platform,
-} from 'react-native';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { View, Text, StyleSheet, Pressable, Dimensions, Animated, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
-import { LogoIcon } from '../../components/Logo';
-import { colors, spacing, borderRadius, fontFamily } from '../../theme';
+import { LogoIcon, ProfileMarquee } from '../../components';
+import { colors, spacing, fontFamily } from '../../theme';
 
 const { width } = Dimensions.get('window');
-
-const PROFILES = [
-  require('../../../assets/images/profiles/ayo-ogunseinde-6W4F62sN_yI-unsplash.jpg'),
-  require('../../../assets/images/profiles/brooke-cagle-Ss3wTFJPAVY-unsplash.jpg'),
-  require('../../../assets/images/profiles/daniel-monteiro-uGVqeh27EHE-unsplash.jpg'),
-  require('../../../assets/images/profiles/brooke-cagle-KriecpTIWgY-unsplash.jpg'),
-  require('../../../assets/images/profiles/natalia-blauth-gw2udfGe_tM-unsplash.jpg'),
-  require('../../../assets/images/profiles/jakob-owens-lkMJcGDZLVs-unsplash.jpg'),
-  require('../../../assets/images/profiles/rayul-_M6gy9oHgII-unsplash.jpg'),
-  require('../../../assets/images/profiles/arrul-lin-sYhUhse5uT8-unsplash.jpg'),
-];
 
 const SLIDES = [
   { lines: ["You've", 'shared a look with someone before.'], video: require('../../../assets/videos/Video_1.mp4') },
@@ -31,46 +18,17 @@ const SLIDES = [
   { lines: ['Meet the ones', 'you almost missed!'], video: require('../../../assets/videos/Video_4.mp4'), isFinal: true },
 ];
 
-const IMAGE_SIZE = 96;
-const IMAGE_GAP = 12;
-const SET_WIDTH = PROFILES.length * (IMAGE_SIZE + IMAGE_GAP);
-
-// Marquee row
-const ProfileRow = ({ reverse }) => {
-  const anim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(anim, { toValue: 1, duration: reverse ? 35000 : 30000, useNativeDriver: true }),
-      { resetBeforeIteration: true }
-    ).start();
-  }, []);
-
-  const translateX = anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: reverse ? [-SET_WIDTH, 0] : [0, -SET_WIDTH],
-  });
-
-  return (
-    <View style={styles.marquee}>
-      <Animated.View style={[styles.marqueeRow, { transform: [{ translateX }] }]}>
-        {[...PROFILES, ...PROFILES, ...PROFILES].map((img, i) => (
-          <Image key={i} source={img} style={styles.profileImg} />
-        ))}
-      </Animated.View>
-    </View>
-  );
-};
-
-// Animated text
-const BlurText = ({ lines, center, slideIndex }) => {
+// Animated text component
+const AnimatedText = memo(({ lines, center, slideIndex }) => {
   const [anims, setAnims] = useState([]);
 
   useEffect(() => {
     const words = lines.flatMap(l => l.split(' '));
     const newAnims = words.map(() => new Animated.Value(0));
     setAnims(newAnims);
-    newAnims.forEach((a, i) => setTimeout(() => Animated.timing(a, { toValue: 1, duration: 400, useNativeDriver: true }).start(), i * 80));
+    newAnims.forEach((a, i) => setTimeout(() =>
+      Animated.timing(a, { toValue: 1, duration: 400, useNativeDriver: true }).start(), i * 80
+    ));
     return () => newAnims.forEach(a => a.stopAnimation());
   }, [slideIndex, lines]);
 
@@ -99,7 +57,7 @@ const BlurText = ({ lines, center, slideIndex }) => {
       ))}
     </View>
   );
-};
+});
 
 export default function WelcomeScreen({ navigation }) {
   const [slide, setSlide] = useState(0);
@@ -185,17 +143,23 @@ export default function WelcomeScreen({ navigation }) {
           {current.hasProfiles ? (
             <View style={styles.profilesWrap}>
               <View style={styles.rows}>
-                <ProfileRow /><ProfileRow reverse />
+                <ProfileMarquee />
+                <ProfileMarquee reverse speed={35000} />
                 <LinearGradient colors={['transparent', colors.blue.default]} style={styles.fadeOverlay} pointerEvents="none" />
               </View>
-              <View style={styles.center}><BlurText lines={current.lines} center slideIndex={slide} /></View>
+              <View style={styles.center}>
+                <AnimatedText lines={current.lines} center slideIndex={slide} />
+              </View>
               <View style={styles.rows}>
                 <LinearGradient colors={[colors.blue.default, 'transparent']} style={styles.fadeOverlay} pointerEvents="none" />
-                <ProfileRow /><ProfileRow reverse />
+                <ProfileMarquee />
+                <ProfileMarquee reverse speed={35000} />
               </View>
             </View>
           ) : (
-            <View style={styles.textWrap}><BlurText lines={current.lines} slideIndex={slide} /></View>
+            <View style={styles.textWrap}>
+              <AnimatedText lines={current.lines} slideIndex={slide} />
+            </View>
           )}
         </Animated.View>
 
@@ -231,9 +195,6 @@ const styles = StyleSheet.create({
   slideText: { fontSize: 40, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, lineHeight: 50 },
   slideTextCenter: { fontSize: 26, lineHeight: 34 },
   brand: { color: colors.orange.default },
-  marquee: { overflow: 'hidden', height: 96 },
-  marqueeRow: { flexDirection: 'row', gap: IMAGE_GAP },
-  profileImg: { width: 96, height: 96, borderRadius: 48, borderWidth: 2, borderColor: 'rgba(200,227,244,0.25)' },
   ctaWrap: { padding: 32 },
   cta: { height: 48, borderRadius: 99, overflow: 'hidden' },
   ctaInner: { position: 'absolute', top: 2, left: 2, right: 2, bottom: 2, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },

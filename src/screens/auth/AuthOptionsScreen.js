@@ -4,47 +4,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator,
-  KeyboardAvoidingView, Platform, ScrollView, Dimensions, Animated, Image,
+  KeyboardAvoidingView, Platform, ScrollView, Dimensions, Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Mail, ArrowRight } from 'lucide-react-native';
-import { colors, spacing, borderRadius, fontFamily } from '../../theme';
+import { colors, spacing, fontFamily } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
 import { validateEmail } from '../../lib/utils';
-import { LogoIcon, GoogleIcon, AppleIcon } from '../../components';
+import { LogoIcon, GoogleIcon, AppleIcon, ProfileMarquee } from '../../components';
 
 const { width } = Dimensions.get('window');
-
-const PROFILES = [
-  require('../../../assets/images/profiles/ayo-ogunseinde-6W4F62sN_yI-unsplash.jpg'),
-  require('../../../assets/images/profiles/brooke-cagle-Ss3wTFJPAVY-unsplash.jpg'),
-  require('../../../assets/images/profiles/daniel-monteiro-uGVqeh27EHE-unsplash.jpg'),
-  require('../../../assets/images/profiles/brooke-cagle-KriecpTIWgY-unsplash.jpg'),
-  require('../../../assets/images/profiles/natalia-blauth-gw2udfGe_tM-unsplash.jpg'),
-  require('../../../assets/images/profiles/jakob-owens-lkMJcGDZLVs-unsplash.jpg'),
-  require('../../../assets/images/profiles/rayul-_M6gy9oHgII-unsplash.jpg'),
-  require('../../../assets/images/profiles/arrul-lin-sYhUhse5uT8-unsplash.jpg'),
-];
-
-const SET_WIDTH = PROFILES.length * 108; // 96 + 12 gap
-
-const ProfileRow = ({ reverse }) => {
-  const anim = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(anim, { toValue: 1, duration: reverse ? 35000 : 30000, useNativeDriver: true }),
-      { resetBeforeIteration: true }
-    ).start();
-  }, []);
-
-  return (
-    <View style={styles.marquee}>
-      <Animated.View style={[styles.marqueeRow, { transform: [{ translateX: anim.interpolate({ inputRange: [0, 1], outputRange: reverse ? [-SET_WIDTH, 0] : [0, -SET_WIDTH] }) }] }]}>
-        {[...PROFILES, ...PROFILES, ...PROFILES].map((img, i) => <Image key={i} source={img} style={styles.profileImg} />)}
-      </Animated.View>
-    </View>
-  );
-};
 
 export default function AuthOptionsScreen({ navigation, route }) {
   const { login, sendOTP, isLoading } = useAuthStore();
@@ -84,7 +53,10 @@ export default function AuthOptionsScreen({ navigation, route }) {
     else if (!result.success) setError(result.error || 'Login failed');
   };
 
-  const animStyle = (i) => ({ opacity: fadeAnims[i], transform: [{ translateY: fadeAnims[i].interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] });
+  const animStyle = (i) => ({
+    opacity: fadeAnims[i],
+    transform: [{ translateY: fadeAnims[i].interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }]
+  });
 
   return (
     <View style={styles.container}>
@@ -97,8 +69,8 @@ export default function AuthOptionsScreen({ navigation, route }) {
             </View>
 
             <View style={styles.profiles}>
-              <ProfileRow />
-              <ProfileRow reverse />
+              <ProfileMarquee />
+              <ProfileMarquee reverse speed={35000} />
             </View>
 
             <View style={styles.bottom}>
@@ -150,7 +122,17 @@ export default function AuthOptionsScreen({ navigation, route }) {
       {showBlinds && (
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
           {blindsAnims.map((a, i) => (
-            <Animated.View key={i} style={[StyleSheet.absoluteFill, { backgroundColor: ['#4752C4', '#5865F2', 'rgba(88,101,242,0.8)', 'rgba(88,101,242,0.6)', 'rgba(88,101,242,0.4)'][i], zIndex: 5 - i, transform: [{ translateX: a.interpolate({ inputRange: [0, 1], outputRange: [0, width] }) }] }]} />
+            <Animated.View
+              key={i}
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  backgroundColor: ['#4752C4', '#5865F2', 'rgba(88,101,242,0.8)', 'rgba(88,101,242,0.6)', 'rgba(88,101,242,0.4)'][i],
+                  zIndex: 5 - i,
+                  transform: [{ translateX: a.interpolate({ inputRange: [0, 1], outputRange: [0, width] }) }]
+                }
+              ]}
+            />
           ))}
         </View>
       )}
@@ -164,9 +146,6 @@ const styles = StyleSheet.create({
   logoRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 32, paddingTop: 32, gap: 12 },
   logoText: { fontSize: 28, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, marginTop: 5 },
   profiles: { flex: 1, justifyContent: 'center', gap: 16, paddingVertical: spacing[4] },
-  marquee: { overflow: 'hidden', height: 96 },
-  marqueeRow: { flexDirection: 'row', gap: 12 },
-  profileImg: { width: 96, height: 96, borderRadius: 48, borderWidth: 2, borderColor: 'rgba(200,227,244,0.25)' },
   bottom: { paddingHorizontal: 32, paddingBottom: 32 },
   error: { backgroundColor: 'rgba(224,90,61,0.2)', padding: 12, borderRadius: 99, marginBottom: 16 },
   errorText: { color: colors.orange.light, fontSize: 12, fontFamily: fontFamily.bold, textAlign: 'center' },
