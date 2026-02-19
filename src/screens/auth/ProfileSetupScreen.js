@@ -2,24 +2,11 @@
  * Profile Setup Screen
  * Name, DOB, country, photo, bio, interests
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  Image,
-  Platform,
-  Modal,
-  FlatList,
-  ActivityIndicator,
-  Animated,
-  Dimensions,
-  TouchableWithoutFeedback,
+  View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView,
+  Image, Modal, FlatList, ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, ChevronDown, Camera, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -80,7 +67,6 @@ export default function ProfileSetupScreen({ navigation }) {
   });
   const [errors, setErrors] = useState({});
   const [showCountryPicker, setShowCountryPicker] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [interestSearch, setInterestSearch] = useState('');
 
   const filteredInterests = INTERESTS.filter(
@@ -159,15 +145,6 @@ export default function ProfileSetupScreen({ navigation }) {
       setFormData({ ...formData, dateOfBirth: selectedDate });
       setErrors({ ...errors, dateOfBirth: undefined });
     }
-  };
-
-  const formatDate = (date) => {
-    if (!date) return '';
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
   };
 
   const handleSubmit = () => {
@@ -250,23 +227,11 @@ export default function ProfileSetupScreen({ navigation }) {
 
           {/* Date of Birth */}
           <View style={styles.inputGroup}>
-            <TouchableOpacity
-              onPress={() => setShowDatePicker(true)}
-              style={[styles.selectButton, errors.dateOfBirth && styles.inputError]}
-            >
-              <Text
-                style={[
-                  styles.selectButtonText,
-                  !formData.dateOfBirth && styles.placeholderText,
-                ]}
-              >
-                {formData.dateOfBirth ? formatDate(formData.dateOfBirth) : 'Date of birth'}
-              </Text>
-              <ChevronDown size={16} color={colors.brown.default} />
-            </TouchableOpacity>
-            {errors.dateOfBirth && (
-              <Text style={styles.errorText}>{errors.dateOfBirth}</Text>
-            )}
+            <DatePicker
+              value={formData.dateOfBirth}
+              onChange={handleDateChange}
+              error={errors.dateOfBirth}
+            />
           </View>
 
           {/* Country */}
@@ -382,14 +347,6 @@ export default function ProfileSetupScreen({ navigation }) {
           )}
         </TouchableOpacity>
       </View>
-
-      {/* Date Picker */}
-      <DatePicker
-        visible={showDatePicker}
-        value={formData.dateOfBirth}
-        onChange={handleDateChange}
-        onClose={() => setShowDatePicker(false)}
-      />
 
       {/* Country Picker Modal */}
       <Modal
@@ -675,41 +632,6 @@ const styles = StyleSheet.create({
     color: colors.orange.default,
     textTransform: 'uppercase',
     letterSpacing: 3,
-  },
-  datePickerModalOverlay: {
-    flex: 1,
-    backgroundColor: Platform.OS === 'android' ? 'rgba(0,0,0,0.5)' : colors.white,
-    justifyContent: 'flex-end',
-  },
-  datePickerModal: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
-  },
-  datePickerContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing[4],
-  },
-  datePicker: {
-    width: '100%',
-    height: 200,
-  },
-  datePickerButtons: {
-    paddingHorizontal: spacing[4],
-    paddingBottom: spacing[4],
-  },
-  datePickerDoneButton: {
-    height: 48,
-    backgroundColor: colors.blue.default,
-    borderRadius: borderRadius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  datePickerDoneText: {
-    fontSize: fontSize.sm,
-    fontWeight: '700',
-    color: colors.white,
   },
   modalContainer: {
     flex: 1,
