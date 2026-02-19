@@ -1,223 +1,225 @@
 /**
- * Hactually Date Input Component
- * Standardized three-field date selector (Month / Day / Year)
+ * Hactually Date Picker Component
+ * Simple date input field with modal picker
  */
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, Platform,
+  View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView,
 } from 'react-native';
-import { ChevronDown, Check } from 'lucide-react-native';
+import { ChevronDown, X } from 'lucide-react-native';
 import { colors, spacing, fontSize, borderRadius, fontFamily, shadows } from '../theme';
 
-const MONTHS = [
-  { value: 0, label: 'January', short: 'Jan' },
-  { value: 1, label: 'February', short: 'Feb' },
-  { value: 2, label: 'March', short: 'Mar' },
-  { value: 3, label: 'April', short: 'Apr' },
-  { value: 4, label: 'May', short: 'May' },
-  { value: 5, label: 'June', short: 'Jun' },
-  { value: 6, label: 'July', short: 'Jul' },
-  { value: 7, label: 'August', short: 'Aug' },
-  { value: 8, label: 'September', short: 'Sep' },
-  { value: 9, label: 'October', short: 'Oct' },
-  { value: 10, label: 'November', short: 'Nov' },
-  { value: 11, label: 'December', short: 'Dec' },
-];
-
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 100 }, (_, i) => currentYear - 18 - i);
-
 const getDaysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
 
-// Dropdown select component
-const Select = ({ label, value, displayValue, options, onChange, placeholder }) => {
+const DatePicker = ({ value, onChange, label, error, placeholder = 'Date of birth' }) => {
   const [open, setOpen] = useState(false);
+  const [month, setMonth] = useState(value ? value.getMonth() : 0);
+  const [day, setDay] = useState(value ? value.getDate() : 1);
+  const [year, setYear] = useState(value ? value.getFullYear() : 2000);
+
+  const formatDate = (date) => {
+    if (!date) return '';
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  };
+
+  const handleDone = () => {
+    const maxDay = getDaysInMonth(month, year);
+    const validDay = Math.min(day, maxDay);
+    onChange(new Date(year, month, validDay));
+    setOpen(false);
+  };
+
+  const days = Array.from({ length: getDaysInMonth(month, year) }, (_, i) => i + 1);
 
   return (
-    <View style={styles.selectContainer}>
+    <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <TouchableOpacity style={styles.select} onPress={() => setOpen(true)} activeOpacity={0.7}>
-        <Text style={[styles.selectText, !value && styles.placeholder]}>
-          {displayValue || placeholder}
+
+      <TouchableOpacity
+        style={[styles.field, error && styles.fieldError]}
+        onPress={() => setOpen(true)}
+        activeOpacity={0.7}
+      >
+        <Text style={[styles.fieldText, !value && styles.placeholder]}>
+          {value ? formatDate(value) : placeholder}
         </Text>
         <ChevronDown size={16} color={colors.brown.default} />
       </TouchableOpacity>
 
-      <Modal visible={open} transparent animationType="fade">
-        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setOpen(false)}>
-          <View style={styles.dropdown}>
-            <View style={styles.dropdownHeader}>
-              <Text style={styles.dropdownTitle}>{label}</Text>
-            </View>
-            <ScrollView style={styles.optionsList} showsVerticalScrollIndicator={false}>
-              {options.map((opt) => (
-                <TouchableOpacity
-                  key={opt.value}
-                  style={[styles.option, value === opt.value && styles.optionSelected]}
-                  onPress={() => { onChange(opt.value); setOpen(false); }}
-                >
-                  <Text style={[styles.optionText, value === opt.value && styles.optionTextSelected]}>
-                    {opt.label}
-                  </Text>
-                  {value === opt.value && <Check size={16} color={colors.blue.default} />}
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-    </View>
-  );
-};
-
-const DatePicker = ({ value, onChange, label, error }) => {
-  const date = value instanceof Date ? value : null;
-  const [month, setMonth] = useState(date ? date.getMonth() : null);
-  const [day, setDay] = useState(date ? date.getDate() : null);
-  const [year, setYear] = useState(date ? date.getFullYear() : null);
-
-  const updateDate = (m, d, y) => {
-    if (m !== null && d !== null && y !== null) {
-      const maxDay = getDaysInMonth(m, y);
-      const validDay = Math.min(d, maxDay);
-      onChange(new Date(y, m, validDay));
-    }
-  };
-
-  const handleMonth = (m) => { setMonth(m); updateDate(m, day, year); };
-  const handleDay = (d) => { setDay(d); updateDate(month, d, year); };
-  const handleYear = (y) => { setYear(y); updateDate(month, day, y); };
-
-  const dayOptions = Array.from(
-    { length: month !== null && year ? getDaysInMonth(month, year) : 31 },
-    (_, i) => ({ value: i + 1, label: String(i + 1).padStart(2, '0') })
-  );
-
-  const yearOptions = YEARS.map(y => ({ value: y, label: String(y) }));
-
-  return (
-    <View style={styles.container}>
-      {label && <Text style={styles.mainLabel}>{label}</Text>}
-      <View style={styles.row}>
-        <Select
-          label="Month"
-          value={month}
-          displayValue={month !== null ? MONTHS[month].short : null}
-          options={MONTHS.map(m => ({ value: m.value, label: m.label }))}
-          onChange={handleMonth}
-          placeholder="Month"
-        />
-        <Select
-          label="Day"
-          value={day}
-          displayValue={day ? String(day).padStart(2, '0') : null}
-          options={dayOptions}
-          onChange={handleDay}
-          placeholder="Day"
-        />
-        <Select
-          label="Year"
-          value={year}
-          displayValue={year ? String(year) : null}
-          options={yearOptions}
-          onChange={handleYear}
-          placeholder="Year"
-        />
-      </View>
       {error && <Text style={styles.error}>{error}</Text>}
+
+      <Modal visible={open} transparent animationType="slide">
+        <View style={styles.overlay}>
+          <View style={styles.modal}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Select Date</Text>
+              <TouchableOpacity onPress={() => setOpen(false)}>
+                <X size={24} color={colors.black} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.picker}>
+              <View style={styles.column}>
+                <Text style={styles.colLabel}>Month</Text>
+                <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+                  {MONTHS.map((m, i) => (
+                    <TouchableOpacity key={m} style={[styles.option, month === i && styles.optionActive]} onPress={() => setMonth(i)}>
+                      <Text style={[styles.optionText, month === i && styles.optionTextActive]}>{m}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              <View style={[styles.column, { flex: 0.6 }]}>
+                <Text style={styles.colLabel}>Day</Text>
+                <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+                  {days.map((d) => (
+                    <TouchableOpacity key={d} style={[styles.option, day === d && styles.optionActive]} onPress={() => setDay(d)}>
+                      <Text style={[styles.optionText, day === d && styles.optionTextActive]}>{d}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              <View style={[styles.column, { flex: 0.8 }]}>
+                <Text style={styles.colLabel}>Year</Text>
+                <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+                  {YEARS.map((y) => (
+                    <TouchableOpacity key={y} style={[styles.option, year === y && styles.optionActive]} onPress={() => setYear(y)}>
+                      <Text style={[styles.optionText, year === y && styles.optionTextActive]}>{y}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+
+            <View style={styles.footer}>
+              <TouchableOpacity style={styles.doneBtn} onPress={handleDone}>
+                <Text style={styles.doneText}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { width: '100%' },
-  mainLabel: {
+  label: {
     fontSize: fontSize.sm,
     fontFamily: fontFamily.bold,
     fontWeight: '600',
     color: colors.brown.dark,
     marginBottom: spacing[2],
   },
-  row: { flexDirection: 'row', gap: spacing[3] },
-  selectContainer: { flex: 1 },
-  label: {
-    fontSize: fontSize.xs,
-    fontFamily: fontFamily.medium,
-    color: colors.brown.default,
-    marginBottom: spacing[1],
-  },
-  select: {
+  field: {
     height: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.full,
     borderWidth: 1,
     borderColor: colors.brown.light + '4D',
-    paddingHorizontal: spacing[3],
+    paddingHorizontal: spacing[4],
     ...shadows.card,
   },
-  selectText: {
+  fieldError: { borderColor: colors.orange.default },
+  fieldText: {
     fontSize: fontSize.sm,
-    fontFamily: fontFamily.medium,
+    fontFamily: fontFamily.regular,
     color: colors.black,
   },
   placeholder: { color: colors.brown.default + '80' },
+  error: {
+    fontSize: fontSize.xs,
+    color: colors.orange.default,
+    marginTop: spacing[1],
+    marginLeft: spacing[2],
+  },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing[6],
+    justifyContent: 'flex-end',
   },
-  dropdown: {
-    width: '100%',
-    maxWidth: 320,
-    maxHeight: '60%',
+  modal: {
     backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    ...shadows.lg,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
   },
-  dropdownHeader: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: spacing[4],
     borderBottomWidth: 1,
     borderBottomColor: colors.brown.light + '30',
   },
-  dropdownTitle: {
-    fontSize: fontSize.md,
+  title: {
+    fontSize: fontSize.lg,
     fontFamily: fontFamily.bold,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.black,
-    textAlign: 'center',
   },
-  optionsList: { maxHeight: 300 },
-  option: {
+  picker: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing[3],
-    paddingHorizontal: spacing[4],
-    borderBottomWidth: 1,
-    borderBottomColor: colors.brown.light + '20',
+    height: 220,
+    paddingHorizontal: spacing[3],
+    gap: spacing[2],
   },
-  optionSelected: { backgroundColor: colors.blue.default + '10' },
+  column: { flex: 1 },
+  colLabel: {
+    fontSize: fontSize.xs,
+    fontFamily: fontFamily.bold,
+    color: colors.brown.default,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    paddingVertical: spacing[2],
+  },
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.brown.lighter,
+    borderRadius: borderRadius.lg,
+  },
+  option: {
+    paddingVertical: spacing[2.5],
+    paddingHorizontal: spacing[2],
+    alignItems: 'center',
+  },
+  optionActive: {
+    backgroundColor: colors.blue.default,
+    borderRadius: borderRadius.md,
+    marginHorizontal: spacing[1],
+  },
   optionText: {
     fontSize: fontSize.sm,
-    fontFamily: fontFamily.regular,
-    color: colors.black,
+    fontFamily: fontFamily.medium,
+    color: colors.brown.default,
   },
-  optionTextSelected: {
+  optionTextActive: {
+    color: colors.white,
     fontFamily: fontFamily.bold,
-    fontWeight: '600',
-    color: colors.blue.default,
   },
-  error: {
-    fontSize: fontSize.xs,
-    fontFamily: fontFamily.regular,
-    color: colors.orange.default,
-    marginTop: spacing[2],
+  footer: { padding: spacing[4] },
+  doneBtn: {
+    height: 48,
+    backgroundColor: colors.blue.default,
+    borderRadius: borderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  doneText: {
+    fontSize: fontSize.sm,
+    fontFamily: fontFamily.bold,
+    fontWeight: '700',
+    color: colors.white,
   },
 });
 
