@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import { ChevronDown, ChevronRight, Eye, LogOut } from 'lucide-react-native';
+import { ChevronDown, ChevronRight, Eye, LogOut, Palette } from 'lucide-react-native';
 import { colors, spacing, borderRadius, fontFamily } from '../theme';
 import { useAuthStore } from '../store/authStore';
 
@@ -195,12 +195,21 @@ export default function FlowsScreen({ navigation }) {
           <Text style={styles.logo}>hactually</Text>
           <Text style={styles.subtitle}>User Stories - MVP</Text>
         </View>
-        {isAuthenticated && (
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <LogOut size={16} color={colors.orange.default} />
-            <Text style={styles.logoutText}>Logout</Text>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.designSystemButton}
+            onPress={() => navigation.navigate('StyleGuide')}
+          >
+            <Palette size={16} color={colors.blue.default} />
+            <Text style={styles.designSystemText}>Design System</Text>
           </TouchableOpacity>
-        )}
+          {isAuthenticated && (
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <LogOut size={16} color={colors.orange.default} />
+              <Text style={styles.logoutText}>Logout</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
@@ -268,6 +277,26 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.regular,
     color: colors.brown.default,
     marginTop: 2,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[2],
+  },
+  designSystemButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.blue.default + '15',
+  },
+  designSystemText: {
+    fontSize: 13,
+    fontFamily: fontFamily.bold,
+    fontWeight: '700',
+    color: colors.blue.default,
   },
   logoutButton: {
     flexDirection: 'row',

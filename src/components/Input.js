@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: 48,
-    borderRadius: borderRadius.xl,
+    borderRadius: borderRadius.full,
     borderWidth: 1,
     paddingHorizontal: spacing[4],
     ...shadows.card,

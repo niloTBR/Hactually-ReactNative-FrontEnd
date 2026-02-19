@@ -1,19 +1,9 @@
 /**
- * Welcome Screen - Onboarding intro with video carousel
- * Features: Video playback, blur text reveal, fade transitions,
- * tap navigation, press-hold pause, shimmer CTA button
+ * Welcome Screen - Onboarding with video carousel
  */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  TouchableWithoutFeedback,
-  Dimensions,
-  Animated,
-  Image,
-  Platform,
+  View, Text, StyleSheet, Pressable, Dimensions, Animated, Image, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
@@ -21,9 +11,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { LogoIcon } from '../../components/Logo';
 import { colors, spacing, borderRadius, fontFamily } from '../../theme';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-// Profile images for marquee
 const PROFILES = [
   require('../../../assets/images/profiles/ayo-ogunseinde-6W4F62sN_yI-unsplash.jpg'),
   require('../../../assets/images/profiles/brooke-cagle-Ss3wTFJPAVY-unsplash.jpg'),
@@ -35,213 +24,70 @@ const PROFILES = [
   require('../../../assets/images/profiles/arrul-lin-sYhUhse5uT8-unsplash.jpg'),
 ];
 
-// Slide content with video sources
 const SLIDES = [
-  {
-    lines: ["You've", 'shared a look with someone before.'],
-    video: require('../../../assets/videos/Video_1.mp4'),
-    hasVideo: true,
-  },
-  {
-    lines: ["The moment was real. Acting on it wasn't easy."],
-    video: require('../../../assets/videos/Video_2.mp4'),
-    hasVideo: true,
-  },
-  {
-    lines: ['continue the moment', 'with hactually'],
-    hasProfiles: true,
-  },
-  {
-    lines: ['Meet the ones', 'you almost missed!'],
-    video: require('../../../assets/videos/Video_4.mp4'),
-    hasVideo: true,
-    isFinal: true,
-    videoPosition: '70%', // Crop position for this video
-  },
+  { lines: ["You've", 'shared a look with someone before.'], video: require('../../../assets/videos/Video_1.mp4') },
+  { lines: ["The moment was real. Acting on it wasn't easy."], video: require('../../../assets/videos/Video_2.mp4') },
+  { lines: ['continue the moment', 'with hactually'], hasProfiles: true },
+  { lines: ['Meet the ones', 'you almost missed!'], video: require('../../../assets/videos/Video_4.mp4'), isFinal: true },
 ];
 
-// Shimmer animation component for CTA button
-const ShimmerButton = ({ onPress, children }) => {
-  const shimmerAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const animation = Animated.loop(
-      Animated.timing(shimmerAnim, {
-        toValue: 1,
-        duration: 3000,
-        useNativeDriver: true,
-      })
-    );
-    animation.start();
-    return () => animation.stop();
-  }, []);
-
-  const translateX = shimmerAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-width * 0.5, width * 1.5],
-  });
-
-  return (
-    <TouchableWithoutFeedback onPress={onPress}>
-      <View style={styles.ctaButton}>
-        {/* Orange gradient border */}
-        <LinearGradient
-          colors={['#C94A2F', '#E05A3D', '#C94A2F']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.ctaGradient}
-        />
-        {/* Frosted glass inner */}
-        <View style={styles.ctaInner}>
-          {/* Shimmer overlay */}
-          <Animated.View
-            style={[
-              styles.shimmerOverlay,
-              { transform: [{ translateX }] },
-            ]}
-          >
-            <LinearGradient
-              colors={['transparent', 'rgba(255,255,255,0.2)', 'transparent']}
-              style={styles.shimmerGradient}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-            />
-          </Animated.View>
-          {children}
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
-  );
-};
-
-// Calculate exact width of one set for seamless loop
 const IMAGE_SIZE = 96;
 const IMAGE_GAP = 12;
-const SINGLE_SET_WIDTH = PROFILES.length * (IMAGE_SIZE + IMAGE_GAP);
+const SET_WIDTH = PROFILES.length * (IMAGE_SIZE + IMAGE_GAP);
 
-// Marquee row component - smooth looping animation with real images
-const ProfileRow = ({ images, reverse = false }) => {
-  const animatedValue = useRef(new Animated.Value(0)).current;
+// Marquee row
+const ProfileRow = ({ reverse }) => {
+  const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    animatedValue.setValue(0);
     Animated.loop(
-      Animated.timing(animatedValue, {
-        toValue: 1,
-        duration: reverse ? 35000 : 30000,
-        useNativeDriver: true,
-        isInteraction: false,
-      }),
+      Animated.timing(anim, { toValue: 1, duration: reverse ? 35000 : 30000, useNativeDriver: true }),
       { resetBeforeIteration: true }
     ).start();
   }, []);
 
-  // Translate exactly one set width for seamless infinite loop
-  const translateX = animatedValue.interpolate({
+  const translateX = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: reverse ? [-SINGLE_SET_WIDTH, 0] : [0, -SINGLE_SET_WIDTH],
+    outputRange: reverse ? [-SET_WIDTH, 0] : [0, -SET_WIDTH],
   });
 
   return (
-    <View style={styles.marqueeContainer}>
-      <Animated.View
-        style={[
-          styles.marqueeRow,
-          { transform: [{ translateX }] },
-        ]}
-      >
-        {[...images, ...images, ...images].map((img, i) => (
-          <View key={i} style={styles.profileImageWrapper}>
-            <Image source={img} style={styles.profileImage} />
-          </View>
+    <View style={styles.marquee}>
+      <Animated.View style={[styles.marqueeRow, { transform: [{ translateX }] }]}>
+        {[...PROFILES, ...PROFILES, ...PROFILES].map((img, i) => (
+          <Image key={i} source={img} style={styles.profileImg} />
         ))}
       </Animated.View>
     </View>
   );
 };
 
-// Animated blur text reveal - simulates blur(8px) to blur(0) with opacity/translateY
-const BlurText = ({ lines, center = false, slideIndex }) => {
-  const [wordAnimations, setWordAnimations] = useState([]);
+// Animated text
+const BlurText = ({ lines, center, slideIndex }) => {
+  const [anims, setAnims] = useState([]);
 
   useEffect(() => {
-    // Create animation values for each word
-    const allWords = lines.flatMap((line) => line.split(' '));
-    const anims = allWords.map(() => new Animated.Value(0));
-    setWordAnimations(anims);
-
-    // Stagger the word reveal animation - smooth blur-like effect
-    const staggeredAnimations = anims.map((anim, index) =>
-      Animated.timing(anim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      })
-    );
-
-    // Start animations with stagger delay
-    anims.forEach((anim, index) => {
-      setTimeout(() => {
-        Animated.timing(anim, {
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }).start();
-      }, index * 80);
-    });
-
-    return () => {
-      anims.forEach((a) => a.stopAnimation());
-    };
+    const words = lines.flatMap(l => l.split(' '));
+    const newAnims = words.map(() => new Animated.Value(0));
+    setAnims(newAnims);
+    newAnims.forEach((a, i) => setTimeout(() => Animated.timing(a, { toValue: 1, duration: 400, useNativeDriver: true }).start(), i * 80));
+    return () => newAnims.forEach(a => a.stopAnimation());
   }, [slideIndex, lines]);
 
-  let wordIndex = 0;
-
+  let idx = 0;
   return (
     <View style={center && styles.centerText}>
-      {lines.map((line, lineIdx) => (
-        <View
-          key={lineIdx}
-          style={[styles.textLine, center && styles.centerTextLine]}
-        >
-          {line.split(' ').map((word, wordIdx) => {
-            const currentWordIndex = wordIndex++;
-            const isHactually = word.toLowerCase() === 'hactually';
-            const anim = wordAnimations[currentWordIndex];
-
-            // Simulate blur effect with opacity fade from 0 and slight vertical movement
-            const opacity = anim
-              ? anim.interpolate({
-                  inputRange: [0, 0.3, 1],
-                  outputRange: [0, 0.5, 1],
-                })
-              : 1;
-
-            const translateY = anim
-              ? anim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [8, 0],
-                })
-              : 0;
-
-            // Subtle scale for blur-like softness
-            const scale = anim
-              ? anim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [1.02, 1],
-                })
-              : 1;
-
+      {lines.map((line, li) => (
+        <View key={li} style={[styles.textLine, center && styles.centerLine]}>
+          {line.split(' ').map((word, wi) => {
+            const a = anims[idx++];
             return (
               <Animated.Text
-                key={wordIdx}
+                key={wi}
                 style={[
                   styles.slideText,
-                  isHactually && styles.brandText,
-                  {
-                    opacity,
-                    transform: [{ translateY }, { scale }],
-                  },
+                  word.toLowerCase() === 'hactually' && styles.brand,
+                  a && { opacity: a, transform: [{ translateY: a.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] },
                 ]}
               >
                 {word}{' '}
@@ -255,377 +101,132 @@ const BlurText = ({ lines, center = false, slideIndex }) => {
 };
 
 export default function WelcomeScreen({ navigation }) {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [slide, setSlide] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  const [paused, setPaused] = useState(false);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const videoRef = useRef(null);
-  const progressInterval = useRef(null);
   const startTime = useRef(Date.now());
-  const pausedAt = useRef(0);
 
-  const slide = SLIDES[currentSlide];
+  const current = SLIDES[slide];
 
-  // Handle slide progress
   useEffect(() => {
-    if (isPaused) {
-      if (progressInterval.current) {
-        clearInterval(progressInterval.current);
-      }
-      return;
-    }
-
-    startTime.current = Date.now() - (pausedAt.current || 0);
-
-    progressInterval.current = setInterval(() => {
-      const elapsed = Date.now() - startTime.current;
-      const newProgress = Math.min((elapsed / 5000) * 100, 100);
-      setProgress(newProgress);
-
-      if (newProgress >= 100 && currentSlide < SLIDES.length - 1) {
-        goToSlide(currentSlide + 1);
-      }
+    if (paused) return;
+    startTime.current = Date.now();
+    const interval = setInterval(() => {
+      const p = Math.min(((Date.now() - startTime.current) / 5000) * 100, 100);
+      setProgress(p);
+      if (p >= 100 && slide < SLIDES.length - 1) goTo(slide + 1);
     }, 16);
+    return () => clearInterval(interval);
+  }, [slide, paused]);
 
-    return () => {
-      if (progressInterval.current) {
-        clearInterval(progressInterval.current);
-      }
-    };
-  }, [currentSlide, isPaused]);
-
-  // Fade transition to new slide
-  const goToSlide = useCallback((newSlide) => {
-    if (newSlide < 0 || newSlide >= SLIDES.length) return;
-
-    pausedAt.current = 0;
-
-    // Fade out
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
-      setCurrentSlide(newSlide);
+  const goTo = useCallback((n) => {
+    if (n < 0 || n >= SLIDES.length) return;
+    Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
+      setSlide(n);
       setProgress(0);
-
-      // Fade in
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
     });
-  }, [fadeAnim]);
+  }, []);
 
-  // Handle tap - left side goes back, right side goes forward
-  const handleTap = (event) => {
-    // Use pageX for better cross-platform support (web + native)
-    const touchX = event.nativeEvent?.pageX || event.nativeEvent?.locationX || 0;
-    const isLeftSide = touchX < width / 2;
-
-    if (isLeftSide && currentSlide > 0) {
-      goToSlide(currentSlide - 1);
-    } else if (!isLeftSide && currentSlide < SLIDES.length - 1) {
-      goToSlide(currentSlide + 1);
+  const handleTap = (e) => {
+    let x = 0, w = width;
+    if (Platform.OS === 'web' && e.nativeEvent?.target?.getBoundingClientRect) {
+      const rect = e.nativeEvent.target.getBoundingClientRect();
+      w = rect.width;
+      x = e.nativeEvent.clientX - rect.left;
+    } else {
+      x = e.nativeEvent?.locationX ?? 0;
     }
-  };
-
-  // Handle long press - pause/resume
-  const handlePressIn = () => {
-    pausedAt.current = Date.now() - startTime.current;
-    setIsPaused(true);
-    if (videoRef.current) {
-      videoRef.current.pauseAsync();
-    }
-  };
-
-  const handlePressOut = () => {
-    setIsPaused(false);
-    if (videoRef.current) {
-      videoRef.current.playAsync();
-    }
-  };
-
-  const handleStart = () => {
-    navigation.navigate('AuthOptions', { showTransition: true });
+    if (x < w / 2 && slide > 0) goTo(slide - 1);
+    else if (x >= w / 2 && slide < SLIDES.length - 1) goTo(slide + 1);
   };
 
   return (
     <Pressable
       style={styles.container}
       onPress={handleTap}
-      onLongPress={() => {}} // Placeholder to enable long press detection
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      delayLongPress={200}
+      onPressIn={() => { setPaused(true); videoRef.current?.pauseAsync(); }}
+      onPressOut={() => { setPaused(false); videoRef.current?.playAsync(); }}
     >
-        {/* Background video */}
-        {slide.hasVideo && slide.video && (
-          <View style={styles.videoContainer}>
-            <Video
-              ref={videoRef}
-              source={slide.video}
-              style={[
-                styles.backgroundVideo,
-                Platform.OS === 'web' && {
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                },
-              ]}
-              videoStyle={Platform.OS === 'web' ? {
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: slide.isFinal ? 'right center' : 'center center',
-              } : undefined}
-              resizeMode={ResizeMode.COVER}
-              shouldPlay={!isPaused}
-              isLooping
-              isMuted
-              rate={slide.isFinal ? 0.5 : 1.0}
-            />
-          </View>
-        )}
+      {current.video && (
+        <View style={StyleSheet.absoluteFill}>
+          <Video
+            ref={videoRef}
+            source={current.video}
+            style={StyleSheet.absoluteFill}
+            videoStyle={Platform.OS === 'web' ? { width: '100%', height: '100%', objectFit: 'cover', objectPosition: current.isFinal ? 'right center' : 'center' } : undefined}
+            resizeMode={ResizeMode.COVER}
+            shouldPlay={!paused}
+            isLooping
+            isMuted
+            rate={current.isFinal ? 0.5 : 1}
+          />
+          <LinearGradient colors={['transparent', 'rgba(88,101,242,0.6)', 'rgba(88,101,242,0.9)']} locations={[0.4, 0.7, 1]} style={StyleSheet.absoluteFill} />
+        </View>
+      )}
 
-        {/* Gradient overlay for video slides - bottom blur effect */}
-        {slide.hasVideo && (
-          <>
-            <LinearGradient
-              colors={['transparent', 'rgba(88,101,242,0.6)', 'rgba(88,101,242,0.9)']}
-              locations={[0.4, 0.7, 1]}
-              style={styles.videoOverlay}
-            />
-          </>
-        )}
+      {!current.video && <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.blue.default }]} />}
 
-        {/* Non-video slide background */}
-        {!slide.hasVideo && <View style={styles.solidBackground} />}
-
-        <SafeAreaView style={styles.safeArea}>
-          {/* Progress bars */}
-          <View style={styles.progressContainer}>
-            {SLIDES.map((_, i) => (
-              <View key={i} style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    {
-                      width:
-                        i < currentSlide
-                          ? '100%'
-                          : i === currentSlide
-                          ? `${progress}%`
-                          : '0%',
-                    },
-                  ]}
-                />
-              </View>
-            ))}
-          </View>
-
-          {/* Logo - icon only on WelcomeScreen */}
-          <View style={styles.logoContainer}>
-            <LogoIcon size={48} />
-          </View>
-
-          {/* Content with fade animation */}
-          <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-            {slide.hasProfiles ? (
-              <View style={styles.profilesContent}>
-                <View style={styles.topProfiles}>
-                  <ProfileRow images={PROFILES} />
-                  <ProfileRow images={PROFILES} reverse />
-                </View>
-
-                <View style={styles.centerContent}>
-                  <BlurText lines={slide.lines} center slideIndex={currentSlide} />
-                </View>
-
-                <View style={styles.bottomProfiles}>
-                  <ProfileRow images={PROFILES} />
-                  <ProfileRow images={PROFILES} reverse />
-                </View>
-              </View>
-            ) : (
-              <View style={styles.textContent}>
-                <BlurText lines={slide.lines} slideIndex={currentSlide} />
-              </View>
-            )}
-          </Animated.View>
-
-          {/* CTA Button with shimmer */}
-          {slide.isFinal && (
-            <View style={styles.ctaContainer}>
-              <ShimmerButton onPress={handleStart}>
-                <Text style={styles.ctaText}>Start Spotting</Text>
-              </ShimmerButton>
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.progressRow}>
+          {SLIDES.map((_, i) => (
+            <View key={i} style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: i < slide ? '100%' : i === slide ? `${progress}%` : '0%' }]} />
             </View>
+          ))}
+        </View>
+
+        <View style={styles.logo}><LogoIcon size={48} /></View>
+
+        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+          {current.hasProfiles ? (
+            <View style={styles.profilesWrap}>
+              <View style={styles.rows}><ProfileRow /><ProfileRow reverse /></View>
+              <View style={styles.center}><BlurText lines={current.lines} center slideIndex={slide} /></View>
+              <View style={styles.rows}><ProfileRow /><ProfileRow reverse /></View>
+            </View>
+          ) : (
+            <View style={styles.textWrap}><BlurText lines={current.lines} slideIndex={slide} /></View>
           )}
-        </SafeAreaView>
+        </Animated.View>
+
+        {current.isFinal && (
+          <View style={styles.ctaWrap}>
+            <Pressable style={styles.cta} onPress={() => navigation.navigate('AuthOptions')}>
+              <LinearGradient colors={['#C94A2F', '#E05A3D', '#C94A2F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
+              <View style={styles.ctaInner}><Text style={styles.ctaText}>Start Spotting</Text></View>
+            </Pressable>
+          </View>
+        )}
+      </SafeAreaView>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.blue.default,
-  },
-  videoContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    overflow: 'hidden',
-    backgroundColor: colors.blue.default,
-  },
-  backgroundVideo: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  videoOverlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  solidBackground: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.blue.default,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    gap: 4,
-    paddingHorizontal: 32,
-    paddingTop: 32,
-    paddingBottom: 32,
-  },
-  progressBar: {
-    flex: 1,
-    height: 4,
-    borderRadius: borderRadius.full,
-    backgroundColor: 'rgba(200, 227, 244, 0.3)',
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.blue.light,
-    borderRadius: borderRadius.full,
-  },
-  logoContainer: {
-    paddingHorizontal: 32,
-  },
-  profilesContent: {
-    flex: 1,
-    justifyContent: 'space-between',
-    paddingVertical: spacing[8],
-  },
-  topProfiles: {
-    gap: 16,
-  },
-  bottomProfiles: {
-    gap: 16,
-  },
-  centerContent: {
-    paddingHorizontal: 32,
-    alignItems: 'center',
-  },
-  textContent: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    paddingHorizontal: 32,
-    paddingBottom: 0,
-  },
-  textLine: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  centerTextLine: {
-    justifyContent: 'center',
-  },
-  centerText: {
-    alignItems: 'center',
-  },
-  slideText: {
-    fontSize: 40,
-    fontFamily: fontFamily.bold,
-    fontWeight: '700',
-    color: colors.blue.light,
-    lineHeight: 50,
-  },
-  brandText: {
-    color: colors.orange.default,
-  },
-  marqueeContainer: {
-    overflow: 'hidden',
-    height: 96,
-  },
-  marqueeRow: {
-    flexDirection: 'row',
-    gap: spacing[3],
-  },
-  profileImageWrapper: {
-    width: 96,
-    height: 96,
-  },
-  profileImage: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    borderWidth: 2,
-    borderColor: 'rgba(200, 227, 244, 0.25)',
-  },
-  ctaContainer: {
-    paddingHorizontal: 32,
-    paddingTop: 32,
-    paddingBottom: 32,
-  },
-  ctaButton: {
-    height: 48,
-    borderRadius: borderRadius.full,
-    overflow: 'hidden',
-  },
-  ctaGradient: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  ctaInner: {
-    position: 'absolute',
-    top: 2,
-    left: 2,
-    right: 2,
-    bottom: 2,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  shimmerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: 80,
-  },
-  shimmerGradient: {
-    flex: 1,
-  },
-  ctaText: {
-    fontSize: 11,
-    fontFamily: fontFamily.bold,
-    fontWeight: '700',
-    color: colors.blue.light,
-    textTransform: 'uppercase',
-    letterSpacing: 3,
-  },
+  container: { flex: 1, backgroundColor: colors.blue.default },
+  safe: { flex: 1 },
+  progressRow: { flexDirection: 'row', gap: 4, paddingHorizontal: 32, paddingVertical: 32 },
+  progressBar: { flex: 1, height: 4, borderRadius: 99, backgroundColor: 'rgba(200,227,244,0.3)', overflow: 'hidden' },
+  progressFill: { height: '100%', backgroundColor: colors.blue.light, borderRadius: 99 },
+  logo: { paddingHorizontal: 32 },
+  content: { flex: 1 },
+  profilesWrap: { flex: 1, justifyContent: 'space-between', paddingVertical: spacing[8] },
+  rows: { gap: 16 },
+  center: { paddingHorizontal: 32, alignItems: 'center' },
+  textWrap: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 32 },
+  textLine: { flexDirection: 'row', flexWrap: 'wrap' },
+  centerLine: { justifyContent: 'center' },
+  centerText: { alignItems: 'center' },
+  slideText: { fontSize: 40, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, lineHeight: 50 },
+  brand: { color: colors.orange.default },
+  marquee: { overflow: 'hidden', height: 96 },
+  marqueeRow: { flexDirection: 'row', gap: IMAGE_GAP },
+  profileImg: { width: 96, height: 96, borderRadius: 48, borderWidth: 2, borderColor: 'rgba(200,227,244,0.25)' },
+  ctaWrap: { padding: 32 },
+  cta: { height: 48, borderRadius: 99, overflow: 'hidden' },
+  ctaInner: { position: 'absolute', top: 2, left: 2, right: 2, bottom: 2, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  ctaText: { fontSize: 11, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, textTransform: 'uppercase', letterSpacing: 3 },
 });
