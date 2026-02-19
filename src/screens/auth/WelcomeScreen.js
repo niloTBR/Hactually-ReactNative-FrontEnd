@@ -183,9 +183,15 @@ export default function WelcomeScreen({ navigation }) {
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
           {current.hasProfiles ? (
             <View style={styles.profilesWrap}>
-              <View style={styles.rows}><ProfileRow /><ProfileRow reverse /></View>
+              <View style={styles.rows}>
+                <ProfileRow /><ProfileRow reverse />
+                <LinearGradient colors={['transparent', colors.blue.default]} style={styles.fadeOverlay} pointerEvents="none" />
+              </View>
               <View style={styles.center}><BlurText lines={current.lines} center slideIndex={slide} /></View>
-              <View style={styles.rows}><ProfileRow /><ProfileRow reverse /></View>
+              <View style={styles.rows}>
+                <LinearGradient colors={[colors.blue.default, 'transparent']} style={styles.fadeOverlay} pointerEvents="none" />
+                <ProfileRow /><ProfileRow reverse />
+              </View>
             </View>
           ) : (
             <View style={styles.textWrap}><BlurText lines={current.lines} slideIndex={slide} /></View>
@@ -214,7 +220,8 @@ const styles = StyleSheet.create({
   logo: { paddingHorizontal: 32 },
   content: { flex: 1 },
   profilesWrap: { flex: 1, justifyContent: 'space-between', paddingVertical: spacing[8] },
-  rows: { gap: 16 },
+  rows: { gap: 16, position: 'relative' },
+  fadeOverlay: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
   center: { paddingHorizontal: 32, alignItems: 'center' },
   textWrap: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 32 },
   textLine: { flexDirection: 'row', flexWrap: 'wrap' },
