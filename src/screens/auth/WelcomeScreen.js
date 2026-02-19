@@ -86,6 +86,7 @@ const BlurText = ({ lines, center, slideIndex }) => {
                 key={wi}
                 style={[
                   styles.slideText,
+                  center && styles.slideTextCenter,
                   word.toLowerCase() === 'hactually' && styles.brand,
                   a && { opacity: a, transform: [{ translateY: a.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] },
                 ]}
@@ -228,6 +229,7 @@ const styles = StyleSheet.create({
   centerLine: { justifyContent: 'center' },
   centerText: { alignItems: 'center' },
   slideText: { fontSize: 40, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, lineHeight: 50 },
+  slideTextCenter: { fontSize: 26, lineHeight: 34 },
   brand: { color: colors.orange.default },
   marquee: { overflow: 'hidden', height: 96 },
   marqueeRow: { flexDirection: 'row', gap: IMAGE_GAP },
