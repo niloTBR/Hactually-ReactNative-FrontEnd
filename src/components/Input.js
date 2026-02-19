@@ -63,6 +63,7 @@ const Input = ({
       <View
         style={[
           styles.inputWrapper,
+          multiline && styles.inputWrapperMultiline,
           {
             borderColor: getBorderColor(),
             backgroundColor: colors.white,
@@ -140,6 +141,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: spacing[4],
     ...shadows.card,
+  },
+  inputWrapperMultiline: {
+    borderRadius: borderRadius.xl,
+    alignItems: 'flex-start',
+    paddingVertical: spacing[3],
   },
   input: {
     flex: 1,
