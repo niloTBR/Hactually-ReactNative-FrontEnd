@@ -1,78 +1,86 @@
 /**
  * Hactually 2.0 Typography System
- * Using Ezra font family (custom) with system fallbacks
+ * Ezra Bold for headlines, System font for body
  */
 
+// Primary font - Ezra Bold for headlines and display
+// Other weights fallback to system for consistency
 export const fontFamily = {
-  regular: 'Ezra-Regular',
-  medium: 'Ezra-Medium',
   bold: 'Ezra-Bold',
-  black: 'Ezra-Black',
-  // Fallback to system fonts
-  system: 'System',
+  // Fallbacks to system font (for backward compatibility)
+  regular: 'System',
+  medium: 'System',
+  black: 'Ezra-Bold', // Use bold as black fallback
 };
 
+// Secondary font - System font for body text and UI
+// iOS: San Francisco, Android: Roboto
+export const fontFamilySecondary = {
+  regular: 'System',
+  medium: 'System',
+  semibold: 'System',
+  bold: 'System',
+};
+
+// Font sizes based on actual app usage
 export const fontSize = {
-  xs: 12,      // captions, labels
-  sm: 14,      // secondary text
-  base: 16,    // body text
-  lg: 20,      // subheadings
-  xl: 24,      // headings
-  '2xl': 32,   // large headings
-  '3xl': 40,   // display
+  xs: 11,      // button text, uppercase labels
+  sm: 12,      // captions, small labels
+  base: 14,    // body text, inputs
+  lg: 28,      // titles, headings
+  xl: 40,      // display, hero text
 };
 
+// Line heights matched to font sizes
 export const lineHeight = {
-  xs: 15,
-  sm: 20,
-  base: 24,
-  lg: 28,
-  xl: 31,
-  '2xl': 38,
-  '3xl': 44,
+  xs: 14,
+  sm: 16,
+  base: 20,
+  lg: 36,
+  xl: 50,
 };
 
 // Pre-built text styles
 export const textStyles = {
+  // Headlines - Ezra Bold
   display: {
-    fontSize: fontSize['3xl'],
-    lineHeight: lineHeight['3xl'],
-    fontWeight: '900',
-  },
-  heading: {
-    fontSize: fontSize['2xl'],
-    lineHeight: lineHeight['2xl'],
-    fontWeight: '700',
-  },
-  title: {
+    fontFamily: fontFamily.bold,
     fontSize: fontSize.xl,
     lineHeight: lineHeight.xl,
     fontWeight: '700',
   },
-  subtitle: {
+  heading: {
+    fontFamily: fontFamily.bold,
     fontSize: fontSize.lg,
     lineHeight: lineHeight.lg,
-    fontWeight: '500',
+    fontWeight: '700',
   },
+  // Body - System font
   body: {
+    fontFamily: fontFamilySecondary.regular,
     fontSize: fontSize.base,
     lineHeight: lineHeight.base,
     fontWeight: '400',
   },
-  small: {
+  caption: {
+    fontFamily: fontFamilySecondary.regular,
     fontSize: fontSize.sm,
     lineHeight: lineHeight.sm,
     fontWeight: '400',
   },
-  caption: {
+  button: {
+    fontFamily: fontFamily.bold,
     fontSize: fontSize.xs,
     lineHeight: lineHeight.xs,
-    fontWeight: '400',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 3,
   },
 };
 
 export default {
   fontFamily,
+  fontFamilySecondary,
   fontSize,
   lineHeight,
   textStyles,

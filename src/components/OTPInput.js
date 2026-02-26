@@ -3,8 +3,8 @@
  * 6-digit code input with auto-advance
  */
 import React, { useRef, useEffect } from 'react';
-import { View, TextInput, StyleSheet, Keyboard } from 'react-native';
-import { colors, borderRadius, fontSize, spacing, shadows } from '../theme';
+import { View, TextInput, StyleSheet, Keyboard, Platform } from 'react-native';
+import { colors, borderRadius, spacing, shadows, typography } from '../theme';
 
 const OTPInput = ({
   value = ['', '', '', '', '', ''],
@@ -24,20 +24,23 @@ const OTPInput = ({
   }, [autoFocus]);
 
   const handleChange = (index, text) => {
+    // Get last character (handles paste and regular input)
+    const digit = text.slice(-1);
+
     // Only accept digits
-    if (text && !/^\d$/.test(text)) return;
+    if (digit && !/^\d$/.test(digit)) return;
 
     const newValue = [...value];
-    newValue[index] = text;
+    newValue[index] = digit;
     onChange(newValue);
 
     // Auto-advance to next input
-    if (text && index < length - 1) {
+    if (digit && index < length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
 
     // Check if complete
-    if (text && index === length - 1 && newValue.every((d) => d)) {
+    if (digit && index === length - 1 && newValue.every((d) => d)) {
       Keyboard.dismiss();
       onComplete?.(newValue.join(''));
     }
@@ -70,7 +73,7 @@ const OTPInput = ({
           value={value[index]}
           onChangeText={(text) => handleChange(index, text)}
           onKeyPress={(e) => handleKeyPress(index, e)}
-          keyboardType="number-pad"
+          keyboardType={Platform.OS === 'web' ? 'default' : 'number-pad'}
           maxLength={1}
           editable={!disabled}
           selectTextOnFocus
@@ -89,21 +92,22 @@ const OTPInput = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing[2],
+    justifyContent: 'flex-start',
+    gap: spacing.sm, // 8px
   },
   input: {
-    width: 44,
-    height: 52,
+    width: 48,
+    height: 56,
     borderRadius: borderRadius.xl,
     borderWidth: 1,
     borderColor: colors.brown.light + '4D',
     backgroundColor: colors.white,
-    fontSize: fontSize.xl,
+    fontSize: typography.h2.fontSize,
     fontWeight: '700',
     textAlign: 'center',
-    color: colors.black,
+    color: colors.brown.dark,
     ...shadows.card,
+    ...(Platform.OS === 'web' && { outlineStyle: 'none' }),
   },
   inputFilled: {
     borderColor: colors.blue.default,

@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { colors, borderRadius, fontSize, spacing, shadows } from '../theme';
+import { colors, borderRadius, spacing, shadows, typography } from '../theme';
 
 const Input = ({
   value,
@@ -128,10 +128,10 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    fontSize: fontSize.sm,
+    ...typography.caption,
     fontWeight: '500',
     color: colors.brown.dark,
-    marginBottom: spacing[2],
+    marginBottom: spacing.sm, // 8px
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -139,42 +139,42 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: borderRadius.full,
     borderWidth: 1,
-    paddingHorizontal: spacing[4],
+    paddingHorizontal: spacing.lg, // 16px
     ...shadows.card,
   },
   inputWrapperMultiline: {
     borderRadius: borderRadius.xl,
     alignItems: 'flex-start',
-    paddingVertical: spacing[3],
+    paddingVertical: spacing.md, // 12px
   },
   input: {
     flex: 1,
-    fontSize: fontSize.sm,
-    color: colors.black,
+    ...typography.body,
+    color: colors.brown.dark,
     height: '100%',
-    paddingVertical: spacing[3],
+    paddingVertical: spacing.md, // 12px
     ...(Platform.OS === 'web' && { outlineStyle: 'none' }),
   },
   multilineInput: {
     textAlignVertical: 'top',
-    paddingTop: spacing[3],
+    paddingTop: spacing.md, // 12px
   },
   disabledInput: {
     color: colors.brown.default,
     backgroundColor: colors.brown.lighter,
   },
   leftIcon: {
-    marginRight: spacing[3],
+    marginRight: spacing.md, // 12px
   },
   rightIcon: {
-    marginLeft: spacing[3],
-    padding: spacing[1],
+    marginLeft: spacing.md, // 12px
+    padding: spacing.xs, // 4px
   },
   error: {
-    fontSize: fontSize.xs,
+    ...typography.caption,
     color: colors.orange.default,
-    marginTop: spacing[1],
-    marginLeft: spacing[2],
+    marginTop: spacing.xs, // 4px
+    marginLeft: spacing.sm, // 8px
   },
 });
 

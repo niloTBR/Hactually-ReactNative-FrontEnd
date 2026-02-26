@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Mail, ArrowRight } from 'lucide-react-native';
-import { colors, spacing, fontFamily } from '../../theme';
+import { colors, spacing, fontFamily, fontFamilySecondary, fontSize, lineHeight } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
 import { validateEmail } from '../../lib/utils';
 import { LogoIcon, GoogleIcon, AppleIcon, ProfileMarquee } from '../../components';
@@ -144,20 +144,20 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.blue.default },
   scroll: { flexGrow: 1 },
   logoRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 32, paddingTop: 32, gap: 12 },
-  logoText: { fontSize: 28, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, marginTop: 5 },
+  logoText: { fontSize: fontSize.lg, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, marginTop: 5 },
   profiles: { flex: 1, justifyContent: 'center', gap: 16, paddingVertical: spacing[4] },
   bottom: { paddingHorizontal: 32, paddingBottom: 32 },
   error: { backgroundColor: 'rgba(224,90,61,0.2)', padding: 12, borderRadius: 99, marginBottom: 16 },
-  errorText: { color: colors.orange.light, fontSize: 12, fontFamily: fontFamily.bold, textAlign: 'center' },
-  title: { fontSize: 28, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, marginBottom: 24 },
+  errorText: { color: colors.orange.light, fontSize: fontSize.sm, fontFamily: fontFamily.bold, textAlign: 'center' },
+  title: { fontSize: fontSize.lg, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, marginBottom: 24 },
   inputRow: { flexDirection: 'row', alignItems: 'center', height: 48, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 99, paddingLeft: 16, paddingRight: 8, gap: 12 },
-  input: { flex: 1, fontSize: 14, fontFamily: fontFamily.regular, color: 'white', height: '100%', outlineStyle: 'none' },
+  input: { flex: 1, fontSize: fontSize.base, fontFamily: fontFamilySecondary.regular, color: 'white', height: '100%', outlineStyle: 'none' },
   submitBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
   divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 16, gap: 16 },
   line: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.2)' },
-  or: { color: 'rgba(255,255,255,0.4)', fontSize: 12, fontFamily: fontFamily.bold, textTransform: 'uppercase', letterSpacing: 2 },
+  or: { color: 'rgba(255,255,255,0.4)', fontSize: fontSize.sm, fontFamily: fontFamily.bold, textTransform: 'uppercase', letterSpacing: 2 },
   oauth: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 48, backgroundColor: 'rgba(200,227,244,0.15)', borderRadius: 99, borderWidth: 1, borderColor: 'rgba(200,227,244,0.2)', marginBottom: 12, gap: 8 },
-  oauthText: { fontSize: 14, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light },
-  oauthSmall: { fontSize: 12, fontFamily: fontFamily.regular, fontWeight: '400' },
-  terms: { color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: fontFamily.medium, textAlign: 'center', marginTop: 24, lineHeight: 18 },
+  oauthText: { fontSize: fontSize.base, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light },
+  oauthSmall: { fontSize: fontSize.sm, fontFamily: fontFamilySecondary.regular, fontWeight: '400' },
+  terms: { color: 'rgba(255,255,255,0.3)', fontSize: fontSize.sm, fontFamily: fontFamilySecondary.regular, textAlign: 'center', marginTop: 24, lineHeight: lineHeight.sm },
 });

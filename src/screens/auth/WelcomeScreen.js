@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import { LogoIcon, ProfileMarquee } from '../../components';
-import { colors, spacing, fontFamily } from '../../theme';
+import { colors, spacing, fontFamily, fontSize, lineHeight } from '../../theme';
 
 const { width } = Dimensions.get('window');
 
@@ -192,11 +192,11 @@ const styles = StyleSheet.create({
   textLine: { flexDirection: 'row', flexWrap: 'wrap' },
   centerLine: { justifyContent: 'center' },
   centerText: { alignItems: 'center' },
-  slideText: { fontSize: 40, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, lineHeight: 50 },
-  slideTextCenter: { fontSize: 26, lineHeight: 34 },
+  slideText: { fontSize: fontSize.xl, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, lineHeight: lineHeight.xl },
+  slideTextCenter: { fontSize: fontSize.lg, lineHeight: lineHeight.lg },
   brand: { color: colors.orange.default },
   ctaWrap: { padding: 32 },
   cta: { height: 48, borderRadius: 99, overflow: 'hidden' },
   ctaInner: { position: 'absolute', top: 2, left: 2, right: 2, bottom: 2, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
-  ctaText: { fontSize: 11, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, textTransform: 'uppercase', letterSpacing: 3 },
+  ctaText: { fontSize: fontSize.xs, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, textTransform: 'uppercase', letterSpacing: 3 },
 });
