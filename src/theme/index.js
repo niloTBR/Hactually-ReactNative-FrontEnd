@@ -1,25 +1,25 @@
 /**
  * Hactually 2.0 Theme System
- * LEAN Design Tokens - Semantic only
+ * LEAN Design Tokens
  */
 
-// New LEAN tokens (preferred)
-export { color, spacing, radius, typography } from './tokens';
-import { color, spacing, radius, typography } from './tokens';
+// LEAN tokens (primary exports)
+export { color, spacing, radius, typography, inputStyles } from './tokens';
+import { color, spacing, radius, typography, inputStyles } from './tokens';
 
-// Legacy exports (for backward compatibility during migration)
+// Ghost theme context (for automatic ghost variant theming)
+export { GhostTheme, useGhostTheme, DarkGreenTheme, DarkBlueTheme, DarkOrangeTheme, DarkBrownTheme } from './GhostTheme';
+
+// Core exports (still needed by components)
 export { colors, gradients } from './colors';
-export { fontFamily, fontFamilySecondary, fontSize, lineHeight, textStyles } from './typography';
-export { borderRadius } from './spacing';
 export { shadows } from './shadows';
-export { logoPath, logoAspectRatio, logoSizes, logoColors, appIconVariants, appIconContainerSizes } from './brand';
+export { fontFamily, fontFamilySecondary, fontSize } from './typography';
+export { borderRadius } from './spacing';
 
-// Legacy imports
 import { colors, gradients } from './colors';
-import { fontFamily, fontFamilySecondary, fontSize, lineHeight, textStyles } from './typography';
-import { borderRadius } from './spacing';
 import { shadows } from './shadows';
-import { logoPath, logoAspectRatio, logoSizes, logoColors, appIconVariants, appIconContainerSizes } from './brand';
+import { fontFamily, fontFamilySecondary, fontSize } from './typography';
+import { borderRadius } from './spacing';
 
 // Combined theme object
 const theme = {
@@ -28,22 +28,15 @@ const theme = {
   spacing,
   radius,
   typography,
-  // Legacy (remove after migration)
+  inputStyles,
+  // Core
   colors,
   gradients,
+  shadows,
   fontFamily,
   fontFamilySecondary,
   fontSize,
-  lineHeight,
-  textStyles,
   borderRadius,
-  shadows,
-  logoPath,
-  logoAspectRatio,
-  logoSizes,
-  logoColors,
-  appIconVariants,
-  appIconContainerSizes,
 };
 
 export default theme;

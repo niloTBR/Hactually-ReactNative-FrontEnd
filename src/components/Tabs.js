@@ -10,7 +10,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import { colors, borderRadius, fontSize, spacing } from '../theme';
+import { colors, radius, spacing, typography } from '../theme';
 
 const Tabs = ({
   tabs,
@@ -30,25 +30,25 @@ const Tabs = ({
       if (variant === 'pills') {
         return {
           backgroundColor: isActive ? colorScheme.default : 'transparent',
-          borderRadius: borderRadius.full,
-          paddingHorizontal: spacing[4],
-          paddingVertical: spacing[2],
+          borderRadius: radius.full,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.sm,
         };
       }
       if (variant === 'underline') {
         return {
           borderBottomWidth: 2,
           borderBottomColor: isActive ? colorScheme.default : 'transparent',
-          paddingBottom: spacing[2],
-          paddingHorizontal: spacing[4],
+          paddingBottom: spacing.sm,
+          paddingHorizontal: spacing.lg,
         };
       }
       // default
       return {
         backgroundColor: isActive ? colorScheme.light : 'transparent',
-        borderRadius: borderRadius.lg,
-        paddingHorizontal: spacing[4],
-        paddingVertical: spacing[2.5],
+        borderRadius: radius.lg,
+        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.md,
       };
     };
 
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: spacing[2],
+    marginRight: spacing.sm,
   },
   fullWidthTab: {
     flex: 1,
@@ -149,20 +149,20 @@ const styles = StyleSheet.create({
     marginRight: 0,
   },
   tabIcon: {
-    marginRight: spacing[2],
+    marginRight: spacing.sm,
   },
   tabText: {
-    fontSize: fontSize.sm,
+    fontSize: 12,
     fontWeight: '500',
   },
   activeTabText: {
     fontWeight: '700',
   },
   badge: {
-    marginLeft: spacing[2],
-    paddingHorizontal: spacing[2],
+    marginLeft: spacing.sm,
+    paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-    borderRadius: borderRadius.full,
+    borderRadius: radius.full,
     minWidth: 20,
     alignItems: 'center',
   },

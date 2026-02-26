@@ -67,14 +67,18 @@ export const LogoWithText = ({
     resolvedColor = logoColors.dark.orange;
   }
 
-  // Text size scales with logo size
-  const textSize = Math.max(14, resolvedSize * 0.65);
+  // Text size scales with logo size (1.5x larger)
+  const textSize = Math.max(14, resolvedSize * 1.0);
   const gap = Math.max(6, resolvedSize * 0.25);
+  const textOffset = Math.max(2, resolvedSize * 0.15); // Offset text lower
+
+  // Icon size 1.5x
+  const iconSize = resolvedSize * 1.5;
 
   return (
     <View style={[styles.container, { gap }]}>
-      <LogoMark size={resolvedSize} color={resolvedColor} />
-      <Text style={[styles.text, { color: resolvedColor, fontSize: textSize }]}>
+      <LogoMark size={iconSize} color={resolvedColor} />
+      <Text style={[styles.text, { color: resolvedColor, fontSize: textSize, marginTop: textOffset }]}>
         hactually
       </Text>
     </View>

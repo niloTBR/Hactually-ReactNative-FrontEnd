@@ -9,14 +9,21 @@ import {
   StyleSheet,
   ActivityIndicator,
   View,
-  Animated,
-  Easing,
-  PanResponder,
   Platform,
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { colors, borderRadius, shadows, typography } from '../theme';
+import { colors, gradients, radius, shadows, typography } from '../theme';
+
+// Create animated LinearGradient
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 /**
  * Button variants:
@@ -27,50 +34,64 @@ import { colors, borderRadius, shadows, typography } from '../theme';
 const Button = ({
   children,
   onPress,
-  variant = 'solid', // 'solid' | 'outline' | 'glass' | 'slide'
-  color = 'blue', // 'blue' | 'orange' | 'brown' | 'green'
+  variant = 'solid', // 'solid' | 'outline' | 'glass' | 'outline-gradient' | 'checkin'
+  color = 'blue', // 'blue' | 'orange' | 'brown' | 'green' | 'transparent' | 'dark'
   size = 'md', // 'sm' | 'md' | 'lg'
   fullWidth = false,
   disabled = false,
   loading = false,
   leftIcon,
   rightIcon,
-  caption, // Right-side caption text (e.g., "1 credit")
+  caption,
+  fillColor, // For outline-gradient: pass background color to match
   style,
   textStyle,
-  uppercase = false,
 }) => {
   const colorScheme = colors[color] || colors.blue;
-  const shimmerAnim = useRef(new Animated.Value(0)).current;
 
-  // Animation for solid shimmer and gradient border
+  // Reanimated shared values for smooth animations
+  const shimmerX = useSharedValue(0);
+  const rotation = useSharedValue(0);
+
+  // Shimmer animation for solid buttons - percentage based (0 to 100)
   useEffect(() => {
     if (variant === 'solid' && !disabled) {
-      Animated.loop(
-        Animated.timing(shimmerAnim, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: false,
-        })
-      ).start();
-    } else if ((variant === 'outline-gradient' || variant === 'checkin') && !disabled) {
-      Animated.loop(
-        Animated.timing(shimmerAnim, {
-          toValue: 1,
-          duration: 3000,
-          easing: Easing.linear,
-          useNativeDriver: false,
-        })
-      ).start();
+      shimmerX.value = 0;
+      shimmerX.value = withRepeat(
+        withTiming(100, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        -1,
+        false
+      );
     }
   }, [variant, disabled]);
+
+  // Rotation animation for gradient border buttons
+  useEffect(() => {
+    if ((variant === 'outline-gradient' || variant === 'checkin') && !disabled) {
+      rotation.value = 0;
+      rotation.value = withRepeat(
+        withTiming(360, { duration: 3000, easing: Easing.linear }),
+        -1,
+        false
+      );
+    }
+  }, [variant, disabled]);
+
+  // Shimmer travels from -50% to 150% of button width
+  const shimmerStyle = useAnimatedStyle(() => ({
+    left: `${shimmerX.value * 2 - 50}%`,
+    transform: [{ skewX: '-20deg' }],
+  }));
+
+  const rotationStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
 
   const sizeStyles = {
     sm: { height: 36, paddingHorizontal: 12 },
     md: { height: 48, paddingHorizontal: 20 },
     lg: { height: 56, paddingHorizontal: 24 },
   };
-
 
   const getTextColor = () => {
     if (disabled) return colors.brown.default;
@@ -87,13 +108,7 @@ const Button = ({
       ) : (
         <>
           {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
-          <Text
-            style={[
-              styles.text,
-              { color: getTextColor() },
-              textStyle,
-            ]}
-          >
+          <Text style={[styles.text, { color: getTextColor() }, textStyle]}>
             {children}
           </Text>
           {rightIcon && <View style={styles.iconRight}>{rightIcon}</View>}
@@ -102,7 +117,7 @@ const Button = ({
     </View>
   );
 
-  // Glass style button (semi-transparent with blur)
+  // Glass style button
   if (variant === 'glass') {
     return (
       <TouchableOpacity
@@ -118,15 +133,15 @@ const Button = ({
           style,
         ]}
       >
-        {Platform.OS === 'ios' ? (
+        {Platform.OS === 'ios' && (
           <BlurView intensity={20} style={StyleSheet.absoluteFill} tint="light" />
-        ) : null}
+        )}
         {buttonContent}
       </TouchableOpacity>
     );
   }
 
-  // Outline style button (simple border)
+  // Outline style button
   if (variant === 'outline') {
     return (
       <TouchableOpacity
@@ -148,17 +163,14 @@ const Button = ({
     );
   }
 
-  // Outline gradient style button (animated rotating gradient border)
+  // Outline gradient style button (fillColor matches any background)
   if (variant === 'outline-gradient') {
     const bw = 2;
     const btnHeight = sizeStyles[size].height;
-    const innerBg = color === 'dark' ? colors.brown.dark : colors.brown.mid;
-    const textColor = color === 'dark' ? colors.white : colors.brown.dark;
-
-    const rotation = shimmerAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['0deg', '360deg'],
-    });
+    const isDark = color === 'dark';
+    // Inner background: use fillColor prop, or fallback to beige/dark defaults
+    const innerBg = fillColor || (isDark ? colors.brown.dark : colors.brown.lighter);
+    const txtColor = isDark ? colors.white : colors.brown.dark;
 
     return (
       <TouchableOpacity
@@ -169,7 +181,7 @@ const Button = ({
           {
             height: btnHeight,
             paddingHorizontal: sizeStyles[size].paddingHorizontal + bw,
-            borderRadius: borderRadius.full,
+            borderRadius: radius.full,
             overflow: 'hidden',
             alignItems: 'center',
             justifyContent: 'center',
@@ -179,66 +191,41 @@ const Button = ({
           style,
         ]}
       >
-        {/* Rotating gradient background (acts as border) - smooth color wheel */}
-        <Animated.View
-          style={{
-            position: 'absolute',
-            width: 200,
-            height: 200,
-            transform: [{ rotate: rotation }],
-          }}
-        >
-          {/* Top half: orange to blue */}
+        <Animated.View style={[styles.gradientRotator, rotationStyle]}>
           <LinearGradient
-            colors={[colors.orange.default, colors.blue.default]}
+            colors={isDark ? gradients.borderLight : gradients.borderDark}
+            locations={[0, 0.25, 0.5, 0.75, 1]}
             start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{ flex: 1 }}
-          />
-          {/* Bottom half: green to brown */}
-          <LinearGradient
-            colors={[colors.green.default, colors.brown.default]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            end={{ x: 1, y: 1 }}
             style={{ flex: 1 }}
           />
         </Animated.View>
-        {/* Inner background (creates border effect) */}
+        {/* Inner fill creates the border effect */}
         <View
-          style={{
-            position: 'absolute',
-            top: bw,
-            left: bw,
-            right: bw,
-            bottom: bw,
-            borderRadius: borderRadius.full,
-            backgroundColor: innerBg,
-          }}
+          style={[
+            styles.gradientInner,
+            { top: bw, left: bw, right: bw, bottom: bw, backgroundColor: innerBg },
+          ]}
         />
-        {/* Text on top */}
-        <Text style={[styles.text, { color: textColor }, textStyle]}>
+        <Text style={[styles.text, { color: txtColor, zIndex: 2 }, textStyle]}>
           {children}
         </Text>
       </TouchableOpacity>
     );
   }
 
-  // Check-in style button with rotating gradient border, draggable circle with fill effect
+  // Check-in style button
   if (variant === 'checkin') {
     const bw = 2;
     const btnHeight = sizeStyles[size].height;
     const btnWidth = 320;
-    const innerBg = color === 'dark' ? colors.brown.dark : colors.brown.mid;
-    const textColor = color === 'dark' ? colors.white : colors.brown.dark;
+    const isDarkCheckin = color === 'dark';
+    // Light olive for light mode, dark for dark mode
+    const innerBg = isDarkCheckin ? colors.brown.dark : colors.brown.light;
+    const txtColor = isDarkCheckin ? colors.white : colors.brown.dark;
     const circleSize = btnHeight - bw * 2 - 6;
     const maxDrag = btnWidth - circleSize - bw * 2 - 8;
 
-    const rotation = shimmerAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['0deg', '360deg'],
-    });
-
-    // Drag state
     const [dragX, setDragX] = useState(0);
     const dragRef = useRef({ isDragging: false, startX: 0, currentDragX: 0 });
 
@@ -284,108 +271,40 @@ const Button = ({
       dragRef.current.startX = clientX - dragX;
     };
 
-    // Fill width based on drag position
     const fillWidth = dragX + circleSize + 4;
 
     return (
       <View
         style={[
-          {
-            height: btnHeight,
-            width: btnWidth,
-            borderRadius: borderRadius.full,
-            overflow: 'hidden',
-          },
+          { height: btnHeight, width: btnWidth, borderRadius: radius.full, overflow: 'hidden' },
           disabled && styles.disabled,
           style,
         ]}
       >
-        {/* Rotating gradient border */}
-        <Animated.View
-          style={{
-            position: 'absolute',
-            width: 400,
-            height: 400,
-            left: '50%',
-            top: '50%',
-            marginLeft: -200,
-            marginTop: -200,
-            transform: [{ rotate: rotation }],
-          }}
-        >
+        <Animated.View style={[styles.checkinGradientRotator, rotationStyle]}>
           <LinearGradient
-            colors={[colors.orange.default, colors.blue.default]}
+            colors={isDarkCheckin ? gradients.borderLight : gradients.borderDark}
+            locations={[0, 0.25, 0.5, 0.75, 1]}
             start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{ flex: 1 }}
-          />
-          <LinearGradient
-            colors={[colors.green.default, colors.brown.default]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            end={{ x: 1, y: 1 }}
             style={{ flex: 1 }}
           />
         </Animated.View>
-        {/* Inner background */}
-        <View
-          style={{
-            position: 'absolute',
-            top: bw,
-            left: bw,
-            right: bw,
-            bottom: bw,
-            borderRadius: borderRadius.full,
-            backgroundColor: innerBg,
-          }}
-        >
-          {/* Fill effect as you drag */}
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              bottom: 0,
-              width: fillWidth,
-              borderRadius: borderRadius.full,
-              backgroundColor: colors.blue.default,
-              opacity: 0.3,
-            }}
-          />
-          {/* Content row */}
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 3,
-            }}
-          >
-            {/* Draggable circle with arrow */}
+        <View style={[styles.checkinInner, { top: bw, left: bw, right: bw, bottom: bw, backgroundColor: innerBg }]}>
+          <View style={[styles.checkinFill, { width: fillWidth, backgroundColor: isDarkCheckin ? 'rgba(212, 228, 165, 0.4)' : 'rgba(224, 90, 61, 0.3)' }]} />
+          <View style={styles.checkinContent}>
             <View
               onMouseDown={handleMouseDown}
               onTouchStart={handleMouseDown}
-              style={{
-                width: circleSize,
-                height: circleSize,
-                borderRadius: circleSize / 2,
-                backgroundColor: colors.orange.default,
-                alignItems: 'center',
-                justifyContent: 'center',
-                transform: [{ translateX: dragX }],
-                cursor: 'grab',
-                zIndex: 10,
-                userSelect: 'none',
-              }}
+              style={[styles.checkinCircle, { width: circleSize, height: circleSize, borderRadius: circleSize / 2, transform: [{ translateX: dragX }], backgroundColor: isDarkCheckin ? colors.green.light : colors.orange.default }]}
             >
-              <Text style={{ color: colors.white, fontSize: 16, fontWeight: '600' }}>→</Text>
+              <Text style={[styles.checkinArrow, { color: isDarkCheckin ? colors.brown.dark : colors.white }]}>→</Text>
             </View>
-            {/* Text label - left aligned */}
-            <Text style={[styles.text, { color: textColor, marginLeft: 12, position: 'absolute', left: circleSize + 8 }, textStyle]}>
+            <Text style={[styles.text, { color: txtColor, marginLeft: 12, position: 'absolute', left: circleSize + 8 }, textStyle]}>
               {children}
             </Text>
-            {/* Right: Caption */}
             {caption && (
-              <Text style={[styles.caption, { color: textColor, position: 'absolute', right: 16 }]}>
+              <Text style={[styles.caption, { color: txtColor, position: 'absolute', right: 16 }]}>
                 {caption}
               </Text>
             )}
@@ -395,12 +314,7 @@ const Button = ({
     );
   }
 
-  // Solid style button with shimmer
-  const shimmerTranslate = shimmerAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-200, 200],
-  });
-
+  // Solid style button with smooth shimmer (default)
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -417,12 +331,14 @@ const Button = ({
       ]}
     >
       <View style={styles.shimmerContainer}>
-        <Animated.View
-          style={[
-            styles.shimmer,
-            { transform: [{ translateX: shimmerTranslate }] },
-          ]}
-        />
+        <Animated.View style={[styles.shimmer, shimmerStyle]}>
+          <LinearGradient
+            colors={['transparent', 'rgba(255,255,255,0.25)', 'rgba(255,255,255,0.4)', 'rgba(255,255,255,0.25)', 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={StyleSheet.absoluteFill}
+          />
+        </Animated.View>
       </View>
       {buttonContent}
     </TouchableOpacity>
@@ -431,7 +347,7 @@ const Button = ({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: borderRadius.full,
+    borderRadius: radius.full,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -445,22 +361,6 @@ const styles = StyleSheet.create({
   outlineButton: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-  },
-  outlineInner: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  gradientBtnWrapper: {
-    borderRadius: borderRadius.full,
-    overflow: 'hidden',
-  },
-  gradientBtnInner: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
   },
   fullWidth: {
     width: '100%',
@@ -487,15 +387,69 @@ const styles = StyleSheet.create({
   iconRight: {
     marginLeft: 8,
   },
+  // Shimmer styles
   shimmerContainer: {
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
   },
   shimmer: {
-    width: 100,
+    width: '50%',
     height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    transform: [{ skewX: '-20deg' }],
+    position: 'absolute',
+  },
+  // Gradient border styles - 600x600 to cover wide buttons
+  gradientRotator: {
+    position: 'absolute',
+    width: 600,
+    height: 600,
+    left: '50%',
+    top: '50%',
+    marginLeft: -300,
+    marginTop: -300,
+    zIndex: 0,
+  },
+  gradientInner: {
+    position: 'absolute',
+    borderRadius: radius.full,
+    zIndex: 1,
+  },
+  // Checkin styles - 600x600 to cover wide buttons
+  checkinGradientRotator: {
+    position: 'absolute',
+    width: 600,
+    height: 600,
+    left: '50%',
+    top: '50%',
+    marginLeft: -300,
+    marginTop: -300,
+  },
+  checkinInner: {
+    position: 'absolute',
+    borderRadius: radius.full,
+  },
+  checkinFill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    borderRadius: radius.full,
+  },
+  checkinContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 3,
+  },
+  checkinCircle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'grab',
+    zIndex: 10,
+    userSelect: 'none',
+  },
+  checkinArrow: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

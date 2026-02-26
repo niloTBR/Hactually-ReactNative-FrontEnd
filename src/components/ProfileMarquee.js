@@ -2,7 +2,7 @@
  * Profile Marquee - Seamless infinite scrolling profile images
  */
 import React, { useEffect, useRef, memo } from 'react';
-import { View, Image, Animated, StyleSheet } from 'react-native';
+import { View, Image, Animated, StyleSheet, Easing } from 'react-native';
 
 const DEFAULT_PROFILES = [
   require('../../assets/images/profiles/ayo-ogunseinde-6W4F62sN_yI-unsplash.jpg'),
@@ -27,18 +27,18 @@ const ProfileMarquee = memo(({ images = DEFAULT_PROFILES, reverse = false, speed
 
   useEffect(() => {
     mounted.current = true;
-    const loop = () => {
-      if (!mounted.current) return;
-      anim.setValue(reverse ? -setWidth : 0);
+    anim.setValue(reverse ? -setWidth : 0);
+    const animation = Animated.loop(
       Animated.timing(anim, {
         toValue: reverse ? 0 : -setWidth,
         duration: speed,
         useNativeDriver: true,
         isInteraction: false,
-      }).start(({ finished }) => finished && loop());
-    };
-    loop();
-    return () => { mounted.current = false; anim.stopAnimation(); };
+        easing: Easing.linear,
+      })
+    );
+    animation.start();
+    return () => { mounted.current = false; animation.stop(); };
   }, []);
 
   return (

@@ -1,22 +1,21 @@
 /**
  * OTP Verification Screen
- * 6-digit code input with auto-verify
+ * Dark green theme with ghost-style inputs
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   ActivityIndicator,
-  Keyboard,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, RefreshCw } from 'lucide-react-native';
-import { colors, spacing, fontSize, borderRadius, shadows } from '../../theme';
+import { color, spacing, typography, radius } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
+import { OTPInput, Logo } from '../../components';
 
 export default function OTPScreen({ navigation, route }) {
   const { email, devOTP } = route.params || {};
@@ -25,7 +24,6 @@ export default function OTPScreen({ navigation, route }) {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(30);
-  const inputRefs = useRef([]);
 
   // Countdown timer
   useEffect(() => {
@@ -35,38 +33,6 @@ export default function OTPScreen({ navigation, route }) {
     }
   }, [resendTimer]);
 
-  // Focus first input on mount
-  useEffect(() => {
-    setTimeout(() => inputRefs.current[0]?.focus(), 100);
-  }, []);
-
-  const handleChange = (index, value) => {
-    // Only accept digits
-    if (value && !/^\d$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    setError('');
-
-    // Auto-advance to next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-
-    // Auto-verify when complete
-    if (value && index === 5 && newOtp.every((d) => d)) {
-      Keyboard.dismiss();
-      handleVerify(newOtp.join(''));
-    }
-  };
-
-  const handleKeyPress = (index, e) => {
-    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
   const handleVerify = async (code) => {
     setError('');
     const result = await verifyOTP(email, code);
@@ -75,11 +41,9 @@ export default function OTPScreen({ navigation, route }) {
       if (result.isNewUser || !result.user.onboardingComplete) {
         navigation.navigate('ProfileSetup');
       }
-      // If onboarding complete, AppNavigator will handle navigation
     } else {
       setError(result.error || 'Invalid code. Please try again.');
       setOtp(['', '', '', '', '', '']);
-      inputRefs.current[0]?.focus();
     }
   };
 
@@ -91,7 +55,6 @@ export default function OTPScreen({ navigation, route }) {
       setResendTimer(30);
       setOtp(['', '', '', '', '', '']);
       setError('');
-      inputRefs.current[0]?.focus();
     }
   };
 
@@ -104,14 +67,16 @@ export default function OTPScreen({ navigation, route }) {
           style={styles.backButton}
           activeOpacity={0.8}
         >
-          <ChevronLeft size={24} color={colors.brown.default} />
+          <ChevronLeft size={24} color={color.green.light} />
         </TouchableOpacity>
+        <View style={styles.headerSpacer} />
+        <Logo size={32} color={color.green.light} />
       </View>
 
       {/* Content */}
       <View style={styles.content}>
-        <Text style={styles.title}>Enter the code</Text>
-        <Text style={styles.subtitle}>We sent a code to {email}</Text>
+        <Text style={styles.title}>enter the code</Text>
+        <Text style={styles.subtitle}>We sent a 6-digit code to {email}</Text>
 
         {/* Dev OTP helper */}
         {devOTP && (
@@ -130,26 +95,17 @@ export default function OTPScreen({ navigation, route }) {
           </View>
         ) : null}
 
-        {/* OTP Input */}
+        {/* OTP Input - using component library */}
         <View style={styles.otpContainer}>
-          {otp.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={(el) => (inputRefs.current[index] = el)}
-              value={digit}
-              onChangeText={(value) => handleChange(index, value)}
-              onKeyPress={(e) => handleKeyPress(index, e)}
-              keyboardType="number-pad"
-              maxLength={1}
-              selectTextOnFocus
-              editable={!isLoading}
-              style={[
-                styles.otpInput,
-                digit && styles.otpInputFilled,
-                error && styles.otpInputError,
-              ]}
-            />
-          ))}
+          <OTPInput
+            value={otp}
+            onChange={(val) => { setOtp(val); setError(''); }}
+            onComplete={handleVerify}
+            disabled={isLoading}
+            error={!!error}
+            variant="ghost"
+            themeColor={color.green.light}
+          />
         </View>
 
         {/* Resend */}
@@ -166,7 +122,7 @@ export default function OTPScreen({ navigation, route }) {
               style={styles.resendButton}
               activeOpacity={0.7}
             >
-              <RefreshCw size={14} color={colors.blue.default} />
+              <RefreshCw size={14} color={color.green.light} />
               <Text style={styles.resendButtonText}>Resend Code</Text>
             </TouchableOpacity>
           )}
@@ -176,7 +132,7 @@ export default function OTPScreen({ navigation, route }) {
       {/* Loading overlay */}
       {isLoading && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={colors.blue.default} />
+          <ActivityIndicator size="large" color={color.green.light} />
         </View>
       )}
     </SafeAreaView>
@@ -186,49 +142,51 @@ export default function OTPScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.brown.lighter,
+    backgroundColor: color.green.dark,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[3],
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+  },
+  headerSpacer: {
+    flex: 1,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.brown.light + '4D',
+    borderRadius: radius.full,
+    backgroundColor: color.green.light + '20',
     alignItems: 'center',
     justifyContent: 'center',
   },
   content: {
     flex: 1,
-    paddingHorizontal: spacing[6],
-    paddingTop: spacing[8],
+    paddingHorizontal: spacing['2xl'],
+    paddingTop: spacing['2xl'],
   },
   title: {
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-    color: colors.blue.default,
-    marginBottom: spacing[2],
+    ...typography.h2,
+    color: color.green.light,
+    marginBottom: spacing.sm,
   },
   subtitle: {
-    fontSize: fontSize.sm,
-    color: colors.brown.default,
-    marginBottom: spacing[8],
+    ...typography.caption,
+    color: color.green.light + '99',
+    marginBottom: spacing['2xl'],
   },
   devOtpContainer: {
-    backgroundColor: colors.blue.light + '4D',
+    backgroundColor: color.green.light + '20',
     borderWidth: 1,
-    borderColor: colors.blue.default + '33',
-    borderRadius: borderRadius.xl,
-    padding: spacing[3],
-    marginBottom: spacing[4],
+    borderColor: color.green.light + '40',
+    borderRadius: radius.full,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
   },
   devOtpText: {
-    fontSize: fontSize.xs,
-    color: colors.blue.default,
+    ...typography.caption,
+    color: color.green.light,
     textAlign: 'center',
   },
   devOtpCode: {
@@ -236,68 +194,48 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   errorContainer: {
-    backgroundColor: colors.orange.default + '1A',
-    borderWidth: 1,
-    borderColor: colors.orange.default + '33',
-    borderRadius: borderRadius.xl,
-    padding: spacing[3],
-    marginBottom: spacing[4],
+    backgroundColor: 'rgba(224,90,61,0.2)',
+    borderRadius: radius.full,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
   },
   errorText: {
-    fontSize: fontSize.xs,
-    color: colors.orange.default,
+    ...typography.caption,
+    color: color.orange.light,
     fontWeight: '700',
     textAlign: 'center',
   },
   otpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing[1.5],
-    marginBottom: spacing[8],
-  },
-  otpInput: {
-    width: 44,
-    height: 52,
-    borderRadius: borderRadius.xl,
-    borderWidth: 1,
-    borderColor: colors.brown.light + '4D',
-    backgroundColor: colors.white,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-    textAlign: 'center',
-    color: colors.black,
-    ...shadows.card,
-  },
-  otpInputFilled: {
-    borderColor: colors.blue.default,
-  },
-  otpInputError: {
-    borderColor: colors.orange.default,
+    marginBottom: spacing['2xl'],
   },
   resendContainer: {
     alignItems: 'center',
   },
   resendTimer: {
-    fontSize: fontSize.sm,
-    color: colors.brown.default,
+    ...typography.caption,
+    color: color.green.light + '80',
   },
   resendTimerBold: {
     fontWeight: '700',
-    color: colors.black,
+    color: color.green.light,
   },
   resendButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[2],
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.full,
+    backgroundColor: color.green.light + '20',
   },
   resendButtonText: {
-    fontSize: fontSize.sm,
+    ...typography.caption,
     fontWeight: '700',
-    color: colors.blue.default,
+    color: color.green.light,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.brown.lighter + 'CC',
+    backgroundColor: color.green.dark + 'E6',
     alignItems: 'center',
     justifyContent: 'center',
   },

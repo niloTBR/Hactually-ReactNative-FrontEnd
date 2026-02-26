@@ -20,7 +20,7 @@ export const logoSizes = {
   xxl: 96,
 };
 
-// Logo color variants
+// Logo color variants - using light/dark from colors.js consistently
 export const logoColors = {
   // Light variants (for dark backgrounds)
   light: {
@@ -31,10 +31,10 @@ export const logoColors = {
   },
   // Dark variants (for light backgrounds)
   dark: {
-    orange: colors.orange.default,
-    blue: colors.blue.default,
-    brown: colors.brown.default,
-    green: colors.green.default,
+    orange: colors.orange.default, // #E05A3D - vibrant coral
+    blue: colors.blue.default, // #5865F2 - vibrant blue
+    brown: colors.brown.dark,
+    green: colors.green.dark,
   },
 };
 

@@ -1,6 +1,7 @@
 /**
  * Hactually Input Component
  * Text input with icon support and validation states
+ * Supports solid (light bg) and ghost (dark bg) variants
  */
 import React, { useState } from 'react';
 import {
@@ -12,7 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { colors, borderRadius, spacing, shadows, typography } from '../theme';
+import { colors, color, radius, spacing, shadows, typography, useGhostTheme } from '../theme';
 
 const Input = ({
   value,
@@ -30,6 +31,8 @@ const Input = ({
   multiline = false,
   numberOfLines = 1,
   editable = true,
+  variant = 'solid', // 'solid' | 'ghost'
+  themeColor, // For ghost variant - auto-detected from context if not provided
   style,
   inputStyle,
   containerStyle,
@@ -39,6 +42,13 @@ const Input = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [internalValue, setInternalValue] = useState('');
+  const isGhost = variant === 'ghost';
+
+  // Use context theme if themeColor not explicitly provided
+  const ghostTheme = useGhostTheme();
+  const resolvedThemeColor = themeColor || ghostTheme.themeColor;
+  const isDarkBg = ghostTheme.isDark;
 
   const handleFocus = (e) => {
     setIsFocused(true);
@@ -50,15 +60,49 @@ const Input = ({
     onBlur?.(e);
   };
 
+  const handleChangeText = (text) => {
+    setInternalValue(text);
+    onChangeText?.(text);
+  };
+
+  // Check controlled value OR internal value for uncontrolled inputs
+  const hasValue = (value !== undefined ? value : internalValue).length > 0;
+
   const getBorderColor = () => {
-    if (error) return colors.orange.default;
-    if (isFocused) return colors.blue.default;
-    return colors.brown.light + '4D'; // 30% opacity
+    if (error) return isGhost ? color.error.light : color.error.dark;
+    // Full border (100%) when focused OR has value, otherwise 50% (80 hex)
+    if (isFocused || hasValue) return isGhost ? resolvedThemeColor : colors.blue.default;
+    return isGhost ? resolvedThemeColor + '80' : colors.brown.light + '80';
+  };
+
+  const getBackgroundColor = () => {
+    // Ghost: 10% fill when focused (1A hex), transparent otherwise
+    if (isGhost) return isFocused ? resolvedThemeColor + '1A' : 'transparent';
+    return colors.white;
+  };
+
+  const getTextColor = () => {
+    // Ghost: 100% theme color when typing
+    return isGhost ? resolvedThemeColor : colors.brown.dark;
+  };
+
+  const getPlaceholderColor = () => {
+    // Ghost: 75% opacity for placeholder (BF hex)
+    return isGhost ? resolvedThemeColor + 'BF' : colors.brown.default + 'BF';
+  };
+
+  const getLabelColor = () => {
+    // Labels: always 100% contrast color
+    return isGhost ? resolvedThemeColor : colors.brown.dark;
+  };
+
+  const getIconColor = () => {
+    return isGhost ? resolvedThemeColor : colors.brown.default;
   };
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={[styles.label, { color: getLabelColor() }]}>{label}</Text>}
 
       <View
         style={[
@@ -66,19 +110,24 @@ const Input = ({
           multiline && styles.inputWrapperMultiline,
           {
             borderColor: getBorderColor(),
-            backgroundColor: colors.white,
+            backgroundColor: getBackgroundColor(),
           },
+          !isGhost && shadows.card,
           multiline && { height: 'auto', minHeight: 48 * numberOfLines },
           style,
         ]}
       >
-        {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
+        {leftIcon && (
+          <View style={styles.leftIcon}>
+            {React.cloneElement(leftIcon, { color: getIconColor(), size: leftIcon.props.size || 18 })}
+          </View>
+        )}
 
         <TextInput
           value={value}
-          onChangeText={onChangeText}
+          onChangeText={handleChangeText}
           placeholder={placeholder}
-          placeholderTextColor={colors.brown.default + '80'}
+          placeholderTextColor={getPlaceholderColor()}
           secureTextEntry={secureTextEntry && !showPassword}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
@@ -91,10 +140,12 @@ const Input = ({
           onBlur={handleBlur}
           style={[
             styles.input,
+            { color: getTextColor() },
             leftIcon && { paddingLeft: 0 },
             (rightIcon || secureTextEntry) && { paddingRight: 0 },
             multiline && styles.multilineInput,
-            !editable && styles.disabledInput,
+            !editable && !isGhost && styles.disabledInput,
+            !editable && { opacity: 0.5 },
             inputStyle,
           ]}
           {...props}
@@ -106,19 +157,25 @@ const Input = ({
             style={styles.rightIcon}
           >
             {showPassword ? (
-              <EyeOff size={18} color={colors.brown.default} />
+              <EyeOff size={18} color={getIconColor()} />
             ) : (
-              <Eye size={18} color={colors.brown.default} />
+              <Eye size={18} color={getIconColor()} />
             )}
           </TouchableOpacity>
         )}
 
         {rightIcon && !secureTextEntry && (
-          <View style={styles.rightIcon}>{rightIcon}</View>
+          <View style={styles.rightIcon}>
+            {React.cloneElement(rightIcon, { color: getIconColor(), size: rightIcon.props.size || 18 })}
+          </View>
         )}
       </View>
 
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && (
+        <Text style={[styles.error, isGhost && { color: color.error.light }]}>
+          {error}
+        </Text>
+      )}
     </View>
   );
 };
@@ -130,51 +187,47 @@ const styles = StyleSheet.create({
   label: {
     ...typography.caption,
     fontWeight: '500',
-    color: colors.brown.dark,
-    marginBottom: spacing.sm, // 8px
+    marginBottom: spacing.sm,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     height: 48,
-    borderRadius: borderRadius.full,
+    borderRadius: radius.full,
     borderWidth: 1,
-    paddingHorizontal: spacing.lg, // 16px
-    ...shadows.card,
+    paddingHorizontal: spacing.lg,
   },
   inputWrapperMultiline: {
-    borderRadius: borderRadius.xl,
+    borderRadius: radius.lg,
     alignItems: 'flex-start',
-    paddingVertical: spacing.md, // 12px
+    paddingVertical: spacing.md,
   },
   input: {
     flex: 1,
     ...typography.body,
-    color: colors.brown.dark,
     height: '100%',
-    paddingVertical: spacing.md, // 12px
+    paddingVertical: spacing.md,
     ...(Platform.OS === 'web' && { outlineStyle: 'none' }),
   },
   multilineInput: {
     textAlignVertical: 'top',
-    paddingTop: spacing.md, // 12px
+    paddingTop: spacing.md,
   },
   disabledInput: {
-    color: colors.brown.default,
     backgroundColor: colors.brown.lighter,
   },
   leftIcon: {
-    marginRight: spacing.md, // 12px
+    marginRight: spacing.md,
   },
   rightIcon: {
-    marginLeft: spacing.md, // 12px
-    padding: spacing.xs, // 4px
+    marginLeft: spacing.md,
+    padding: spacing.xs,
   },
   error: {
     ...typography.caption,
-    color: colors.orange.default,
-    marginTop: spacing.xs, // 4px
-    marginLeft: spacing.sm, // 8px
+    color: colors.red.default,
+    marginTop: spacing.xs,
+    marginLeft: spacing.sm,
   },
 });
 

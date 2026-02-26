@@ -9,27 +9,33 @@ import { colors } from './colors';
 // References colors.js (single source of truth)
 // ============================================
 export const color = {
-  // Brand Colors
+  // Brand Colors - light/dark pairs from colors.js
   orange: {
     light: colors.orange.light,
-    dark: colors.orange.default,
+    dark: colors.orange.default, // #E05A3D - the vibrant coral
   },
   blue: {
     light: colors.blue.light,
-    dark: colors.blue.default,
+    dark: colors.blue.default, // #5865F2 - the vibrant blue
   },
   brown: {
     light: colors.brown.light,
-    dark: colors.brown.default,
+    dark: colors.brown.dark,
   },
   green: {
     light: colors.green.light,
-    dark: colors.green.default,
+    dark: colors.green.dark,
   },
 
   // Neutrals
   beige: colors.brown.lighter,
-  charcoal: colors.brown.dark,
+  charcoal: '#1A1A1A', // true charcoal black
+
+  // Error - distinct red that works on all backgrounds
+  error: {
+    light: colors.red.light,
+    dark: colors.red.default,
+  },
 };
 
 // ============================================
@@ -65,19 +71,16 @@ export const typography = {
   h1: {
     fontFamily: fontFamilyPrimary,
     fontSize: 40,
-    fontWeight: '700',
     lineHeight: 50,
   },
   h2: {
     fontFamily: fontFamilyPrimary,
     fontSize: 28,
-    fontWeight: '700',
     lineHeight: 36,
   },
   h3: {
     fontFamily: fontFamilyPrimary,
     fontSize: 20,
-    fontWeight: '700',
     lineHeight: 28,
   },
   body: {
@@ -109,6 +112,30 @@ export const typography = {
 };
 
 // ============================================
+// INPUT STYLES
+// ============================================
+export const inputStyles = {
+  // Solid: White background with subtle border (for light backgrounds)
+  solid: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(197, 198, 173, 0.3)', // brown.light with opacity
+  },
+  // Ghost: Transparent with visible border (for dark backgrounds)
+  ghost: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  // Shared base styles
+  base: {
+    height: 48,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.lg,
+  },
+};
+
+// ============================================
 // DEFAULT EXPORT
 // ============================================
 const tokens = {
@@ -116,6 +143,7 @@ const tokens = {
   spacing,
   radius,
   typography,
+  inputStyles,
 };
 
 export default tokens;

@@ -1,146 +1,229 @@
 /**
  * Hactually Date Picker Component
- * Simple date input field with modal picker
+ * Uses native date picker on iOS/Android, styled input on web
+ * Supports solid (light bg) and ghost (dark bg) variants
  */
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView,
+  View, Text, StyleSheet, TouchableOpacity, Modal, Platform,
 } from 'react-native';
-import { ChevronDown, X } from 'lucide-react-native';
-import { colors, spacing, fontSize, borderRadius, fontFamily, shadows } from '../theme';
+import { ChevronDown } from 'lucide-react-native';
+import { color, spacing, typography, radius, useGhostTheme } from '../theme';
+import { colors, shadows } from '../theme';
 
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const currentYear = new Date().getFullYear();
-const YEARS = Array.from({ length: 100 }, (_, i) => currentYear - 18 - i);
-const getDaysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
+// Only import DateTimePicker on native platforms
+let DateTimePicker = null;
+if (Platform.OS !== 'web') {
+  DateTimePicker = require('@react-native-community/datetimepicker').default;
+}
 
-const DatePicker = ({ value, onChange, label, error, placeholder = 'Date of birth' }) => {
-  const [open, setOpen] = useState(false);
-  const [month, setMonth] = useState(value ? value.getMonth() : 0);
-  const [day, setDay] = useState(value ? value.getDate() : 1);
-  const [year, setYear] = useState(value ? value.getFullYear() : 2000);
+const DatePicker = ({
+  value,
+  onChange,
+  label,
+  error,
+  placeholder = 'Date of birth',
+  variant = 'solid', // 'solid' | 'ghost'
+  themeColor, // For ghost variant - auto-detected from context if not provided
+}) => {
+  const [showPicker, setShowPicker] = useState(false);
+  const isGhost = variant === 'ghost';
+
+  // Use context theme if themeColor not explicitly provided
+  const ghostTheme = useGhostTheme();
+  const resolvedThemeColor = themeColor || ghostTheme.themeColor;
+  const isDarkBg = ghostTheme.isDark;
+  // Default to a reasonable birth year for adults
+  const defaultDate = new Date(2000, 0, 1);
 
   const formatDate = (date) => {
     if (!date) return '';
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   };
 
-  const handleDone = () => {
-    const maxDay = getDaysInMonth(month, year);
-    const validDay = Math.min(day, maxDay);
-    onChange(new Date(year, month, validDay));
-    setOpen(false);
+  const handleDateChange = (event, selectedDate) => {
+    if (Platform.OS === 'android') {
+      setShowPicker(false);
+    }
+    if (selectedDate) {
+      onChange(selectedDate);
+    }
   };
 
-  const days = Array.from({ length: getDaysInMonth(month, year) }, (_, i) => i + 1);
+  const handleWebDateChange = (e) => {
+    const dateValue = e.target.value;
+    if (dateValue) {
+      const [year, month, day] = dateValue.split('-').map(Number);
+      onChange(new Date(year, month - 1, day));
+    }
+  };
 
-  return (
-    <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
+  // Helper functions for ghost variant styling
+  const getFieldStyle = () => {
+    if (isGhost) {
+      return {
+        backgroundColor: 'transparent',
+        borderColor: error ? color.error.light : resolvedThemeColor + '80', // 50% when not focused
+        ...shadows.none,
+      };
+    }
+    return {
+      backgroundColor: colors.white,
+      borderColor: error ? color.error.dark : color.brown.light + '80',
+    };
+  };
 
-      <TouchableOpacity
-        style={[styles.field, error && styles.fieldError]}
-        onPress={() => setOpen(true)}
-        activeOpacity={0.7}
-      >
-        <Text style={[styles.fieldText, !value && styles.placeholder]}>
-          {value ? formatDate(value) : placeholder}
-        </Text>
-        <ChevronDown size={16} color={colors.brown.default} />
-      </TouchableOpacity>
+  const getTextColor = () => isGhost ? resolvedThemeColor : color.charcoal; // 100%
+  const getPlaceholderColor = () => isGhost ? resolvedThemeColor + 'BF' : color.brown.dark + 'BF'; // 75%
+  const getIconColor = () => isGhost ? resolvedThemeColor : color.brown.dark; // 100%
+  const getLabelColor = () => isGhost ? resolvedThemeColor : color.brown.dark; // 100%
+  const getErrorColor = () => isGhost ? color.error.light : color.error.dark;
 
-      {error && <Text style={styles.error}>{error}</Text>}
+  // Web: Use native HTML date input
+  if (Platform.OS === 'web') {
+    const webDateValue = value
+      ? `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`
+      : '';
 
-      <Modal visible={open} transparent animationType="slide">
-        <View style={styles.overlay}>
-          <View style={styles.modal}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Select Date</Text>
-              <TouchableOpacity onPress={() => setOpen(false)}>
-                <X size={24} color={colors.black} />
-              </TouchableOpacity>
-            </View>
+    // Use dark color scheme on dark backgrounds to get light icons
+    const colorScheme = isDarkBg ? 'dark' : 'light';
 
-            <View style={styles.picker}>
-              <View style={styles.column}>
-                <Text style={styles.colLabel}>Month</Text>
-                <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-                  {MONTHS.map((m, i) => (
-                    <TouchableOpacity key={m} style={[styles.option, month === i && styles.optionActive]} onPress={() => setMonth(i)}>
-                      <Text style={[styles.optionText, month === i && styles.optionTextActive]}>{m}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+    return (
+      <View style={styles.container}>
+        {label && <Text style={[styles.label, { color: getLabelColor() }]}>{label}</Text>}
+        <View style={[styles.field, !isGhost && shadows.card, getFieldStyle()]}>
+          <input
+            type="date"
+            value={webDateValue}
+            onChange={handleWebDateChange}
+            max={new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()).toISOString().split('T')[0]}
+            min={new Date(new Date().getFullYear() - 100, 0, 1).toISOString().split('T')[0]}
+            style={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              backgroundColor: 'transparent',
+              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+              fontSize: 14,
+              color: value ? getTextColor() : getPlaceholderColor(),
+              cursor: 'pointer',
+              colorScheme: colorScheme,
+              accentColor: resolvedThemeColor,
+            }}
+          />
+        </View>
+        {error && <Text style={[styles.error, { color: getErrorColor() }]}>{error}</Text>}
+      </View>
+    );
+  }
+
+  // iOS: Show modal with spinner picker
+  if (Platform.OS === 'ios') {
+    return (
+      <View style={styles.container}>
+        {label && <Text style={[styles.label, { color: getLabelColor() }]}>{label}</Text>}
+
+        <TouchableOpacity
+          style={[styles.field, !isGhost && shadows.card, getFieldStyle()]}
+          onPress={() => setShowPicker(true)}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.fieldText, { color: value ? getTextColor() : getPlaceholderColor() }]}>
+            {value ? formatDate(value) : placeholder}
+          </Text>
+          <ChevronDown size={16} color={getIconColor()} />
+        </TouchableOpacity>
+
+        {error && <Text style={[styles.error, { color: getErrorColor() }]}>{error}</Text>}
+
+        <Modal visible={showPicker} transparent animationType="slide">
+          <View style={styles.overlay}>
+            <View style={styles.modal}>
+              <View style={styles.header}>
+                <TouchableOpacity onPress={() => setShowPicker(false)}>
+                  <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <Text style={styles.title}>Date of Birth</Text>
+                <TouchableOpacity onPress={() => setShowPicker(false)}>
+                  <Text style={styles.doneText}>Done</Text>
+                </TouchableOpacity>
               </View>
 
-              <View style={[styles.column, { flex: 0.6 }]}>
-                <Text style={styles.colLabel}>Day</Text>
-                <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-                  {days.map((d) => (
-                    <TouchableOpacity key={d} style={[styles.option, day === d && styles.optionActive]} onPress={() => setDay(d)}>
-                      <Text style={[styles.optionText, day === d && styles.optionTextActive]}>{d}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-
-              <View style={[styles.column, { flex: 0.8 }]}>
-                <Text style={styles.colLabel}>Year</Text>
-                <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-                  {YEARS.map((y) => (
-                    <TouchableOpacity key={y} style={[styles.option, year === y && styles.optionActive]} onPress={() => setYear(y)}>
-                      <Text style={[styles.optionText, year === y && styles.optionTextActive]}>{y}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            </View>
-
-            <View style={styles.footer}>
-              <TouchableOpacity style={styles.doneBtn} onPress={handleDone}>
-                <Text style={styles.doneText}>Done</Text>
-              </TouchableOpacity>
+              {DateTimePicker && (
+                <DateTimePicker
+                  value={value || defaultDate}
+                  mode="date"
+                  display="spinner"
+                  onChange={handleDateChange}
+                  maximumDate={new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate())}
+                  minimumDate={new Date(new Date().getFullYear() - 100, 0, 1)}
+                  style={styles.picker}
+                />
+              )}
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      </View>
+    );
+  }
+
+  // Android: Show native date picker dialog
+  return (
+    <View style={styles.container}>
+      {label && <Text style={[styles.label, { color: getLabelColor() }]}>{label}</Text>}
+
+      <TouchableOpacity
+        style={[styles.field, !isGhost && shadows.card, getFieldStyle()]}
+        onPress={() => setShowPicker(true)}
+        activeOpacity={0.7}
+      >
+        <Text style={[styles.fieldText, { color: value ? getTextColor() : getPlaceholderColor() }]}>
+          {value ? formatDate(value) : placeholder}
+        </Text>
+        <ChevronDown size={16} color={getIconColor()} />
+      </TouchableOpacity>
+
+      {error && <Text style={[styles.error, { color: getErrorColor() }]}>{error}</Text>}
+
+      {showPicker && DateTimePicker && (
+        <DateTimePicker
+          value={value || defaultDate}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+          maximumDate={new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate())}
+          minimumDate={new Date(new Date().getFullYear() - 100, 0, 1)}
+        />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { width: '100%' },
+  container: {
+    width: '100%',
+  },
   label: {
-    fontSize: fontSize.sm,
-    fontFamily: fontFamily.bold,
-    fontWeight: '600',
-    color: colors.brown.dark,
-    marginBottom: spacing[2],
+    ...typography.caption,
+    fontWeight: '500',
+    marginBottom: spacing.sm,
   },
   field: {
     height: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.full,
+    borderRadius: radius.full,
     borderWidth: 1,
-    borderColor: colors.brown.light + '4D',
-    paddingHorizontal: spacing[4],
-    ...shadows.card,
+    paddingHorizontal: spacing.lg,
   },
-  fieldError: { borderColor: colors.orange.default },
   fieldText: {
-    fontSize: fontSize.sm,
-    fontFamily: fontFamily.regular,
-    color: colors.black,
+    ...typography.body,
   },
-  placeholder: { color: colors.brown.default + '80' },
   error: {
-    fontSize: fontSize.xs,
-    color: colors.orange.default,
-    marginTop: spacing[1],
-    marginLeft: spacing[2],
+    ...typography.caption,
+    marginTop: spacing.xs,
+    marginLeft: spacing.sm,
   },
   overlay: {
     flex: 1,
@@ -149,77 +232,33 @@ const styles = StyleSheet.create({
   },
   modal: {
     backgroundColor: colors.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '70%',
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: spacing[4],
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.brown.light + '30',
+    borderBottomColor: color.brown.light + '30',
   },
   title: {
-    fontSize: fontSize.lg,
-    fontFamily: fontFamily.bold,
-    fontWeight: '700',
-    color: colors.black,
+    ...typography.h3,
+    color: color.charcoal,
   },
-  picker: {
-    flexDirection: 'row',
-    height: 220,
-    paddingHorizontal: spacing[3],
-    gap: spacing[2],
-  },
-  column: { flex: 1 },
-  colLabel: {
-    fontSize: fontSize.xs,
-    fontFamily: fontFamily.bold,
-    color: colors.brown.default,
-    textAlign: 'center',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    paddingVertical: spacing[2],
-  },
-  scroll: {
-    flex: 1,
-    backgroundColor: colors.brown.lighter,
-    borderRadius: borderRadius.lg,
-  },
-  option: {
-    paddingVertical: spacing[2.5],
-    paddingHorizontal: spacing[2],
-    alignItems: 'center',
-  },
-  optionActive: {
-    backgroundColor: colors.blue.default,
-    borderRadius: borderRadius.md,
-    marginHorizontal: spacing[1],
-  },
-  optionText: {
-    fontSize: fontSize.sm,
-    fontFamily: fontFamily.medium,
-    color: colors.brown.default,
-  },
-  optionTextActive: {
-    color: colors.white,
-    fontFamily: fontFamily.bold,
-  },
-  footer: { padding: spacing[4] },
-  doneBtn: {
-    height: 48,
-    backgroundColor: colors.blue.default,
-    borderRadius: borderRadius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
+  cancelText: {
+    ...typography.body,
+    color: color.brown.dark,
   },
   doneText: {
-    fontSize: fontSize.sm,
-    fontFamily: fontFamily.bold,
-    fontWeight: '700',
-    color: colors.white,
+    ...typography.body,
+    fontWeight: '600',
+    color: color.blue.dark,
+  },
+  picker: {
+    height: 200,
   },
 });
 

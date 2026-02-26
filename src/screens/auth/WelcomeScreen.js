@@ -6,8 +6,8 @@ import { View, Text, StyleSheet, Pressable, Dimensions, Animated, Platform } fro
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
-import { LogoIcon, ProfileMarquee } from '../../components';
-import { colors, spacing, fontFamily, fontSize, lineHeight } from '../../theme';
+import { Logo, ProfileMarquee, Button } from '../../components';
+import { color, spacing, typography } from '../../theme';
 
 const { width } = Dimensions.get('window');
 
@@ -82,33 +82,23 @@ export default function WelcomeScreen({ navigation }) {
 
   const goTo = useCallback((n) => {
     if (n < 0 || n >= SLIDES.length) return;
-    Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
-      setSlide(n);
-      setProgress(0);
-      Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
-    });
-  }, []);
+    // Change slide immediately and animate in - more reliable than waiting for callback
+    setSlide(n);
+    setProgress(0);
+    fadeAnim.setValue(0);
+    Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+  }, [fadeAnim]);
 
-  const handleTap = (e) => {
-    let x = 0, w = width;
-    if (Platform.OS === 'web' && e.nativeEvent?.target?.getBoundingClientRect) {
-      const rect = e.nativeEvent.target.getBoundingClientRect();
-      w = rect.width;
-      x = e.nativeEvent.clientX - rect.left;
-    } else {
-      x = e.nativeEvent?.locationX ?? 0;
-    }
-    if (x < w / 2 && slide > 0) goTo(slide - 1);
-    else if (x >= w / 2 && slide < SLIDES.length - 1) goTo(slide + 1);
-  };
+  const handlePrev = useCallback(() => {
+    if (slide > 0) goTo(slide - 1);
+  }, [slide, goTo]);
+
+  const handleNext = useCallback(() => {
+    if (slide < SLIDES.length - 1) goTo(slide + 1);
+  }, [slide, goTo]);
 
   return (
-    <Pressable
-      style={styles.container}
-      onPress={handleTap}
-      onPressIn={() => { setPaused(true); videoRef.current?.pauseAsync(); }}
-      onPressOut={() => { setPaused(false); videoRef.current?.playAsync(); }}
-    >
+    <View style={styles.container}>
       {current.video && (
         <View style={StyleSheet.absoluteFill}>
           <Video
@@ -126,7 +116,7 @@ export default function WelcomeScreen({ navigation }) {
         </View>
       )}
 
-      {!current.video && <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.blue.default }]} />}
+      {!current.video && <View style={[StyleSheet.absoluteFill, { backgroundColor: color.blue.dark }]} />}
 
       <SafeAreaView style={styles.safe}>
         <View style={styles.progressRow}>
@@ -137,27 +127,27 @@ export default function WelcomeScreen({ navigation }) {
           ))}
         </View>
 
-        <View style={styles.logo}><LogoIcon size={48} /></View>
+        <View style={styles.logo}><Logo size={48} color={color.blue.light} /></View>
 
-        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+        <Animated.View style={[styles.content, { opacity: fadeAnim }]} pointerEvents="box-none">
           {current.hasProfiles ? (
             <View style={styles.profilesWrap}>
               <View style={styles.rows}>
                 <ProfileMarquee />
                 <ProfileMarquee reverse speed={35000} />
-                <LinearGradient colors={['transparent', colors.blue.default]} style={styles.fadeOverlay} pointerEvents="none" />
+                <LinearGradient colors={['transparent', color.blue.dark]} style={styles.fadeOverlay} />
               </View>
               <View style={styles.center}>
                 <AnimatedText lines={current.lines} center slideIndex={slide} />
               </View>
               <View style={styles.rows}>
-                <LinearGradient colors={[colors.blue.default, 'transparent']} style={styles.fadeOverlay} pointerEvents="none" />
+                <LinearGradient colors={[color.blue.dark, 'transparent']} style={styles.fadeOverlay} />
                 <ProfileMarquee />
                 <ProfileMarquee reverse speed={35000} />
               </View>
             </View>
           ) : (
-            <View style={styles.textWrap}>
+            <View style={[styles.textWrap, !current.isFinal && styles.textWrapPadded]}>
               <AnimatedText lines={current.lines} slideIndex={slide} />
             </View>
           )}
@@ -165,38 +155,54 @@ export default function WelcomeScreen({ navigation }) {
 
         {current.isFinal && (
           <View style={styles.ctaWrap}>
-            <Pressable style={styles.cta} onPress={() => navigation.navigate('AuthOptions')}>
-              <LinearGradient colors={['#C94A2F', '#E05A3D', '#C94A2F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
-              <View style={styles.ctaInner}><Text style={styles.ctaText}>Start Spotting</Text></View>
-            </Pressable>
+            <Button variant="solid" color="orange" size="lg" onPress={() => navigation.navigate('AuthOptions')}>
+              Start Spotting
+            </Button>
           </View>
         )}
       </SafeAreaView>
-    </Pressable>
+
+      {/* Tap zones for navigation */}
+      <View style={styles.tapZones} pointerEvents="box-none">
+        <Pressable
+          style={styles.tapLeft}
+          onPress={handlePrev}
+          onPressIn={() => { setPaused(true); videoRef.current?.pauseAsync(); }}
+          onPressOut={() => { setPaused(false); videoRef.current?.playAsync(); }}
+        />
+        <Pressable
+          style={styles.tapRight}
+          onPress={handleNext}
+          onPressIn={() => { setPaused(true); videoRef.current?.pauseAsync(); }}
+          onPressOut={() => { setPaused(false); videoRef.current?.playAsync(); }}
+        />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.blue.default },
+  container: { flex: 1, backgroundColor: color.blue.dark },
   safe: { flex: 1 },
-  progressRow: { flexDirection: 'row', gap: 4, paddingHorizontal: 32, paddingVertical: 32 },
+  tapZones: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 100, flexDirection: 'row' },
+  tapLeft: { flex: 1 },
+  tapRight: { flex: 1 },
+  progressRow: { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing['2xl'], paddingVertical: spacing['2xl'] },
   progressBar: { flex: 1, height: 4, borderRadius: 99, backgroundColor: 'rgba(200,227,244,0.3)', overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: colors.blue.light, borderRadius: 99 },
-  logo: { paddingHorizontal: 32 },
+  progressFill: { height: '100%', backgroundColor: color.blue.light, borderRadius: 99 },
+  logo: { paddingHorizontal: spacing['2xl'] },
   content: { flex: 1 },
-  profilesWrap: { flex: 1, justifyContent: 'space-between', paddingVertical: spacing[8] },
-  rows: { gap: 16, position: 'relative' },
+  profilesWrap: { flex: 1, justifyContent: 'space-between', paddingVertical: spacing['2xl'] },
+  rows: { gap: spacing.lg, position: 'relative' },
   fadeOverlay: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
-  center: { paddingHorizontal: 32, alignItems: 'center' },
-  textWrap: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 32 },
+  center: { paddingHorizontal: spacing['2xl'], alignItems: 'center' },
+  textWrap: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: spacing['2xl'] },
+  textWrapPadded: { paddingBottom: spacing['2xl'] },
   textLine: { flexDirection: 'row', flexWrap: 'wrap' },
   centerLine: { justifyContent: 'center' },
   centerText: { alignItems: 'center' },
-  slideText: { fontSize: fontSize.xl, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, lineHeight: lineHeight.xl },
-  slideTextCenter: { fontSize: fontSize.lg, lineHeight: lineHeight.lg },
-  brand: { color: colors.orange.default },
-  ctaWrap: { padding: 32 },
-  cta: { height: 48, borderRadius: 99, overflow: 'hidden' },
-  ctaInner: { position: 'absolute', top: 2, left: 2, right: 2, bottom: 2, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
-  ctaText: { fontSize: fontSize.xs, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, textTransform: 'uppercase', letterSpacing: 3 },
+  slideText: { ...typography.h1, color: color.blue.light },
+  slideTextCenter: { ...typography.h2 },
+  brand: { color: color.orange.dark },
+  ctaWrap: { padding: spacing['2xl'] },
 });

@@ -1,17 +1,18 @@
 /**
  * Auth Options Screen - Email, Google, Apple sign-in
+ * Green theme with ghost-style inputs
  */
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator,
+  View, Text, StyleSheet, TouchableOpacity,
   KeyboardAvoidingView, Platform, ScrollView, Dimensions, Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Mail, ArrowRight } from 'lucide-react-native';
-import { colors, spacing, fontFamily, fontFamilySecondary, fontSize, lineHeight } from '../../theme';
+import { Mail } from 'lucide-react-native';
+import { color, spacing, typography, radius, inputStyles, GhostTheme } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
 import { validateEmail } from '../../lib/utils';
-import { LogoIcon, GoogleIcon, AppleIcon, ProfileMarquee } from '../../components';
+import { Logo, GoogleIcon, AppleIcon, ProfileMarquee, Button, GhostInput } from '../../components';
 
 const { width } = Dimensions.get('window');
 
@@ -64,7 +65,7 @@ export default function AuthOptionsScreen({ navigation, route }) {
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
             <View style={styles.logoRow}>
-              <LogoIcon size={44} />
+              <Logo size={44} color={color.green.light} />
               <Text style={styles.logoText}>hactually</Text>
             </View>
 
@@ -78,21 +79,19 @@ export default function AuthOptionsScreen({ navigation, route }) {
 
               <Text style={styles.title}>continue the moment</Text>
 
-              <Animated.View style={[styles.inputRow, animStyle(0)]}>
-                <Mail size={16} color="rgba(255,255,255,0.5)" />
-                <TextInput
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="Enter your email"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  style={styles.input}
-                  onSubmitEditing={handleEmailSubmit}
-                />
-                <TouchableOpacity onPress={handleEmailSubmit} disabled={isLoading || !email.trim()} style={[styles.submitBtn, (!email.trim() || isLoading) && { opacity: 0.3 }]}>
-                  {isLoading ? <ActivityIndicator size="small" color="white" /> : <ArrowRight size={16} color="white" />}
-                </TouchableOpacity>
+              <Animated.View style={animStyle(0)}>
+                <GhostTheme themeColor={color.green.light} isDark={true}>
+                  <GhostInput
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="Enter your email"
+                    leftIcon={<Mail />}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    onSubmit={handleEmailSubmit}
+                    loading={isLoading}
+                  />
+                </GhostTheme>
               </Animated.View>
 
               <Animated.View style={[styles.divider, animStyle(1)]}>
@@ -101,13 +100,13 @@ export default function AuthOptionsScreen({ navigation, route }) {
 
               <Animated.View style={animStyle(2)}>
                 <TouchableOpacity onPress={() => handleOAuth('google')} style={styles.oauth}>
-                  <GoogleIcon size={20} /><Text style={styles.oauthText}><Text style={styles.oauthSmall}>continue with </Text>Google</Text>
+                  <GoogleIcon size={20} color={color.green.light} /><Text style={styles.oauthText}><Text style={styles.oauthSmall}>continue with </Text>Google</Text>
                 </TouchableOpacity>
               </Animated.View>
 
               <Animated.View style={animStyle(3)}>
                 <TouchableOpacity onPress={() => handleOAuth('apple')} style={styles.oauth}>
-                  <AppleIcon size={24} /><Text style={styles.oauthText}><Text style={styles.oauthSmall}>continue with </Text>Apple</Text>
+                  <AppleIcon size={24} color={color.green.light} /><Text style={styles.oauthText}><Text style={styles.oauthSmall}>continue with </Text>Apple</Text>
                 </TouchableOpacity>
               </Animated.View>
 
@@ -127,7 +126,7 @@ export default function AuthOptionsScreen({ navigation, route }) {
               style={[
                 StyleSheet.absoluteFill,
                 {
-                  backgroundColor: ['#4752C4', '#5865F2', 'rgba(88,101,242,0.8)', 'rgba(88,101,242,0.6)', 'rgba(88,101,242,0.4)'][i],
+                  backgroundColor: [color.green.dark, color.green.dark, 'rgba(74,124,124,0.8)', 'rgba(74,124,124,0.6)', 'rgba(74,124,124,0.4)'][i],
                   zIndex: 5 - i,
                   transform: [{ translateX: a.interpolate({ inputRange: [0, 1], outputRange: [0, width] }) }]
                 }
@@ -141,23 +140,30 @@ export default function AuthOptionsScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.blue.default },
+  container: { flex: 1, backgroundColor: color.green.dark },
   scroll: { flexGrow: 1 },
-  logoRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 32, paddingTop: 32, gap: 12 },
-  logoText: { fontSize: fontSize.lg, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, marginTop: 5 },
-  profiles: { flex: 1, justifyContent: 'center', gap: 16, paddingVertical: spacing[4] },
-  bottom: { paddingHorizontal: 32, paddingBottom: 32 },
-  error: { backgroundColor: 'rgba(224,90,61,0.2)', padding: 12, borderRadius: 99, marginBottom: 16 },
-  errorText: { color: colors.orange.light, fontSize: fontSize.sm, fontFamily: fontFamily.bold, textAlign: 'center' },
-  title: { fontSize: fontSize.lg, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light, marginBottom: 24 },
-  inputRow: { flexDirection: 'row', alignItems: 'center', height: 48, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 99, paddingLeft: 16, paddingRight: 8, gap: 12 },
-  input: { flex: 1, fontSize: fontSize.base, fontFamily: fontFamilySecondary.regular, color: 'white', height: '100%', outlineStyle: 'none' },
-  submitBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
-  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 16, gap: 16 },
-  line: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.2)' },
-  or: { color: 'rgba(255,255,255,0.4)', fontSize: fontSize.sm, fontFamily: fontFamily.bold, textTransform: 'uppercase', letterSpacing: 2 },
-  oauth: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 48, backgroundColor: 'rgba(200,227,244,0.15)', borderRadius: 99, borderWidth: 1, borderColor: 'rgba(200,227,244,0.2)', marginBottom: 12, gap: 8 },
-  oauthText: { fontSize: fontSize.base, fontFamily: fontFamily.bold, fontWeight: '700', color: colors.blue.light },
-  oauthSmall: { fontSize: fontSize.sm, fontFamily: fontFamilySecondary.regular, fontWeight: '400' },
-  terms: { color: 'rgba(255,255,255,0.3)', fontSize: fontSize.sm, fontFamily: fontFamilySecondary.regular, textAlign: 'center', marginTop: 24, lineHeight: lineHeight.sm },
+  logoRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing['2xl'], paddingTop: spacing['2xl'], gap: spacing.md },
+  logoText: { ...typography.h2, color: color.green.light, marginTop: 5 },
+  profiles: { flex: 1, justifyContent: 'center', gap: spacing.lg, paddingVertical: spacing.lg },
+  bottom: { paddingHorizontal: spacing['2xl'], paddingBottom: spacing['2xl'] },
+  error: { backgroundColor: 'rgba(224,90,61,0.2)', padding: spacing.md, borderRadius: radius.full, marginBottom: spacing.lg },
+  errorText: { ...typography.caption, fontWeight: '700', color: color.orange.light, textAlign: 'center' },
+  title: { ...typography.h2, color: color.green.light, marginBottom: spacing.xl },
+  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: spacing.lg, gap: spacing.lg },
+  line: { flex: 1, height: 1, backgroundColor: color.green.light + '50' },
+  or: { ...typography.caption, fontWeight: '700', color: color.green.light + '80', textTransform: 'uppercase', letterSpacing: 2 },
+  // Ghost oauth buttons
+  oauth: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...inputStyles.base,
+    ...inputStyles.ghost,
+    borderColor: color.green.light + '60',
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  oauthText: { ...typography.body, fontWeight: '700', color: color.green.light },
+  oauthSmall: { ...typography.caption, fontWeight: '400' },
+  terms: { ...typography.caption, color: color.green.light + '80', textAlign: 'center', marginTop: spacing.xl },
 });

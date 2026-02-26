@@ -15,7 +15,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, MapPin, Navigation, Shield } from 'lucide-react-native';
 import * as Location from 'expo-location';
-import { colors, spacing, fontSize, borderRadius } from '../../theme';
+import { color, spacing, typography, radius } from '../../theme';
+import { colors } from '../../theme';
+import { Button } from '../../components';
 import { useAuthStore } from '../../store/authStore';
 
 export default function LocationScreen({ navigation }) {
@@ -100,7 +102,7 @@ export default function LocationScreen({ navigation }) {
           style={styles.backButton}
           activeOpacity={0.8}
         >
-          <ChevronLeft size={20} color={colors.brown.default} />
+          <ChevronLeft size={20} color={color.brown.dark} />
         </TouchableOpacity>
       </View>
 
@@ -116,7 +118,7 @@ export default function LocationScreen({ navigation }) {
           <View style={styles.pulseOuter} />
           <View style={styles.pulseInner} />
           <View style={styles.iconContainer}>
-            <MapPin size={32} color={colors.white} strokeWidth={1.5} />
+            <MapPin size={32} color="white" strokeWidth={1.5} />
           </View>
         </View>
 
@@ -127,7 +129,7 @@ export default function LocationScreen({ navigation }) {
               <View style={styles.benefitIcon}>
                 <item.icon
                   size={20}
-                  color={colors.brown.default}
+                  color={color.brown.dark}
                   strokeWidth={1.5}
                 />
               </View>
@@ -148,37 +150,24 @@ export default function LocationScreen({ navigation }) {
       <View style={styles.bottomSection}>
         {permissionStatus === 'denied' ? (
           <>
-            <TouchableOpacity
-              onPress={handleOpenSettings}
-              style={styles.primaryButton}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.primaryButtonText}>Open Settings</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleRequestLocation}
-              style={styles.secondaryButton}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.secondaryButtonText}>Try Again</Text>
-            </TouchableOpacity>
+            <Button variant="solid" size="large" onPress={handleOpenSettings}>
+              Open Settings
+            </Button>
+            <Button variant="outline" size="large" onPress={handleRequestLocation}>
+              Try Again
+            </Button>
           </>
         ) : (
-          <TouchableOpacity
+          <Button
+            variant="outline"
+            size="large"
             onPress={handleRequestLocation}
             disabled={isRequesting}
-            style={styles.gradientButton}
-            activeOpacity={0.8}
+            loading={isRequesting}
+            icon={<MapPin size={16} color={color.orange.dark} />}
           >
-            {isRequesting ? (
-              <ActivityIndicator color={colors.black} />
-            ) : (
-              <View style={styles.buttonContent}>
-                <MapPin size={16} color={colors.black} />
-                <Text style={styles.gradientButtonText}>Allow Location</Text>
-              </View>
-            )}
-          </TouchableOpacity>
+            Allow Location
+          </Button>
         )}
 
         <TouchableOpacity
@@ -196,147 +185,101 @@ export default function LocationScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.brown.lighter,
+    backgroundColor: color.beige,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[3],
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.brown.light + '4D',
+    borderRadius: radius.full,
+    backgroundColor: color.brown.light + '4D',
     alignItems: 'center',
     justifyContent: 'center',
   },
   content: {
     flex: 1,
-    paddingHorizontal: spacing[6],
-    paddingTop: spacing[8],
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing['2xl'],
   },
   title: {
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-    color: colors.black,
-    marginBottom: spacing[2],
+    ...typography.h1,
+    color: color.charcoal,
+    marginBottom: spacing.sm,
   },
   subtitle: {
-    fontSize: fontSize.sm,
-    color: colors.brown.default,
-    marginBottom: spacing[8],
+    ...typography.caption,
+    color: color.brown.dark,
+    marginBottom: spacing['2xl'],
   },
   illustration: {
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing[8],
+    marginBottom: spacing['2xl'],
   },
   pulseOuter: {
     position: 'absolute',
     width: 160,
     height: 160,
     borderRadius: 80,
-    backgroundColor: colors.blue.default + '1A',
+    backgroundColor: color.blue.dark + '1A',
   },
   pulseInner: {
     position: 'absolute',
     width: 112,
     height: 112,
     borderRadius: 56,
-    backgroundColor: colors.blue.default + '26',
+    backgroundColor: color.blue.dark + '26',
   },
   iconContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.blue.default,
+    backgroundColor: color.blue.dark,
     alignItems: 'center',
     justifyContent: 'center',
   },
   benefits: {
-    gap: spacing[4],
+    gap: spacing.lg,
   },
   benefitRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[3],
+    gap: spacing.md,
   },
   benefitIcon: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.brown.light + '4D',
+    borderRadius: radius.full,
+    backgroundColor: color.brown.light + '4D',
     alignItems: 'center',
     justifyContent: 'center',
   },
   benefitText: {
-    fontSize: fontSize.sm,
-    color: colors.black,
+    ...typography.caption,
+    color: color.charcoal,
   },
   errorContainer: {
-    marginTop: spacing[6],
-    backgroundColor: colors.orange.default + '1A',
+    marginTop: spacing.xl,
+    backgroundColor: color.orange.dark + '1A',
     borderWidth: 1,
-    borderColor: colors.orange.default + '33',
-    borderRadius: borderRadius.xl,
-    padding: spacing[4],
+    borderColor: color.orange.dark + '33',
+    borderRadius: radius.xl,
+    padding: spacing.lg,
   },
   errorText: {
-    fontSize: fontSize.sm,
-    color: colors.orange.default,
+    ...typography.caption,
+    color: color.orange.dark,
   },
   bottomSection: {
-    paddingHorizontal: spacing[6],
-    paddingVertical: spacing[8],
-    gap: spacing[3],
-  },
-  primaryButton: {
-    height: 48,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.blue.default,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButtonText: {
-    fontSize: fontSize.sm,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  secondaryButton: {
-    height: 48,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.brown.light + '4D',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondaryButtonText: {
-    fontSize: fontSize.sm,
-    fontWeight: '700',
-    color: colors.black,
-  },
-  gradientButton: {
-    height: 48,
-    borderRadius: borderRadius.full,
-    borderWidth: 1.5,
-    borderColor: colors.orange.default,
-    backgroundColor: colors.brown.lighter,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[2],
-  },
-  gradientButtonText: {
-    fontSize: fontSize.sm,
-    fontWeight: '700',
-    color: colors.black,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing['2xl'],
+    gap: spacing.md,
   },
   skipButton: {
     height: 48,
@@ -344,7 +287,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   skipButtonText: {
-    fontSize: fontSize.sm,
-    color: colors.brown.default,
+    ...typography.caption,
+    color: color.brown.dark,
   },
 });

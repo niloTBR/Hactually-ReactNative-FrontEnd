@@ -11,7 +11,8 @@ import * as Clipboard from 'expo-clipboard';
 import { color, spacing, radius, typography } from '../theme';
 // Legacy (for components not yet migrated)
 import { colors, fontFamily, fontFamilySecondary } from '../theme';
-import { Button, Input, OTPInput, GoogleIcon, AppleIcon, LogoMark, LogoWithText, AppIcon } from '../components';
+import { Button, Input, OTPInput, Chip, DatePicker, GhostInput, GoogleIcon, AppleIcon, LogoMark, LogoWithText, AppIcon } from '../components';
+import { GhostTheme } from '../theme';
 
 const sections = [
   { id: 'colors', label: 'Colors', icon: Palette },
@@ -87,9 +88,51 @@ const Section = ({ title, children }) => (
 const Label = ({ children }) => <Text style={styles.label}>{children}</Text>;
 const Divider = () => <View style={styles.divider} />;
 
+// Background options for form showcase
+// All fields use ghost/outline style - theme is the contrasting color for borders/text
+const LIGHT_BACKGROUNDS = [
+  { id: 'beige', label: 'Beige', bg: color.beige, text: color.charcoal, theme: color.charcoal },
+  { id: 'olive', label: 'Olive', bg: color.brown.light, text: color.brown.dark, theme: color.brown.dark },
+];
+
+const DARK_BACKGROUNDS = [
+  { id: 'green', label: 'Green', bg: color.green.dark, text: color.green.light, theme: color.green.light },
+  { id: 'olive', label: 'Olive', bg: color.brown.dark, text: color.brown.light, theme: color.brown.light },
+];
+
+// Simple dropdown selector
+const BgSelector = ({ options, selected, onSelect, label }) => (
+  <View style={styles.bgSelector}>
+    <Text style={styles.bgSelectorLabel}>{label}</Text>
+    <View style={styles.bgSelectorOptions}>
+      {options.map((opt) => (
+        <TouchableOpacity
+          key={opt.id}
+          onPress={() => onSelect(opt.id)}
+          style={[
+            styles.bgSelectorOption,
+            { backgroundColor: opt.bg },
+            selected === opt.id && styles.bgSelectorOptionActive,
+          ]}
+        >
+          <Text style={[styles.bgSelectorOptionText, { color: opt.text }]}>
+            {opt.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  </View>
+);
+
 export default function StyleGuideScreen() {
   const [active, setActive] = useState('logo');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [lightBg, setLightBg] = useState('beige');
+  const [darkBg, setDarkBg] = useState('green');
+
+  // Get current background settings
+  const currentLight = LIGHT_BACKGROUNDS.find(b => b.id === lightBg) || LIGHT_BACKGROUNDS[0];
+  const currentDark = DARK_BACKGROUNDS.find(b => b.id === darkBg) || DARK_BACKGROUNDS[0];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -116,10 +159,10 @@ export default function StyleGuideScreen() {
                 </View>
               </View>
               <View style={styles.colorBrandColumn}>
-                <Text style={styles.colorBrandName}>Brown</Text>
+                <Text style={styles.colorBrandName}>Olive</Text>
                 <View style={styles.colorPairRow}>
-                  <ColorSwatch tokenName="color.brown.light" colorValue={color.brown.light} dark />
-                  <ColorSwatch tokenName="color.brown.dark" colorValue={color.brown.dark} />
+                  <ColorSwatch tokenName="color.olive.light" colorValue={color.brown.light} dark />
+                  <ColorSwatch tokenName="color.olive.dark" colorValue={color.brown.dark} />
                 </View>
               </View>
               <View style={styles.colorBrandColumn}>
@@ -169,8 +212,8 @@ export default function StyleGuideScreen() {
                   </View>
                   <View style={styles.logoMarkItem}>
                     <LogoMark size="lg" colorScheme="light" colorVariant="brown" />
-                    <Text style={styles.logoMarkLabel}>Brown</Text>
-                    <TokenLabel token="color.brown.light" />
+                    <Text style={styles.logoMarkLabel}>Olive</Text>
+                    <TokenLabel token="color.olive.light" />
                   </View>
                   <View style={styles.logoMarkItem}>
                     <LogoMark size="lg" colorScheme="light" colorVariant="green" />
@@ -194,8 +237,8 @@ export default function StyleGuideScreen() {
                   </View>
                   <View style={styles.logoMarkItem}>
                     <LogoMark size="lg" colorScheme="dark" colorVariant="brown" />
-                    <Text style={styles.logoMarkLabel}>Brown</Text>
-                    <TokenLabel token="color.brown.dark" />
+                    <Text style={styles.logoMarkLabel}>Olive</Text>
+                    <TokenLabel token="color.olive.dark" />
                   </View>
                   <View style={styles.logoMarkItem}>
                     <LogoMark size="lg" colorScheme="dark" colorVariant="green" />
@@ -225,8 +268,8 @@ export default function StyleGuideScreen() {
                   </View>
                   <View style={styles.logoBoxItem}>
                     <AppIcon size="md" colorScheme="light" colorVariant="brown" />
-                    <Text style={styles.logoBoxLabel}>Brown</Text>
-                    <TokenLabel token="color.brown.light" />
+                    <Text style={styles.logoBoxLabel}>Olive</Text>
+                    <TokenLabel token="color.olive.light" />
                   </View>
                   <View style={styles.logoBoxItem}>
                     <AppIcon size="md" colorScheme="light" colorVariant="green" />
@@ -250,8 +293,8 @@ export default function StyleGuideScreen() {
                   </View>
                   <View style={styles.logoBoxItem}>
                     <AppIcon size="md" colorScheme="dark" colorVariant="brown" />
-                    <Text style={styles.logoBoxLabel}>Brown</Text>
-                    <TokenLabel token="color.brown.dark" />
+                    <Text style={styles.logoBoxLabel}>Olive</Text>
+                    <TokenLabel token="color.olive.dark" />
                   </View>
                   <View style={styles.logoBoxItem}>
                     <AppIcon size="md" colorScheme="dark" colorVariant="green" />
@@ -281,8 +324,8 @@ export default function StyleGuideScreen() {
                   </View>
                   <View style={styles.logoTextItem}>
                     <LogoWithText size="sm" colorScheme="light" colorVariant="brown" />
-                    <Text style={styles.logoBoxLabel}>Brown</Text>
-                    <TokenLabel token="color.brown.light" />
+                    <Text style={styles.logoBoxLabel}>Olive</Text>
+                    <TokenLabel token="color.olive.light" />
                   </View>
                   <View style={styles.logoTextItem}>
                     <LogoWithText size="sm" colorScheme="light" colorVariant="green" />
@@ -306,8 +349,8 @@ export default function StyleGuideScreen() {
                   </View>
                   <View style={styles.logoTextItem}>
                     <LogoWithText size="sm" colorScheme="dark" colorVariant="brown" />
-                    <Text style={styles.logoBoxLabel}>Brown</Text>
-                    <TokenLabel token="color.brown.dark" />
+                    <Text style={styles.logoBoxLabel}>Olive</Text>
+                    <TokenLabel token="color.olive.dark" />
                   </View>
                   <View style={styles.logoTextItem}>
                     <LogoWithText size="sm" colorScheme="dark" colorVariant="green" />
@@ -456,15 +499,15 @@ export default function StyleGuideScreen() {
                 </View>
               </View>
               <View style={styles.btn2x2Cell}>
-                <Text style={styles.btn2x2Label}>Brown</Text>
+                <Text style={styles.btn2x2Label}>Olive</Text>
                 <View style={styles.btn2x2Pair}>
                   <View style={styles.btnColorItem}>
                     <Button variant="solid" color="brown">Button</Button>
-                    <TokenLabel token="Button.solid.brown" />
+                    <TokenLabel token="Button.solid.olive" />
                   </View>
                   <View style={styles.btnColorItem}>
                     <Button variant="outline" color="brown">Button</Button>
-                    <TokenLabel token="Button.outline.brown" />
+                    <TokenLabel token="Button.outline.olive" />
                   </View>
                 </View>
               </View>
@@ -485,21 +528,51 @@ export default function StyleGuideScreen() {
 
             <Divider />
 
-            <Label>5.2 OUTLINE GRADIENT</Label>
-            <View style={styles.btnVariantRow}>
-              <View style={[styles.btnVariantGroup, styles.btnLightBg]}>
-                <Text style={styles.btnVariantLabel}>Light</Text>
-                <View style={styles.btnColorItem}>
-                  <Button variant="outline-gradient" color="light">Button</Button>
-                  <TokenLabel token="Button.outlineGradient.light" />
-                </View>
+            <Label>5.2 OUTLINE GRADIENT (fillColor prop)</Label>
+            <Text style={styles.btnGradientSubLabel}>Light Backgrounds</Text>
+            <View style={styles.btnGradientGrid}>
+              <View style={[styles.btnGradientItem, { backgroundColor: colors.orange.light }]}>
+                <Button variant="outline-gradient" fillColor={colors.orange.light}>Button</Button>
+                <Text style={styles.btnGradientLabel}>Orange</Text>
               </View>
-              <View style={[styles.btnVariantGroup, styles.btnDarkBg]}>
-                <Text style={[styles.btnVariantLabel, { color: color.beige }]}>Dark</Text>
-                <View style={styles.btnColorItem}>
-                  <Button variant="outline-gradient" color="dark">Button</Button>
-                  <TokenLabel token="Button.outlineGradient.dark" />
-                </View>
+              <View style={[styles.btnGradientItem, { backgroundColor: colors.blue.light }]}>
+                <Button variant="outline-gradient" fillColor={colors.blue.light}>Button</Button>
+                <Text style={styles.btnGradientLabel}>Blue</Text>
+              </View>
+              <View style={[styles.btnGradientItem, { backgroundColor: colors.brown.light }]}>
+                <Button variant="outline-gradient" fillColor={colors.brown.light}>Button</Button>
+                <Text style={styles.btnGradientLabel}>Olive</Text>
+              </View>
+              <View style={[styles.btnGradientItem, { backgroundColor: colors.green.light }]}>
+                <Button variant="outline-gradient" fillColor={colors.green.light}>Button</Button>
+                <Text style={styles.btnGradientLabel}>Green</Text>
+              </View>
+              <View style={[styles.btnGradientItem, { backgroundColor: colors.brown.lighter }]}>
+                <Button variant="outline-gradient" fillColor={colors.brown.lighter}>Button</Button>
+                <Text style={styles.btnGradientLabel}>Beige</Text>
+              </View>
+            </View>
+            <Text style={styles.btnGradientSubLabel}>Dark Backgrounds</Text>
+            <View style={styles.btnGradientGrid}>
+              <View style={[styles.btnGradientItem, { backgroundColor: colors.orange.default }]}>
+                <Button variant="outline-gradient" color="dark" fillColor={colors.orange.default}>Button</Button>
+                <Text style={[styles.btnGradientLabel, { color: colors.white }]}>Orange</Text>
+              </View>
+              <View style={[styles.btnGradientItem, { backgroundColor: colors.blue.default }]}>
+                <Button variant="outline-gradient" color="dark" fillColor={colors.blue.default}>Button</Button>
+                <Text style={[styles.btnGradientLabel, { color: colors.white }]}>Blue</Text>
+              </View>
+              <View style={[styles.btnGradientItem, { backgroundColor: colors.brown.dark }]}>
+                <Button variant="outline-gradient" color="dark" fillColor={colors.brown.dark}>Button</Button>
+                <Text style={[styles.btnGradientLabel, { color: colors.white }]}>Olive</Text>
+              </View>
+              <View style={[styles.btnGradientItem, { backgroundColor: colors.green.dark }]}>
+                <Button variant="outline-gradient" color="dark" fillColor={colors.green.dark}>Button</Button>
+                <Text style={[styles.btnGradientLabel, { color: colors.white }]}>Green</Text>
+              </View>
+              <View style={[styles.btnGradientItem, { backgroundColor: color.charcoal }]}>
+                <Button variant="outline-gradient" color="dark" fillColor={color.charcoal}>Button</Button>
+                <Text style={[styles.btnGradientLabel, { color: colors.white }]}>Charcoal</Text>
               </View>
             </View>
 
@@ -507,7 +580,7 @@ export default function StyleGuideScreen() {
 
             <Label>5.3 CHECK IN</Label>
             <View style={styles.btnVariantRow}>
-              <View style={[styles.btnVariantGroup, styles.btnLightBg]}>
+              <View style={[styles.btnVariantGroup, styles.btnOliveBg]}>
                 <Text style={styles.btnVariantLabel}>Light</Text>
                 <View style={styles.btnColorItem}>
                   <Button variant="checkin" color="light" caption="1 credit">Check in</Button>
@@ -554,93 +627,179 @@ export default function StyleGuideScreen() {
 
           {/* FORMS */}
           <Section title="Form Components">
-            <Label>6.1 WITHOUT LABEL</Label>
-            <View style={styles.formGrid}>
-              <View style={styles.formColumn}>
-                <View style={styles.formItem}>
-                  <Text style={styles.formItemLabel}>Default</Text>
-                  <Input placeholder="Default input" />
-                  <TokenLabel token="Input.default" />
+
+            {/* LIGHT BACKGROUNDS */}
+            <Label>6.1 LIGHT BACKGROUNDS (Default)</Label>
+            <BgSelector options={LIGHT_BACKGROUNDS} selected={lightBg} onSelect={setLightBg} label="Select background:" />
+
+            <GhostTheme themeColor={currentLight.theme} style={[styles.formShowcase, { backgroundColor: currentLight.bg }]}>
+              {/* Row 1: With Label & OTP */}
+              <View style={styles.formRow}>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentLight.text }]}>With Label</Text>
+                  <Input label="Email" placeholder="you@example.com" variant="ghost" />
+                  <TokenLabel token="Input.ghost + label" />
                 </View>
-                <View style={styles.formItem}>
-                  <Text style={styles.formItemLabel}>With Icon</Text>
-                  <Input placeholder="Search..." leftIcon={<Search size={18} color={colors.brown.default} />} />
-                  <TokenLabel token="Input.withIcon" />
-                </View>
-              </View>
-              <View style={styles.formColumn}>
-                <View style={styles.formItem}>
-                  <Text style={styles.formItemLabel}>Password</Text>
-                  <Input placeholder="Enter password" secureTextEntry leftIcon={<Lock size={18} color={colors.brown.default} />} />
-                  <TokenLabel token="Input.password" />
-                </View>
-                <View style={styles.formItem}>
-                  <Text style={styles.formItemLabel}>Multiline</Text>
-                  <Input placeholder="Write your bio..." multiline numberOfLines={3} />
-                  <TokenLabel token="Input.multiline" />
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentLight.text }]}>OTP</Text>
+                  <View style={{ alignSelf: 'flex-start' }}>
+                    <OTPInput value={otp} onChange={setOtp} variant="ghost" />
+                  </View>
+                  <TokenLabel token="OTPInput.ghost" />
                 </View>
               </View>
-            </View>
+              <View style={[styles.formDivider, { borderColor: currentLight.theme + '30' }]} />
+
+              {/* Row 2: Input & With Icon */}
+              <View style={styles.formRow}>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentLight.text }]}>Input</Text>
+                  <Input placeholder="Enter text..." variant="ghost" />
+                  <TokenLabel token="Input.ghost" />
+                </View>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentLight.text }]}>With Icon</Text>
+                  <Input placeholder="Search..." variant="ghost" leftIcon={<Search size={18} />} />
+                  <TokenLabel token="Input.ghost + leftIcon" />
+                </View>
+              </View>
+              <View style={[styles.formDivider, { borderColor: currentLight.theme + '30' }]} />
+
+              {/* Row 3: Password & With Error */}
+              <View style={styles.formRow}>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentLight.text }]}>Password</Text>
+                  <Input placeholder="Password" variant="ghost" secureTextEntry leftIcon={<Lock size={18} />} />
+                  <TokenLabel token="Input.ghost + secureTextEntry" />
+                </View>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentLight.text }]}>With Error</Text>
+                  <Input placeholder="Email" variant="ghost" error="Invalid email" />
+                  <TokenLabel token="Input.ghost + error" />
+                </View>
+              </View>
+              <View style={[styles.formDivider, { borderColor: currentLight.theme + '30' }]} />
+
+              {/* Row 4: DatePicker & Multiline */}
+              <View style={styles.formRow}>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentLight.text }]}>DatePicker</Text>
+                  <DatePicker placeholder="Date of birth" variant="ghost" onChange={() => {}} />
+                  <TokenLabel token="DatePicker.ghost" />
+                </View>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentLight.text }]}>Multiline</Text>
+                  <Input placeholder="Write your bio..." variant="ghost" multiline numberOfLines={2} />
+                  <TokenLabel token="Input.ghost + multiline" />
+                </View>
+              </View>
+              <View style={[styles.formDivider, { borderColor: currentLight.theme + '30' }]} />
+
+              {/* Row 5: Chips */}
+              <View style={styles.formRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.formLabel, { color: currentLight.text }]}>Chips</Text>
+                  <View style={styles.chipRow}>
+                    <Chip label="Default" variant="ghost" />
+                    <Chip label="Selected" variant="ghost" selected onRemove={() => {}} />
+                    <Chip label="Fire" emoji="🔥" variant="ghost" />
+                    <Chip label="Disabled" variant="ghost" disabled />
+                  </View>
+                  <TokenLabel token="Chip.ghost" />
+                </View>
+              </View>
+            </GhostTheme>
 
             <Divider />
 
-            <Label>6.2 WITH LABEL</Label>
-            <View style={styles.formGrid}>
-              <View style={styles.formColumn}>
-                <View style={styles.formItem}>
-                  <Text style={styles.formItemLabel}>Email Field</Text>
-                  <Input label="Email Address" placeholder="you@example.com" keyboardType="email-address" />
-                  <TokenLabel token="Input.withLabel" />
+            {/* DARK BACKGROUNDS */}
+            <Label>6.2 DARK BACKGROUNDS (Ghost Variant)</Label>
+            <BgSelector options={DARK_BACKGROUNDS} selected={darkBg} onSelect={setDarkBg} label="Select background:" />
+
+            <GhostTheme themeColor={currentDark.theme} isDark style={[styles.formShowcase, { backgroundColor: currentDark.bg }]}>
+              {/* Row 1: With Label & OTP */}
+              <View style={styles.formRow}>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>With Label</Text>
+                  <Input label="Email" placeholder="you@example.com" variant="ghost" />
+                  <TokenLabel token="Input.ghost + label" />
+                </View>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>OTP</Text>
+                  <View style={{ alignSelf: 'flex-start' }}>
+                    <OTPInput value={['', '', '', '', '', '']} onChange={() => {}} variant="ghost" />
+                  </View>
+                  <TokenLabel token="OTPInput.ghost" />
                 </View>
               </View>
-              <View style={styles.formColumn}>
-                <View style={styles.formItem}>
-                  <Text style={styles.formItemLabel}>With Error</Text>
-                  <Input label="Email" placeholder="Enter email" error="Please enter a valid email" leftIcon={<Mail size={18} color={colors.orange.default} />} />
-                  <TokenLabel token="Input.error" />
+              <View style={[styles.formDivider, { borderColor: currentDark.theme + '30' }]} />
+
+              {/* Row 2: Input & With Icon */}
+              <View style={styles.formRow}>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>Input</Text>
+                  <Input placeholder="Enter text..." variant="ghost" />
+                  <TokenLabel token="Input.ghost" />
+                </View>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>With Icon</Text>
+                  <Input placeholder="Search..." variant="ghost" leftIcon={<Search size={18} />} />
+                  <TokenLabel token="Input.ghost + leftIcon" />
                 </View>
               </View>
-            </View>
+              <View style={[styles.formDivider, { borderColor: currentDark.theme + '30' }]} />
 
-            <Divider />
+              {/* Row 3: Password & With Error */}
+              <View style={styles.formRow}>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>Password</Text>
+                  <Input placeholder="Password" variant="ghost" secureTextEntry leftIcon={<Lock size={18} />} />
+                  <TokenLabel token="Input.ghost + secureTextEntry" />
+                </View>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>With Error</Text>
+                  <Input placeholder="Email" variant="ghost" error="Invalid email" />
+                  <TokenLabel token="Input.ghost + error" />
+                </View>
+              </View>
+              <View style={[styles.formDivider, { borderColor: currentDark.theme + '30' }]} />
 
-            <Label>6.3 INPUT SPACING</Label>
-            <View style={styles.formSpacingInfo}>
-              <View style={styles.formSpacingRow}>
-                <Text style={styles.formSpacingLabel}>Height</Text>
-                <Text style={styles.formSpacingValue}>48px</Text>
-                <TokenLabel token="spacing.lg × 3" />
+              {/* Row 4: DatePicker & Multiline */}
+              <View style={styles.formRow}>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>DatePicker</Text>
+                  <DatePicker placeholder="Date of birth" variant="ghost" onChange={() => {}} />
+                  <TokenLabel token="DatePicker.ghost" />
+                </View>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>Multiline</Text>
+                  <Input placeholder="Write your bio..." variant="ghost" multiline numberOfLines={2} />
+                  <TokenLabel token="Input.ghost + multiline" />
+                </View>
               </View>
-              <View style={styles.formSpacingRow}>
-                <Text style={styles.formSpacingLabel}>Padding Horizontal</Text>
-                <Text style={styles.formSpacingValue}>16px</Text>
-                <TokenLabel token="spacing.lg" />
-              </View>
-              <View style={styles.formSpacingRow}>
-                <Text style={styles.formSpacingLabel}>Border Radius</Text>
-                <Text style={styles.formSpacingValue}>full</Text>
-                <TokenLabel token="radius.full" />
-              </View>
-              <View style={styles.formSpacingRow}>
-                <Text style={styles.formSpacingLabel}>Label Margin Bottom</Text>
-                <Text style={styles.formSpacingValue}>8px</Text>
-                <TokenLabel token="spacing.sm" />
-              </View>
-              <View style={styles.formSpacingRow}>
-                <Text style={styles.formSpacingLabel}>Error Margin Top</Text>
-                <Text style={styles.formSpacingValue}>4px</Text>
-                <TokenLabel token="spacing.xs" />
-              </View>
-            </View>
+              <View style={[styles.formDivider, { borderColor: currentDark.theme + '30' }]} />
 
-            <Divider />
+              {/* Row 5: Email Action & Chips */}
+              <View style={styles.formRow}>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>Email Action</Text>
+                  <GhostInput placeholder="Enter email..." leftIcon={<Mail />} onSubmit={() => {}} />
+                  <TokenLabel token="GhostInput" />
+                </View>
+                <View style={styles.formCol}>
+                  <Text style={[styles.formLabel, { color: currentDark.text }]}>Chips</Text>
+                  <View style={styles.chipRow}>
+                    <Chip label="Default" variant="ghost" />
+                    <Chip label="Selected" variant="ghost" selected onRemove={() => {}} />
+                    <Chip label="Fire" emoji="🔥" variant="ghost" />
+                    <Chip label="Disabled" variant="ghost" disabled />
+                  </View>
+                  <TokenLabel token="Chip.ghost" />
+                </View>
+              </View>
+            </GhostTheme>
 
-            <Label>6.4 OTP INPUT</Label>
-            <OTPInput value={otp} onChange={setOtp} />
-            <View style={{ marginTop: spacing.md }}>
-              <TokenLabel token="OTPInput" />
-            </View>
-          </Section>
+            </Section>
 
           <View style={{ height: 40 }} />
         </ScrollView>
@@ -680,8 +839,8 @@ const styles = StyleSheet.create({
   logoBoxItem: { alignItems: 'flex-start', gap: spacing.sm },
   logoBox: { width: 80, height: 80, borderRadius: radius.xl, alignItems: 'center', justifyContent: 'center' },
   logoBoxLabel: { ...typography.body, color: color.brown.dark },
-  logoTextGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.lg, width: 340 },
-  logoTextItem: { alignItems: 'flex-start', gap: spacing.sm, width: 160, marginBottom: spacing.md },
+  logoTextGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing['2xl'], width: 480 },
+  logoTextItem: { alignItems: 'flex-start', gap: spacing.sm, width: 220, marginBottom: spacing.lg },
   logoTextInline: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   logoText: { ...typography.h3 },
   iconRow: { flexDirection: 'row', gap: spacing['2xl'] },
@@ -717,8 +876,8 @@ const styles = StyleSheet.create({
   radiusLabel: { fontSize: 14, fontFamily: fontFamily.bold, color: color.charcoal },
   radiusValue: { fontSize: 12, color: color.brown.dark, fontFamily: fontFamilySecondary.regular },
   // Buttons
-  btn2x2Grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing['2xl'] },
-  btn2x2Cell: { width: '45%', gap: spacing.md },
+  btn2x2Grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing['3xl'] },
+  btn2x2Cell: { width: '45%', gap: spacing.lg },
   btn2x2Label: { ...typography.bodyStrong, color: color.charcoal },
   btn2x2Pair: { flexDirection: 'row', gap: spacing.lg },
   btnVariantRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing['2xl'] },
@@ -727,16 +886,36 @@ const styles = StyleSheet.create({
   btnColorGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xl },
   btnColorItem: { alignItems: 'flex-start', gap: spacing.sm },
   btnLightBg: { backgroundColor: colors.brown.mid, padding: spacing.lg, borderRadius: radius.lg },
+  btnOliveBg: { backgroundColor: colors.brown.light, padding: spacing.lg, borderRadius: radius.lg },
   btnDarkBg: { backgroundColor: colors.brown.dark, padding: spacing.lg, borderRadius: radius.lg },
+  btnGradientGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginBottom: spacing.lg },
+  btnGradientItem: { padding: spacing.lg, borderRadius: radius.lg, alignItems: 'center', gap: spacing.sm },
+  btnGradientLabel: { fontSize: 11, fontWeight: '600', color: colors.brown.dark },
+  btnGradientSubLabel: { fontSize: 12, fontWeight: '600', color: color.brown.dark, marginBottom: spacing.sm, marginTop: spacing.sm },
   btnGlassRow: { flexDirection: 'row', gap: spacing.xl, backgroundColor: color.blue.dark, padding: spacing.xl, borderRadius: radius.lg, alignSelf: 'flex-start' },
-  // Forms
-  inputBox: { maxWidth: 400 },
-  formGrid: { flexDirection: 'row', gap: spacing['2xl'] },
-  formColumn: { flex: 1, gap: spacing.xl },
-  formItem: { gap: spacing.sm },
-  formItemLabel: { ...typography.bodyStrong, color: color.charcoal },
-  formSpacingInfo: { gap: spacing.md },
-  formSpacingRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
-  formSpacingLabel: { ...typography.body, color: color.charcoal, width: 160 },
-  formSpacingValue: { ...typography.bodyStrong, color: color.blue.dark, width: 60 },
+  // Forms - Background selector
+  bgSelector: { marginBottom: spacing.xl },
+  bgSelectorLabel: { ...typography.caption, color: color.charcoal, marginBottom: spacing.sm },
+  bgSelectorOptions: { flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap' },
+  bgSelectorOption: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.md, borderWidth: 2, borderColor: 'transparent' },
+  bgSelectorOptionActive: { borderColor: color.charcoal },
+  bgSelectorOptionText: { ...typography.caption, fontWeight: '600' },
+  // Forms - Showcase
+  formShowcase: { padding: spacing.xl, borderRadius: radius.lg, gap: spacing.lg },
+  formRow: { flexDirection: 'row', gap: spacing.xl },
+  formCol: { flex: 1, gap: spacing.sm },
+  formLabel: { ...typography.caption, fontWeight: '600' },
+  formDivider: { borderBottomWidth: 1, marginVertical: spacing.sm },
+  // Chips
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  // Token table
+  tokenTable: { borderWidth: 1, borderColor: color.brown.light, borderRadius: radius.md, overflow: 'hidden' },
+  tokenTableHeader: { flexDirection: 'row', backgroundColor: color.brown.light, paddingVertical: spacing.sm, paddingHorizontal: spacing.md },
+  tokenTableHeaderText: { ...typography.caption, fontWeight: '700', color: color.charcoal },
+  tokenTableRow: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.brown.light, paddingVertical: spacing.sm, paddingHorizontal: spacing.md },
+  tokenTableCell: { ...typography.caption, color: color.charcoal },
+  tokenCode: { fontFamily: 'monospace', fontSize: 11 },
+  // Code block
+  codeBlock: { backgroundColor: color.charcoal, padding: spacing.lg, borderRadius: radius.lg },
+  codeText: { fontFamily: 'monospace', fontSize: 12, color: color.green.light, lineHeight: 20 },
 });

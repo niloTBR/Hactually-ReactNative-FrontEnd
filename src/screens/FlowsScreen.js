@@ -12,7 +12,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { ChevronDown, ChevronRight, Eye, LogOut, Palette } from 'lucide-react-native';
-import { colors, spacing, borderRadius, fontFamily } from '../theme';
+import { color, spacing, radius, typography } from '../theme';
 import { useAuthStore } from '../store/authStore';
 
 const FLOW_SECTIONS = [
@@ -146,9 +146,9 @@ const FlowAccordion = ({ flow, index, isExpanded, onToggle, onNavigate }) => {
             <Text style={styles.flowCountActive}>{activeCount}</Text>/{totalCount}
           </Text>
           {isExpanded ? (
-            <ChevronDown size={20} color={colors.brown.default} />
+            <ChevronDown size={20} color={color.charcoal} />
           ) : (
-            <ChevronRight size={20} color={colors.brown.light} />
+            <ChevronRight size={20} color={color.brown.light} />
           )}
         </View>
       </TouchableOpacity>
@@ -200,12 +200,12 @@ export default function FlowsScreen({ navigation }) {
             style={styles.designSystemButton}
             onPress={() => navigation.navigate('StyleGuide')}
           >
-            <Palette size={16} color={colors.blue.default} />
+            <Palette size={16} color={color.blue.dark} />
             <Text style={styles.designSystemText}>Design System</Text>
           </TouchableOpacity>
           {isAuthenticated && (
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-              <LogOut size={16} color={colors.orange.default} />
+              <LogOut size={16} color={color.orange.dark} />
               <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>
           )}
@@ -254,149 +254,140 @@ export default function FlowsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.brown.lighter,
+    backgroundColor: color.beige,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing[6],
-    paddingVertical: spacing[4],
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
     backgroundColor: 'rgba(255,255,255,0.9)',
     borderBottomWidth: 1,
-    borderBottomColor: colors.brown.light + '50',
+    borderBottomColor: color.brown.light + '50',
   },
   logo: {
-    fontSize: 22,
-    fontFamily: fontFamily.black,
-    fontWeight: '900',
-    color: colors.blue.default,
+    ...typography.h3,
+    color: color.blue.dark,
   },
   subtitle: {
-    fontSize: 11,
-    fontFamily: fontFamily.regular,
-    color: colors.brown.default,
-    marginTop: 2,
+    ...typography.caption,
+    color: color.charcoal,
+    marginTop: spacing.xs,
   },
   headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[2],
+    gap: spacing.sm,
   },
   designSystemButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.blue.default + '15',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
+    backgroundColor: color.blue.dark + '15',
   },
   designSystemText: {
-    fontSize: 13,
-    fontFamily: fontFamily.bold,
+    ...typography.caption,
     fontWeight: '700',
-    color: colors.blue.default,
+    color: color.blue.dark,
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.orange.default + '15',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
+    backgroundColor: color.orange.dark + '15',
   },
   logoutText: {
-    fontSize: 13,
-    fontFamily: fontFamily.bold,
+    ...typography.caption,
     fontWeight: '700',
-    color: colors.orange.default,
+    color: color.orange.dark,
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    padding: spacing[6],
-    paddingBottom: spacing[12],
+    padding: spacing.xl,
+    paddingBottom: spacing['3xl'],
   },
   stats: {
     flexDirection: 'row',
-    gap: spacing[6],
-    marginBottom: spacing[4],
+    gap: spacing.xl,
+    marginBottom: spacing.lg,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   statDot: {
     width: 10,
     height: 10,
-    borderRadius: 5,
+    borderRadius: radius.full,
   },
   statDotBuilt: {
-    backgroundColor: colors.green.default,
+    backgroundColor: color.green.dark,
   },
   statDotToBuild: {
-    backgroundColor: colors.brown.light,
+    backgroundColor: color.brown.light,
   },
   statText: {
-    fontSize: 12,
-    fontFamily: fontFamily.medium,
-    color: colors.brown.default,
+    ...typography.caption,
+    color: color.charcoal,
   },
   statTextMuted: {
-    fontSize: 12,
-    fontFamily: fontFamily.regular,
-    color: colors.brown.default + '99',
+    ...typography.caption,
+    color: color.charcoal + '99',
   },
   progressBar: {
     height: 10,
-    backgroundColor: colors.brown.light + '60',
-    borderRadius: borderRadius.full,
+    backgroundColor: color.brown.light + '60',
+    borderRadius: radius.full,
     overflow: 'hidden',
-    marginBottom: spacing[2],
+    marginBottom: spacing.sm,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.blue.default,
-    borderRadius: borderRadius.full,
+    backgroundColor: color.blue.dark,
+    borderRadius: radius.full,
   },
   progressText: {
-    fontSize: 12,
-    fontFamily: fontFamily.medium,
-    color: colors.brown.default,
+    ...typography.caption,
+    color: color.charcoal,
     textAlign: 'center',
-    marginBottom: spacing[6],
+    marginBottom: spacing.xl,
   },
   accordions: {
-    gap: spacing[3],
+    gap: spacing.md,
   },
   accordion: {
     backgroundColor: 'white',
-    borderRadius: 16,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.brown.light + '60',
+    borderColor: color.brown.light + '60',
     overflow: 'hidden',
   },
   accordionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: spacing[4],
-    gap: spacing[3],
+    padding: spacing.lg,
+    gap: spacing.md,
   },
   flowNumber: {
     width: 32,
     height: 32,
-    borderRadius: 10,
-    backgroundColor: colors.blue.default,
+    borderRadius: radius.md,
+    backgroundColor: color.blue.dark,
     alignItems: 'center',
     justifyContent: 'center',
   },
   flowNumberText: {
-    fontSize: 14,
-    fontFamily: fontFamily.bold,
+    ...typography.caption,
     fontWeight: '700',
     color: 'white',
   },
@@ -404,91 +395,84 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   flowTitle: {
-    fontSize: 14,
-    fontFamily: fontFamily.bold,
-    fontWeight: '700',
-    color: 'black',
+    ...typography.bodyStrong,
+    color: color.charcoal,
   },
   flowDescription: {
-    fontSize: 11,
-    fontFamily: fontFamily.regular,
-    color: colors.brown.default,
-    marginTop: 2,
+    ...typography.caption,
+    color: color.charcoal,
+    marginTop: spacing.xs,
   },
   flowMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[3],
+    gap: spacing.md,
   },
   flowCount: {
-    fontSize: 12,
-    fontFamily: fontFamily.regular,
-    color: colors.brown.default,
+    ...typography.caption,
+    color: color.charcoal,
   },
   flowCountActive: {
-    fontFamily: fontFamily.bold,
     fontWeight: '700',
-    color: colors.green.default,
+    color: color.green.dark,
   },
   accordionContent: {
     borderTopWidth: 1,
-    borderTopColor: colors.brown.light + '40',
-    backgroundColor: colors.brown.lighter + '50',
+    borderTopColor: color.brown.light + '40',
+    backgroundColor: color.beige + '80',
   },
   screenItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[3],
-    gap: spacing[3],
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    gap: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.brown.light + '30',
+    borderBottomColor: color.brown.light + '30',
   },
   screenId: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.md,
     minWidth: 40,
     alignItems: 'center',
   },
   screenIdActive: {
-    backgroundColor: colors.green.light,
+    backgroundColor: color.green.light,
   },
   screenIdInactive: {
-    backgroundColor: colors.brown.light + '50',
+    backgroundColor: color.brown.light + '50',
   },
   screenIdText: {
-    fontSize: 11,
-    fontFamily: fontFamily.bold,
+    ...typography.caption,
     fontWeight: '700',
   },
   screenIdTextActive: {
-    color: colors.green.default,
+    color: color.green.dark,
   },
   screenIdTextInactive: {
-    color: colors.brown.default,
+    color: color.charcoal,
   },
   screenName: {
     flex: 1,
-    fontSize: 13,
+    ...typography.caption,
   },
   screenNameActive: {
-    fontFamily: fontFamily.medium,
-    color: 'black',
+    fontWeight: '600',
+    color: color.charcoal,
   },
   screenNameInactive: {
-    fontFamily: fontFamily.regular,
-    color: colors.brown.default,
+    color: color.charcoal + '99',
   },
   statusDot: {
     width: 10,
     height: 10,
-    borderRadius: 5,
+    borderRadius: radius.full,
   },
   statusDotActive: {
-    backgroundColor: colors.green.default,
+    backgroundColor: color.green.dark,
   },
   statusDotInactive: {
-    backgroundColor: colors.brown.light,
+    backgroundColor: color.brown.light,
   },
 });

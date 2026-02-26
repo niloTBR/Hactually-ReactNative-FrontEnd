@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, borderRadius, fontSize, spacing } from '../theme';
+import { colors, radius, spacing } from '../theme';
 
 const Badge = ({
   children,
@@ -34,23 +34,18 @@ const Badge = ({
   };
 
   const sizeStyles = {
-    xs: { paddingVertical: 2, paddingHorizontal: 6 },
-    sm: { paddingVertical: 4, paddingHorizontal: 10 },
-    md: { paddingVertical: 6, paddingHorizontal: 14 },
-  };
-
-  const textSizes = {
-    xs: 10,
-    sm: fontSize.xs,
-    md: fontSize.sm,
+    xs: { paddingVertical: 2, paddingHorizontal: 6, fontSize: 10 },
+    sm: { paddingVertical: 4, paddingHorizontal: 10, fontSize: 11 },
+    md: { paddingVertical: 6, paddingHorizontal: 14, fontSize: 12 },
   };
 
   return (
     <View
       style={[
         styles.badge,
-        sizeStyles[size],
         {
+          paddingVertical: sizeStyles[size].paddingVertical,
+          paddingHorizontal: sizeStyles[size].paddingHorizontal,
           backgroundColor: getBackgroundColor(),
           borderColor: getBorderColor(),
           borderWidth: variant === 'outline' ? 1 : 0,
@@ -62,7 +57,7 @@ const Badge = ({
       <Text
         style={[
           styles.text,
-          { color: getTextColor(), fontSize: textSizes[size] },
+          { color: getTextColor(), fontSize: sizeStyles[size].fontSize },
           textStyle,
         ]}
       >
@@ -76,11 +71,11 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: borderRadius.full,
+    borderRadius: radius.full,
     alignSelf: 'flex-start',
   },
   icon: {
-    marginRight: spacing[1],
+    marginRight: spacing.xs,
   },
   text: {
     fontWeight: '600',
