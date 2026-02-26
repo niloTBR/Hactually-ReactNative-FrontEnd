@@ -9,7 +9,7 @@ import { colors, radius, spacing } from '../theme';
 const Badge = ({
   children,
   variant = 'solid', // 'solid' | 'outline' | 'subtle'
-  color = 'blue', // 'blue' | 'orange' | 'brown' | 'green'
+  color = 'blue', // 'blue' | 'orange' | 'olive' | 'green'
   size = 'sm', // 'xs' | 'sm' | 'md'
   icon,
   style,

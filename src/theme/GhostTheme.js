@@ -65,8 +65,8 @@ export const DarkOrangeTheme = ({ style, children }) => (
   </GhostTheme>
 );
 
-export const DarkBrownTheme = ({ style, children }) => (
-  <GhostTheme themeColor={color.brown.light} isDark style={[{ backgroundColor: color.brown.dark }, style]}>
+export const DarkOliveTheme = ({ style, children }) => (
+  <GhostTheme themeColor={color.olive.light} isDark style={[{ backgroundColor: color.olive.dark }, style]}>
     {children}
   </GhostTheme>
 );

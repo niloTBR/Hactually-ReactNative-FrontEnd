@@ -55,7 +55,7 @@ const Tabs = ({
     const getTextColor = () => {
       if (variant === 'pills' && isActive) return colors.white;
       if (isActive) return colorScheme.default;
-      return colors.brown.default;
+      return colors.olive.default;
     };
 
     return (
@@ -90,13 +90,13 @@ const Tabs = ({
           <View
             style={[
               styles.badge,
-              { backgroundColor: isActive ? colorScheme.default : colors.brown.light },
+              { backgroundColor: isActive ? colorScheme.default : colors.olive.light },
             ]}
           >
             <Text
               style={[
                 styles.badgeText,
-                { color: isActive ? colors.white : colors.brown.default },
+                { color: isActive ? colors.white : colors.olive.default },
               ]}
             >
               {tab.badge}
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   underlineContainer: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.brown.light,
+    borderBottomColor: colors.olive.light,
   },
   tab: {
     flexDirection: 'row',

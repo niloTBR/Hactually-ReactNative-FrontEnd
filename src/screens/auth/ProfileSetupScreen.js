@@ -10,10 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, ChevronDown, Camera, X, Trash2, RefreshCw } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import DatePicker from '../../components/DatePicker';
-import { Button, Input, Chip } from '../../components';
+import { Button, Input, Chip, DatePicker, Logo } from '../../components';
 import { color, spacing, typography, radius } from '../../theme';
-import { colors } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
 import { authService } from '../../services/authService';
 import { getAge } from '../../lib/utils';
@@ -143,6 +141,8 @@ export default function ProfileSetupScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton} activeOpacity={0.8}>
           <ChevronLeft size={20} color={themeColor} />
         </TouchableOpacity>
+        <View style={styles.headerSpacer} />
+        <Logo size={32} color={themeColor} />
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -215,18 +215,17 @@ export default function ProfileSetupScreen({ navigation }) {
         {/* Bio */}
         <View style={styles.bioSection}>
           <Text style={styles.sectionLabel}>Tell us about yourself</Text>
-          <View style={styles.bioInputWrapper}>
-            <Input
-              value={formData.bio}
-              onChangeText={(text) => setFormData({ ...formData, bio: text.slice(0, 250) })}
-              placeholder="A little something about you..."
-              multiline
-              numberOfLines={3}
-              variant="ghost"
-              themeColor={themeColor}
-            />
-            <Text style={styles.bioCounter}>{formData.bio.length}/250</Text>
-          </View>
+          <Input
+            value={formData.bio}
+            onChangeText={(text) => setFormData({ ...formData, bio: text })}
+            placeholder="A little something about you..."
+            multiline
+            numberOfLines={3}
+            maxLength={250}
+            showCharacterCount
+            variant="ghost"
+            themeColor={themeColor}
+          />
         </View>
 
         {/* Interests */}
@@ -321,6 +320,7 @@ export default function ProfileSetupScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: color.green.dark },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.md },
+  headerSpacer: { flex: 1 },
   backButton: { width: 40, height: 40, borderRadius: radius.full, backgroundColor: themeColor + '20', alignItems: 'center', justifyContent: 'center' },
   scrollView: { flex: 1 },
   scrollContent: { paddingHorizontal: spacing['2xl'], paddingBottom: spacing.lg },
@@ -348,8 +348,6 @@ const styles = StyleSheet.create({
   // Bio
   bioSection: { marginTop: spacing.xl },
   sectionLabel: { ...typography.caption, fontWeight: '700', color: themeColor, marginBottom: spacing.sm },
-  bioInputWrapper: { position: 'relative' },
-  bioCounter: { position: 'absolute', bottom: spacing.lg, right: spacing.lg, fontSize: 10, color: themeColor + '66' },
 
   // Interests
   interestsSection: { marginTop: spacing.xl },

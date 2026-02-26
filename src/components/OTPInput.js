@@ -75,9 +75,9 @@ const OTPInput = ({
         ? color.error.dark
         : isFilled
         ? colors.blue.default
-        : colors.brown.light + '80', // 50%
+        : colors.olive.light + '80', // 50%
       backgroundColor: colors.white,
-      color: colors.brown.dark,
+      color: colors.olive.dark,
     };
   };
 

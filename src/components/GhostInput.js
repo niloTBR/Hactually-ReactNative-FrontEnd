@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { ArrowRight } from 'lucide-react-native';
 import { color, spacing, radius, typography, inputStyles, useGhostTheme } from '../theme';
+import FormError from './FormError';
 
 const GhostInput = ({
   value,
@@ -22,10 +23,12 @@ const GhostInput = ({
   leftIcon,
   loading = false,
   disabled = false,
+  error, // Error message to display below input
   themeColor, // Color for text/icons/border - auto-detected from context if not provided
   keyboardType = 'default',
   autoCapitalize = 'none',
   style,
+  containerStyle,
 }) => {
   // Use context theme if themeColor not explicitly provided
   const ghostTheme = useGhostTheme();
@@ -37,15 +40,21 @@ const GhostInput = ({
   // Contrast color for solid button: charcoal on light bg, beige on dark bg
   const buttonIconColor = isDarkBg ? color.charcoal : color.beige;
 
+  const getBorderColor = () => {
+    if (error) return color.error.light;
+    return hasValue ? resolvedThemeColor : resolvedThemeColor + '80';
+  };
+
   return (
-    <View
-      style={[
-        styles.container,
-        { borderColor: hasValue ? resolvedThemeColor : resolvedThemeColor + '80' },
-        disabled && styles.disabled,
-        style,
-      ]}
-    >
+    <View style={containerStyle}>
+      <View
+        style={[
+          styles.inputWrapper,
+          { borderColor: getBorderColor() },
+          disabled && styles.disabled,
+          style,
+        ]}
+      >
       {leftIcon && (
         <View style={styles.iconLeft}>
           {React.cloneElement(leftIcon, { color: resolvedThemeColor, size: 16 })}
@@ -62,28 +71,31 @@ const GhostInput = ({
         onSubmitEditing={onSubmit}
         style={[styles.input, { color: resolvedThemeColor }]}
       />
-      <TouchableOpacity
-        onPress={onSubmit}
-        disabled={!canSubmit}
-        style={[
-          styles.submitBtn,
-          {
-            backgroundColor: canSubmit ? resolvedThemeColor : resolvedThemeColor + '30',
-          },
-        ]}
-      >
-        {loading ? (
-          <ActivityIndicator size="small" color={canSubmit ? buttonIconColor : resolvedThemeColor} />
-        ) : (
-          <ArrowRight size={16} color={canSubmit ? buttonIconColor : resolvedThemeColor} />
-        )}
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onSubmit}
+          disabled={!canSubmit}
+          style={[
+            styles.submitBtn,
+            {
+              backgroundColor: canSubmit ? resolvedThemeColor : resolvedThemeColor + '30',
+            },
+          ]}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color={canSubmit ? buttonIconColor : resolvedThemeColor} />
+          ) : (
+            <ArrowRight size={16} color={canSubmit ? buttonIconColor : resolvedThemeColor} />
+          )}
+        </TouchableOpacity>
+      </View>
+
+      <FormError message={error} variant="ghost" />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     ...inputStyles.base,

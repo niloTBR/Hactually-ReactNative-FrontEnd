@@ -1,6 +1,6 @@
 /**
  * Hactually 2.0 Color System
- * 4 Core Colors: Blue, Orange, Brown, Green
+ * 4 Core Colors: Blue, Orange, Olive, Green
  * Each with light, default, and dark variants
  */
 
@@ -20,7 +20,7 @@ export const colors = {
   },
 
   // Secondary - Olive
-  brown: {
+  olive: {
     lighter: '#F5F1E8',
     mid: '#EDE5D5',
     light: '#C5C6AD',
@@ -28,14 +28,14 @@ export const colors = {
     dark: '#6A6B5A',
   },
 
-  // Accent - Green (NO teal - only lime and dark green)
+  // Accent - Green
   green: {
     light: '#D4E4A5',
-    default: '#3A6262', // dark green (was teal #4A7C7C - removed)
+    default: '#3A6262',
     dark: '#3A6262',
   },
 
-  // Error - Red (distinct from orange)
+  // Error - Red
   red: {
     light: '#FF6B6B',
     default: '#D9081E',
@@ -47,15 +47,25 @@ export const colors = {
   transparent: 'transparent',
 };
 
-// Gradient definitions for LinearGradient component
+/**
+ * Gradient definitions
+ * Used by LinearGradient components and animated borders
+ */
 export const gradients = {
-  blue: ['#C8E3F4', '#5865F2'],
-  orange: ['#F5C4C4', '#E05A3D'],
-  brown: ['#E5D9C3', '#8A8B73'],
-  green: ['#D4E4A5', '#3A6262'],
-  // Animated border gradients (all 4 brand colors, looped)
-  borderLight: ['#F5C4C4', '#C8E3F4', '#D4E4A5', '#C5C6AD', '#F5C4C4'], // light variants
-  borderDark: ['#E05A3D', '#5865F2', '#3A6262', '#8A8B73', '#E05A3D'], // dark/default variants
+  // Single-color gradients (light to dark)
+  blue: [colors.blue.light, colors.blue.default],
+  orange: [colors.orange.light, colors.orange.default],
+  olive: [colors.olive.light, colors.olive.default],
+  green: [colors.green.light, colors.green.default],
+
+  /**
+   * Animated border gradients
+   * Two-color gradients that rotate around button borders
+   * - borderLight: For buttons on LIGHT backgrounds (vibrant colors for contrast)
+   * - borderDark: For buttons on DARK backgrounds (pastel colors for contrast)
+   */
+  borderLight: [colors.blue.default, colors.orange.default],
+  borderDark: ['#A8D4F0', '#FFB5A7'], // light blue, peach (softer than brand colors)
 };
 
 export default colors;

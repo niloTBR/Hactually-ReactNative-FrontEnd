@@ -21,7 +21,7 @@ export default function HomeScreen({ navigation }) {
           onPress={() => navigation.navigate('StyleGuide')}
           style={styles.iconButton}
         >
-          <Palette size={20} color={colors.brown.default} />
+          <Palette size={20} color={colors.olive.default} />
         </TouchableOpacity>
       </View>
 
@@ -84,7 +84,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.brown.lighter,
+    backgroundColor: colors.olive.lighter,
   },
   header: {
     flexDirection: 'row',
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.brown.light + '4D',
+    backgroundColor: colors.olive.light + '4D',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: fontSize.sm,
-    color: colors.brown.default,
+    color: colors.olive.default,
     width: 100,
   },
   infoValue: {

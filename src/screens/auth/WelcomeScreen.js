@@ -6,7 +6,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, Animated, Platform } fro
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Logo, ProfileMarquee, Button } from '../../components';
+import { Logo, ProfileMarquee, Button, ShimmerText } from '../../components';
 import { color, spacing, typography } from '../../theme';
 
 const { width } = Dimensions.get('window');
@@ -39,13 +39,32 @@ const AnimatedText = memo(({ lines, center, slideIndex }) => {
         <View key={li} style={[styles.textLine, center && styles.centerLine]}>
           {line.split(' ').map((word, wi) => {
             const a = anims[idx++];
+            const isHactually = word.toLowerCase() === 'hactually';
+
+            if (isHactually) {
+              return (
+                <Animated.View
+                  key={wi}
+                  style={[{ flexDirection: 'row' }, a && { opacity: a, transform: [{ translateY: a.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] }]}
+                >
+                  <ShimmerText
+                    style={center ? styles.slideTextCenter : styles.slideText}
+                    color={color.orange.dark}
+                    shimmerColor="rgba(255,255,255,0.7)"
+                  >
+                    {word}
+                  </ShimmerText>
+                  <Text style={center ? styles.slideTextCenter : styles.slideText}>{' '}</Text>
+                </Animated.View>
+              );
+            }
+
             return (
               <Animated.Text
                 key={wi}
                 style={[
                   styles.slideText,
                   center && styles.slideTextCenter,
-                  word.toLowerCase() === 'hactually' && styles.brand,
                   a && { opacity: a, transform: [{ translateY: a.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] },
                 ]}
               >

@@ -4,11 +4,11 @@
  */
 
 // LEAN tokens (primary exports)
-export { color, spacing, radius, typography, inputStyles } from './tokens';
-import { color, spacing, radius, typography, inputStyles } from './tokens';
+export { color, opacity, spacing, radius, typography, inputStyles } from './tokens';
+import { color, opacity, spacing, radius, typography, inputStyles } from './tokens';
 
 // Ghost theme context (for automatic ghost variant theming)
-export { GhostTheme, useGhostTheme, DarkGreenTheme, DarkBlueTheme, DarkOrangeTheme, DarkBrownTheme } from './GhostTheme';
+export { GhostTheme, useGhostTheme, DarkGreenTheme, DarkBlueTheme, DarkOrangeTheme, DarkOliveTheme } from './GhostTheme';
 
 // Core exports (still needed by components)
 export { colors, gradients } from './colors';

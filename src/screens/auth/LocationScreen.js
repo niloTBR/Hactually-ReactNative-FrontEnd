@@ -1,23 +1,22 @@
 /**
  * Location Permission Screen
- * Request location access for venue discovery
+ * Modal popup for requesting location access
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   Linking,
   Platform,
+  Modal,
+  Animated,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, MapPin, Navigation, Shield } from 'lucide-react-native';
+import { MapPin, X, Check } from 'lucide-react-native';
 import * as Location from 'expo-location';
 import { color, spacing, typography, radius } from '../../theme';
-import { colors } from '../../theme';
-import { Button } from '../../components';
+import { Button, LogoMark } from '../../components';
 import { useAuthStore } from '../../store/authStore';
 
 export default function LocationScreen({ navigation }) {
@@ -25,9 +24,29 @@ export default function LocationScreen({ navigation }) {
   const [permissionStatus, setPermissionStatus] = useState(null);
   const [isRequesting, setIsRequesting] = useState(false);
   const [error, setError] = useState('');
+  const [visible, setVisible] = useState(true);
+
+  // Fade in/out animation for logo
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     checkPermission();
+
+    // Start blinking animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 0.4,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
   }, []);
 
   const checkPermission = async () => {
@@ -58,13 +77,13 @@ export default function LocationScreen({ navigation }) {
         });
 
         setOnboardingStep(4);
-        // Navigation handled by AppNavigator detecting onboardingComplete
+        setVisible(false);
       } else {
-        setError('Location access was denied. Please enable it in settings.');
+        setError('Location access was denied');
       }
     } catch (err) {
       console.error('Location error:', err);
-      setError('Failed to get location. Please try again.');
+      setError('Failed to get location');
     } finally {
       setIsRequesting(false);
     }
@@ -84,210 +103,183 @@ export default function LocationScreen({ navigation }) {
       onboardingComplete: true,
     });
     setOnboardingStep(4);
-    // Navigation handled by AppNavigator
+    setVisible(false);
   };
 
   const benefits = [
-    { icon: Navigation, text: 'See people at venues near you' },
-    { icon: MapPin, text: 'Check into places and meet others' },
-    { icon: Shield, text: 'Your exact location is never shared' },
+    'Discover who\'s nearby right now',
+    'Get notified when someone checks in',
+    'We never share your exact location',
   ];
 
+  const themeColor = color.green.light;
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-          activeOpacity={0.8}
-        >
-          <ChevronLeft size={20} color={color.brown.dark} />
-        </TouchableOpacity>
-      </View>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+    >
+      <View style={styles.overlay}>
+        <View style={styles.popup}>
+          {/* Close button */}
+          <TouchableOpacity onPress={handleSkip} style={styles.closeButton}>
+            <X size={18} color={themeColor + '80'} />
+          </TouchableOpacity>
 
-      {/* Content */}
-      <View style={styles.content}>
-        <Text style={styles.title}>Enable location</Text>
-        <Text style={styles.subtitle}>
-          So we can show you who's actually around
-        </Text>
+          {/* Animated Logo */}
+          <Animated.View style={[styles.logoSection, { opacity: fadeAnim }]}>
+            <LogoMark size="lg" colorScheme="light" colorVariant="green" />
+          </Animated.View>
 
-        {/* Location illustration */}
-        <View style={styles.illustration}>
-          <View style={styles.pulseOuter} />
-          <View style={styles.pulseInner} />
-          <View style={styles.iconContainer}>
-            <MapPin size={32} color="white" strokeWidth={1.5} />
-          </View>
-        </View>
+          {/* Content */}
+          <Text style={styles.title}>one last thing</Text>
+          <Text style={styles.subtitle}>
+            Enable location to see who's{'\n'}actually around you
+          </Text>
 
-        {/* Benefits */}
-        <View style={styles.benefits}>
-          {benefits.map((item, index) => (
-            <View key={index} style={styles.benefitRow}>
-              <View style={styles.benefitIcon}>
-                <item.icon
-                  size={20}
-                  color={color.brown.dark}
-                  strokeWidth={1.5}
-                />
+          {/* Benefits */}
+          <View style={styles.benefits}>
+            {benefits.map((text, index) => (
+              <View key={index} style={styles.benefitRow}>
+                <View style={styles.checkIcon}>
+                  <Check size={12} color={color.green.dark} strokeWidth={3} />
+                </View>
+                <Text style={styles.benefitText}>{text}</Text>
               </View>
-              <Text style={styles.benefitText}>{item.text}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Error */}
-        {error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
+            ))}
           </View>
-        ) : null}
-      </View>
 
-      {/* Bottom buttons */}
-      <View style={styles.bottomSection}>
-        {permissionStatus === 'denied' ? (
-          <>
-            <Button variant="solid" size="large" onPress={handleOpenSettings}>
-              Open Settings
-            </Button>
-            <Button variant="outline" size="large" onPress={handleRequestLocation}>
-              Try Again
-            </Button>
-          </>
-        ) : (
-          <Button
-            variant="outline"
-            size="large"
-            onPress={handleRequestLocation}
-            disabled={isRequesting}
-            loading={isRequesting}
-            icon={<MapPin size={16} color={color.orange.dark} />}
-          >
-            Allow Location
-          </Button>
-        )}
+          {/* Error */}
+          {error ? (
+            <Text style={styles.errorText}>{error}</Text>
+          ) : null}
 
-        <TouchableOpacity
-          onPress={handleSkip}
-          style={styles.skipButton}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.skipButtonText}>Maybe later</Text>
-        </TouchableOpacity>
+          {/* Primary Button */}
+          <View style={styles.buttons}>
+            {permissionStatus === 'denied' ? (
+              <Button
+                variant="outline-gradient"
+                color="dark"
+                fillColor={color.green.dark}
+                size="lg"
+                fullWidth
+                onPress={handleOpenSettings}
+              >
+                Open Settings
+              </Button>
+            ) : (
+              <Button
+                variant="outline-gradient"
+                color="dark"
+                fillColor={color.green.dark}
+                size="lg"
+                fullWidth
+                onPress={handleRequestLocation}
+                disabled={isRequesting}
+                loading={isRequesting}
+                leftIcon={<MapPin size={18} />}
+              >
+                Enable Location
+              </Button>
+            )}
+          </View>
+
+          {/* Skip Link */}
+          <TouchableOpacity onPress={handleSkip} style={styles.linkButton}>
+            <Text style={styles.linkText}>Maybe later</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </SafeAreaView>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  overlay: {
     flex: 1,
-    backgroundColor: color.beige,
-  },
-  header: {
-    flexDirection: 'row',
+    backgroundColor: 'rgba(0,0,0,0.7)',
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    justifyContent: 'center',
+    padding: spacing.xl,
   },
-  backButton: {
-    width: 40,
-    height: 40,
+  popup: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: color.green.dark,
+    borderRadius: radius.xl,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing['3xl'],
+    paddingBottom: spacing.xl,
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    width: 32,
+    height: 32,
     borderRadius: radius.full,
-    backgroundColor: color.brown.light + '4D',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing['2xl'],
+  logoSection: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xl,
   },
   title: {
-    ...typography.h1,
-    color: color.charcoal,
+    ...typography.h2,
+    color: color.green.light,
     marginBottom: spacing.sm,
+    textAlign: 'center',
   },
   subtitle: {
-    ...typography.caption,
-    color: color.brown.dark,
-    marginBottom: spacing['2xl'],
-  },
-  illustration: {
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing['2xl'],
-  },
-  pulseOuter: {
-    position: 'absolute',
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: color.blue.dark + '1A',
-  },
-  pulseInner: {
-    position: 'absolute',
-    width: 112,
-    height: 112,
-    borderRadius: 56,
-    backgroundColor: color.blue.dark + '26',
-  },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: color.blue.dark,
-    alignItems: 'center',
-    justifyContent: 'center',
+    ...typography.body,
+    color: color.green.light + 'CC',
+    marginBottom: spacing.xl,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   benefits: {
-    gap: spacing.lg,
+    width: '100%',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
   },
   benefitRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
   },
-  benefitIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    backgroundColor: color.brown.light + '4D',
+  checkIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: color.green.light,
     alignItems: 'center',
     justifyContent: 'center',
   },
   benefitText: {
     ...typography.caption,
-    color: color.charcoal,
-  },
-  errorContainer: {
-    marginTop: spacing.xl,
-    backgroundColor: color.orange.dark + '1A',
-    borderWidth: 1,
-    borderColor: color.orange.dark + '33',
-    borderRadius: radius.xl,
-    padding: spacing.lg,
+    color: color.green.light,
+    flex: 1,
   },
   errorText: {
     ...typography.caption,
-    color: color.orange.dark,
+    color: color.error.light,
+    textAlign: 'center',
+    marginBottom: spacing.md,
   },
-  bottomSection: {
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing['2xl'],
-    gap: spacing.md,
+  buttons: {
+    width: '100%',
   },
-  skipButton: {
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
+  linkButton: {
+    marginTop: spacing.lg,
+    paddingVertical: spacing.sm,
   },
-  skipButtonText: {
-    ...typography.caption,
-    color: color.brown.dark,
+  linkText: {
+    ...typography.link,
+    color: color.green.light,
   },
 });

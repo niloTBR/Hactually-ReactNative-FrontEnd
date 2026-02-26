@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Mail } from 'lucide-react-native';
-import { color, spacing, typography, radius, inputStyles, GhostTheme } from '../../theme';
+import { color, spacing, typography, radius, GhostTheme } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
 import { validateEmail } from '../../lib/utils';
 import { Logo, GoogleIcon, AppleIcon, ProfileMarquee, Button, GhostInput } from '../../components';
@@ -75,21 +75,20 @@ export default function AuthOptionsScreen({ navigation, route }) {
             </View>
 
             <View style={styles.bottom}>
-              {error ? <View style={styles.error}><Text style={styles.errorText}>{error}</Text></View> : null}
-
               <Text style={styles.title}>continue the moment</Text>
 
               <Animated.View style={animStyle(0)}>
                 <GhostTheme themeColor={color.green.light} isDark={true}>
                   <GhostInput
                     value={email}
-                    onChangeText={setEmail}
+                    onChangeText={(text) => { setEmail(text); setError(''); }}
                     placeholder="Enter your email"
                     leftIcon={<Mail />}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     onSubmit={handleEmailSubmit}
                     loading={isLoading}
+                    error={error}
                   />
                 </GhostTheme>
               </Animated.View>
@@ -99,19 +98,31 @@ export default function AuthOptionsScreen({ navigation, route }) {
               </Animated.View>
 
               <Animated.View style={animStyle(2)}>
-                <TouchableOpacity onPress={() => handleOAuth('google')} style={styles.oauth}>
-                  <GoogleIcon size={20} color={color.green.light} /><Text style={styles.oauthText}><Text style={styles.oauthSmall}>continue with </Text>Google</Text>
-                </TouchableOpacity>
+                <Button
+                  variant="ghost"
+                  themeColor={color.green.light}
+                  leftIcon={<GoogleIcon size={20} />}
+                  onPress={() => handleOAuth('google')}
+                  fullWidth
+                >
+                  Continue with Google
+                </Button>
               </Animated.View>
 
-              <Animated.View style={animStyle(3)}>
-                <TouchableOpacity onPress={() => handleOAuth('apple')} style={styles.oauth}>
-                  <AppleIcon size={24} color={color.green.light} /><Text style={styles.oauthText}><Text style={styles.oauthSmall}>continue with </Text>Apple</Text>
-                </TouchableOpacity>
+              <Animated.View style={[animStyle(3), { marginTop: spacing.md }]}>
+                <Button
+                  variant="ghost"
+                  themeColor={color.green.light}
+                  leftIcon={<AppleIcon size={24} />}
+                  onPress={() => handleOAuth('apple')}
+                  fullWidth
+                >
+                  Continue with Apple
+                </Button>
               </Animated.View>
 
               <Animated.Text style={[styles.terms, animStyle(4)]}>
-                By continuing, you agree to our{'\n'}Terms of Service and Privacy Policy
+                By continuing, you agree to our{'\n'}<Text style={styles.termsBold}>Terms of Service</Text> and <Text style={styles.termsBold}>Privacy Policy</Text>
               </Animated.Text>
             </View>
           </ScrollView>
@@ -146,24 +157,10 @@ const styles = StyleSheet.create({
   logoText: { ...typography.h2, color: color.green.light, marginTop: 5 },
   profiles: { flex: 1, justifyContent: 'center', gap: spacing.lg, paddingVertical: spacing.lg },
   bottom: { paddingHorizontal: spacing['2xl'], paddingBottom: spacing['2xl'] },
-  error: { backgroundColor: 'rgba(224,90,61,0.2)', padding: spacing.md, borderRadius: radius.full, marginBottom: spacing.lg },
-  errorText: { ...typography.caption, fontWeight: '700', color: color.orange.light, textAlign: 'center' },
   title: { ...typography.h2, color: color.green.light, marginBottom: spacing.xl },
   divider: { flexDirection: 'row', alignItems: 'center', marginVertical: spacing.lg, gap: spacing.lg },
   line: { flex: 1, height: 1, backgroundColor: color.green.light + '50' },
   or: { ...typography.caption, fontWeight: '700', color: color.green.light + '80', textTransform: 'uppercase', letterSpacing: 2 },
-  // Ghost oauth buttons
-  oauth: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...inputStyles.base,
-    ...inputStyles.ghost,
-    borderColor: color.green.light + '60',
-    marginBottom: spacing.md,
-    gap: spacing.sm,
-  },
-  oauthText: { ...typography.body, fontWeight: '700', color: color.green.light },
-  oauthSmall: { ...typography.caption, fontWeight: '400' },
   terms: { ...typography.caption, color: color.green.light + '80', textAlign: 'center', marginTop: spacing.xl },
+  termsBold: { fontWeight: '700' },
 });

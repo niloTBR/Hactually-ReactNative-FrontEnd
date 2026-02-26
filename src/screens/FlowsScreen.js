@@ -148,7 +148,7 @@ const FlowAccordion = ({ flow, index, isExpanded, onToggle, onNavigate }) => {
           {isExpanded ? (
             <ChevronDown size={20} color={color.charcoal} />
           ) : (
-            <ChevronRight size={20} color={color.brown.light} />
+            <ChevronRight size={20} color={color.olive.light} />
           )}
         </View>
       </TouchableOpacity>
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     backgroundColor: 'rgba(255,255,255,0.9)',
     borderBottomWidth: 1,
-    borderBottomColor: color.brown.light + '50',
+    borderBottomColor: color.olive.light + '50',
   },
   logo: {
     ...typography.h3,
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     backgroundColor: color.green.dark,
   },
   statDotToBuild: {
-    backgroundColor: color.brown.light,
+    backgroundColor: color.olive.light,
   },
   statText: {
     ...typography.caption,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 10,
-    backgroundColor: color.brown.light + '60',
+    backgroundColor: color.olive.light + '60',
     borderRadius: radius.full,
     overflow: 'hidden',
     marginBottom: spacing.sm,
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: color.brown.light + '60',
+    borderColor: color.olive.light + '60',
     overflow: 'hidden',
   },
   accordionHeader: {
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
   },
   accordionContent: {
     borderTopWidth: 1,
-    borderTopColor: color.brown.light + '40',
+    borderTopColor: color.olive.light + '40',
     backgroundColor: color.beige + '80',
   },
   screenItem: {
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     gap: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: color.brown.light + '30',
+    borderBottomColor: color.olive.light + '30',
   },
   screenId: {
     paddingHorizontal: spacing.sm,
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     backgroundColor: color.green.light,
   },
   screenIdInactive: {
-    backgroundColor: color.brown.light + '50',
+    backgroundColor: color.olive.light + '50',
   },
   screenIdText: {
     ...typography.caption,
@@ -473,6 +473,6 @@ const styles = StyleSheet.create({
     backgroundColor: color.green.dark,
   },
   statusDotInactive: {
-    backgroundColor: color.brown.light,
+    backgroundColor: color.olive.light,
   },
 });

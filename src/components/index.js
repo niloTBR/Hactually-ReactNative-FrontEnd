@@ -11,5 +11,7 @@ export { default as SocialButton } from './SocialButton';
 export { default as Logo, LogoMark, LogoWithText, AppIcon } from './Logo';
 export { default as DatePicker } from './DatePicker';
 export { default as Chip } from './Chip';
+export { default as FormError } from './FormError';
 export { default as ProfileMarquee } from './ProfileMarquee';
+export { default as ShimmerText } from './ShimmerText';
 export { GoogleIcon, AppleIcon } from './Icons';

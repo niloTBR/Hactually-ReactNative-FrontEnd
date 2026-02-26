@@ -10,6 +10,7 @@ import {
 import { ChevronDown } from 'lucide-react-native';
 import { color, spacing, typography, radius, useGhostTheme } from '../theme';
 import { colors, shadows } from '../theme';
+import FormError from './FormError';
 
 // Only import DateTimePicker on native platforms
 let DateTimePicker = null;
@@ -69,50 +70,58 @@ const DatePicker = ({
     }
     return {
       backgroundColor: colors.white,
-      borderColor: error ? color.error.dark : color.brown.light + '80',
+      borderColor: error ? color.error.dark : color.olive.light + '80',
     };
   };
 
   const getTextColor = () => isGhost ? resolvedThemeColor : color.charcoal; // 100%
-  const getPlaceholderColor = () => isGhost ? resolvedThemeColor + 'BF' : color.brown.dark + 'BF'; // 75%
-  const getIconColor = () => isGhost ? resolvedThemeColor : color.brown.dark; // 100%
-  const getLabelColor = () => isGhost ? resolvedThemeColor : color.brown.dark; // 100%
-  const getErrorColor = () => isGhost ? color.error.light : color.error.dark;
+  const getPlaceholderColor = () => isGhost ? resolvedThemeColor + 'BF' : color.olive.dark + 'BF'; // 75%
+  const getIconColor = () => isGhost ? resolvedThemeColor : color.olive.dark; // 100%
+  const getLabelColor = () => isGhost ? resolvedThemeColor : color.olive.dark; // 100%
 
-  // Web: Use native HTML date input
+  // Web: Use native HTML date input with custom icon
   if (Platform.OS === 'web') {
     const webDateValue = value
       ? `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`
       : '';
 
-    // Use dark color scheme on dark backgrounds to get light icons
-    const colorScheme = isDarkBg ? 'dark' : 'light';
-
     return (
       <View style={styles.container}>
         {label && <Text style={[styles.label, { color: getLabelColor() }]}>{label}</Text>}
+        <style>{`
+          input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+            position: absolute;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+          }
+        `}</style>
         <View style={[styles.field, !isGhost && shadows.card, getFieldStyle()]}>
-          <input
-            type="date"
-            value={webDateValue}
-            onChange={handleWebDateChange}
-            max={new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()).toISOString().split('T')[0]}
-            min={new Date(new Date().getFullYear() - 100, 0, 1).toISOString().split('T')[0]}
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              backgroundColor: 'transparent',
-              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-              fontSize: 14,
-              color: value ? getTextColor() : getPlaceholderColor(),
-              cursor: 'pointer',
-              colorScheme: colorScheme,
-              accentColor: resolvedThemeColor,
-            }}
-          />
+          <View style={styles.webInputWrapper}>
+            <input
+              type="date"
+              value={webDateValue}
+              onChange={handleWebDateChange}
+              max={new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()).toISOString().split('T')[0]}
+              min={new Date(new Date().getFullYear() - 100, 0, 1).toISOString().split('T')[0]}
+              style={{
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                backgroundColor: 'transparent',
+                fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                fontSize: 14,
+                color: value ? getTextColor() : getPlaceholderColor(),
+                cursor: 'pointer',
+                position: 'relative',
+              }}
+            />
+          </View>
+          <ChevronDown size={16} color={getIconColor()} />
         </View>
-        {error && <Text style={[styles.error, { color: getErrorColor() }]}>{error}</Text>}
+        <FormError message={error} variant={variant} />
       </View>
     );
   }
@@ -134,7 +143,7 @@ const DatePicker = ({
           <ChevronDown size={16} color={getIconColor()} />
         </TouchableOpacity>
 
-        {error && <Text style={[styles.error, { color: getErrorColor() }]}>{error}</Text>}
+        <FormError message={error} variant={variant} />
 
         <Modal visible={showPicker} transparent animationType="slide">
           <View style={styles.overlay}>
@@ -183,7 +192,7 @@ const DatePicker = ({
         <ChevronDown size={16} color={getIconColor()} />
       </TouchableOpacity>
 
-      {error && <Text style={[styles.error, { color: getErrorColor() }]}>{error}</Text>}
+      <FormError message={error} variant={variant} />
 
       {showPicker && DateTimePicker && (
         <DateTimePicker
@@ -217,13 +226,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: spacing.lg,
   },
+  webInputWrapper: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'center',
+  },
   fieldText: {
     ...typography.body,
-  },
-  error: {
-    ...typography.caption,
-    marginTop: spacing.xs,
-    marginLeft: spacing.sm,
   },
   overlay: {
     flex: 1,
@@ -242,7 +251,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: color.brown.light + '30',
+    borderBottomColor: color.olive.light + '30',
   },
   title: {
     ...typography.h3,
@@ -250,7 +259,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     ...typography.body,
-    color: color.brown.dark,
+    color: color.olive.dark,
   },
   doneText: {
     ...typography.body,

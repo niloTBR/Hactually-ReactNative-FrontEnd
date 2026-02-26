@@ -26,14 +26,14 @@ export const logoColors = {
   light: {
     orange: colors.orange.light,
     blue: colors.blue.light,
-    brown: colors.brown.light,
+    olive: colors.olive.light,
     green: colors.green.light,
   },
   // Dark variants (for light backgrounds)
   dark: {
     orange: colors.orange.default, // #E05A3D - vibrant coral
     blue: colors.blue.default, // #5865F2 - vibrant blue
-    brown: colors.brown.dark,
+    olive: colors.olive.dark,
     green: colors.green.dark,
   },
 };
@@ -43,13 +43,13 @@ export const appIconVariants = {
   light: {
     orange: { bg: colors.orange.light, fg: colors.orange.default },
     blue: { bg: colors.blue.light, fg: colors.blue.default },
-    brown: { bg: colors.brown.light, fg: colors.brown.dark },
+    olive: { bg: colors.olive.light, fg: colors.olive.dark },
     green: { bg: colors.green.light, fg: colors.green.dark },
   },
   dark: {
     orange: { bg: colors.orange.default, fg: colors.orange.light },
     blue: { bg: colors.blue.default, fg: colors.blue.light },
-    brown: { bg: colors.brown.dark, fg: colors.brown.light },
+    olive: { bg: colors.olive.dark, fg: colors.olive.light },
     green: { bg: colors.green.dark, fg: colors.green.light },
   },
 };

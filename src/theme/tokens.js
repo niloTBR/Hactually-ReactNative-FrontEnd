@@ -18,9 +18,9 @@ export const color = {
     light: colors.blue.light,
     dark: colors.blue.default, // #5865F2 - the vibrant blue
   },
-  brown: {
-    light: colors.brown.light,
-    dark: colors.brown.dark,
+  olive: {
+    light: colors.olive.light,
+    dark: colors.olive.dark,
   },
   green: {
     light: colors.green.light,
@@ -28,7 +28,8 @@ export const color = {
   },
 
   // Neutrals
-  beige: colors.brown.lighter,
+  beige: colors.olive.lighter,
+  mid: colors.olive.mid, // #EDE5D5 - for cards/surfaces
   charcoal: '#1A1A1A', // true charcoal black
 
   // Error - distinct red that works on all backgrounds
@@ -36,6 +37,19 @@ export const color = {
     light: colors.red.light,
     dark: colors.red.default,
   },
+};
+
+// ============================================
+// OPACITY TOKENS
+// Hex suffixes for color opacity (append to hex color)
+// ============================================
+export const opacity = {
+  10: '1A',  // 10% - subtle fills
+  20: '33',  // 20% - light fills
+  30: '4D',  // 30% - borders (unselected)
+  50: '80',  // 50% - borders (default)
+  75: 'BF',  // 75% - placeholder text
+  90: 'E6',  // 90% - near solid
 };
 
 // ============================================
@@ -55,6 +69,8 @@ export const spacing = {
 // RADIUS TOKENS
 // ============================================
 export const radius = {
+  xs: 2,
+  sm: 4,
   md: 8,
   lg: 16,
   xl: 24,
@@ -101,6 +117,13 @@ export const typography = {
     fontWeight: '400',
     lineHeight: 20,
   },
+  link: {
+    fontFamily: fontFamilyBody,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
+    textDecorationLine: 'underline',
+  },
   button: {
     fontFamily: fontFamilyPrimary,
     fontSize: 12,
@@ -119,7 +142,7 @@ export const inputStyles = {
   solid: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(197, 198, 173, 0.3)', // brown.light with opacity
+    borderColor: colors.olive.light + opacity[30], // olive.light @ 30%
   },
   // Ghost: Transparent with visible border (for dark backgrounds)
   ghost: {
@@ -140,6 +163,7 @@ export const inputStyles = {
 // ============================================
 const tokens = {
   color,
+  opacity,
   spacing,
   radius,
   typography,

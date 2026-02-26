@@ -59,9 +59,9 @@ const Chip = ({
     }
     return {
       backgroundColor: colors.white,
-      borderColor: colors.brown.light + '4D',
-      textColor: colors.brown.dark,
-      emojiColor: colors.brown.dark,
+      borderColor: colors.olive.light + '4D',
+      textColor: colors.olive.dark,
+      emojiColor: colors.olive.dark,
     };
   };
 

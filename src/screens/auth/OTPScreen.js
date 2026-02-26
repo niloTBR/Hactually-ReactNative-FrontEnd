@@ -78,16 +78,6 @@ export default function OTPScreen({ navigation, route }) {
         <Text style={styles.title}>enter the code</Text>
         <Text style={styles.subtitle}>We sent a 6-digit code to {email}</Text>
 
-        {/* Dev OTP helper */}
-        {devOTP && (
-          <View style={styles.devOtpContainer}>
-            <Text style={styles.devOtpText}>
-              Dev Mode - Code:{' '}
-              <Text style={styles.devOtpCode}>{devOTP}</Text>
-            </Text>
-          </View>
-        )}
-
         {/* Error */}
         {error ? (
           <View style={styles.errorContainer}>
@@ -128,6 +118,16 @@ export default function OTPScreen({ navigation, route }) {
           )}
         </View>
       </View>
+
+      {/* Dev OTP helper - Footer */}
+      {devOTP && (
+        <View style={styles.devOtpContainer}>
+          <Text style={styles.devOtpText}>
+            Dev Mode - Code:{' '}
+            <Text style={styles.devOtpCode}>{devOTP}</Text>
+          </Text>
+        </View>
+      )}
 
       {/* Loading overlay */}
       {isLoading && (
@@ -181,8 +181,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: color.green.light + '40',
     borderRadius: radius.full,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.xl,
+    alignSelf: 'center',
   },
   devOtpText: {
     ...typography.caption,

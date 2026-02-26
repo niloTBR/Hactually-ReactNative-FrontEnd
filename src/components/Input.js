@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { colors, color, radius, spacing, shadows, typography, useGhostTheme } from '../theme';
+import FormError from './FormError';
 
 const Input = ({
   value,
@@ -28,6 +29,7 @@ const Input = ({
   autoCapitalize = 'none',
   autoComplete,
   maxLength,
+  showCharacterCount = false, // Show character counter when maxLength is set
   multiline = false,
   numberOfLines = 1,
   editable = true,
@@ -72,7 +74,7 @@ const Input = ({
     if (error) return isGhost ? color.error.light : color.error.dark;
     // Full border (100%) when focused OR has value, otherwise 50% (80 hex)
     if (isFocused || hasValue) return isGhost ? resolvedThemeColor : colors.blue.default;
-    return isGhost ? resolvedThemeColor + '80' : colors.brown.light + '80';
+    return isGhost ? resolvedThemeColor + '80' : colors.olive.light + '80';
   };
 
   const getBackgroundColor = () => {
@@ -83,21 +85,21 @@ const Input = ({
 
   const getTextColor = () => {
     // Ghost: 100% theme color when typing
-    return isGhost ? resolvedThemeColor : colors.brown.dark;
+    return isGhost ? resolvedThemeColor : colors.olive.dark;
   };
 
   const getPlaceholderColor = () => {
     // Ghost: 75% opacity for placeholder (BF hex)
-    return isGhost ? resolvedThemeColor + 'BF' : colors.brown.default + 'BF';
+    return isGhost ? resolvedThemeColor + 'BF' : colors.olive.default + 'BF';
   };
 
   const getLabelColor = () => {
     // Labels: always 100% contrast color
-    return isGhost ? resolvedThemeColor : colors.brown.dark;
+    return isGhost ? resolvedThemeColor : colors.olive.dark;
   };
 
   const getIconColor = () => {
-    return isGhost ? resolvedThemeColor : colors.brown.default;
+    return isGhost ? resolvedThemeColor : colors.olive.default;
   };
 
   return (
@@ -171,9 +173,11 @@ const Input = ({
         )}
       </View>
 
-      {error && (
-        <Text style={[styles.error, isGhost && { color: color.error.light }]}>
-          {error}
+      <FormError message={error} variant={variant} />
+
+      {showCharacterCount && maxLength && (
+        <Text style={[styles.characterCount, { color: isGhost ? resolvedThemeColor + '66' : colors.olive.default + '66' }]}>
+          {(value || '').length}/{maxLength}
         </Text>
       )}
     </View>
@@ -200,21 +204,20 @@ const styles = StyleSheet.create({
   inputWrapperMultiline: {
     borderRadius: radius.lg,
     alignItems: 'flex-start',
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
   },
   input: {
     flex: 1,
     ...typography.body,
     height: '100%',
-    paddingVertical: spacing.md,
     ...(Platform.OS === 'web' && { outlineStyle: 'none' }),
   },
   multilineInput: {
     textAlignVertical: 'top',
-    paddingTop: spacing.md,
+    paddingTop: 0,
   },
   disabledInput: {
-    backgroundColor: colors.brown.lighter,
+    backgroundColor: colors.olive.lighter,
   },
   leftIcon: {
     marginRight: spacing.md,
@@ -223,11 +226,12 @@ const styles = StyleSheet.create({
     marginLeft: spacing.md,
     padding: spacing.xs,
   },
-  error: {
+  characterCount: {
     ...typography.caption,
-    color: colors.red.default,
+    fontSize: 10,
+    textAlign: 'right',
     marginTop: spacing.xs,
-    marginLeft: spacing.sm,
+    marginRight: spacing.sm,
   },
 });
 

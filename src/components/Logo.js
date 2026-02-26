@@ -13,7 +13,7 @@ import { logoPath, logoAspectRatio, logoSizes, logoColors } from '../theme/brand
  * @param {string} size - 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' or number
  * @param {string} color - Any valid color string
  * @param {string} colorScheme - 'light' | 'dark'
- * @param {string} colorVariant - 'orange' | 'blue' | 'brown' | 'green'
+ * @param {string} colorVariant - 'orange' | 'blue' | 'olive' | 'green'
  */
 export const LogoMark = ({
   size = 'md',
@@ -47,7 +47,7 @@ export const LogoMark = ({
  * @param {string} size - 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' or number
  * @param {string} color - Any valid color string (applies to both icon and text)
  * @param {string} colorScheme - 'light' | 'dark'
- * @param {string} colorVariant - 'orange' | 'blue' | 'brown' | 'green'
+ * @param {string} colorVariant - 'orange' | 'blue' | 'olive' | 'green'
  */
 export const LogoWithText = ({
   size = 'sm',
@@ -89,7 +89,7 @@ export const LogoWithText = ({
  * App Icon (logo with background container)
  * @param {string} size - 'sm' | 'md' | 'lg' | 'xl' or number
  * @param {string} colorScheme - 'light' | 'dark'
- * @param {string} colorVariant - 'orange' | 'blue' | 'brown' | 'green'
+ * @param {string} colorVariant - 'orange' | 'blue' | 'olive' | 'green'
  * @param {string} backgroundColor - Override background color
  * @param {string} foregroundColor - Override foreground/logo color
  */
