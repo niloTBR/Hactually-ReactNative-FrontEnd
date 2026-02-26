@@ -2,7 +2,7 @@
  * StyleGuide Screen - Hactually 2.0 Design System
  * Using LEAN Design Token Standard
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Eye, Type, MousePointer, FormInput, Mail, Lock, Search, Palette, Grid, Circle } from 'lucide-react-native';
@@ -133,20 +133,36 @@ const ThemeSwitcher = ({ selected, onSelect }) => (
 );
 
 export default function StyleGuideScreen() {
-  const [active, setActive] = useState('logo');
+  const [active, setActive] = useState('colors');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [formTheme, setFormTheme] = useState('light');
+
+  const scrollViewRef = useRef(null);
+  const sectionPositions = useRef({});
 
   // Get current form theme
   const currentTheme = FORM_THEMES[formTheme];
 
+  const handleNav = (sectionId) => {
+    setActive(sectionId);
+    const y = sectionPositions.current[sectionId];
+    if (y !== undefined && scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: y - 16, animated: true });
+    }
+  };
+
+  const handleSectionLayout = (sectionId) => (event) => {
+    sectionPositions.current[sectionId] = event.nativeEvent.layout.y;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.layout}>
-        <Sidebar active={active} onNav={setActive} />
-        <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
+        <Sidebar active={active} onNav={handleNav} />
+        <ScrollView ref={scrollViewRef} style={styles.content} contentContainerStyle={styles.contentInner}>
 
           {/* COLORS */}
+          <View onLayout={handleSectionLayout('colors')}>
           <Section title="Colors">
             <Label>1.1 BRAND COLORS</Label>
             <View style={styles.colorBrandGrid}>
@@ -198,8 +214,10 @@ export default function StyleGuideScreen() {
               </View>
             </View>
           </Section>
+          </View>
 
           {/* LOGO */}
+          <View onLayout={handleSectionLayout('logo')}>
           <Section title="Logo">
             <Label>2.1 LOGO MARK</Label>
             <View style={styles.logoMarkSplit}>
@@ -375,8 +393,10 @@ export default function StyleGuideScreen() {
               <View style={styles.iconBox}><AppleIcon size={24} color={color.blue.dark} /><Text style={styles.iconLabel}>Apple</Text></View>
             </View>
           </Section>
+          </View>
 
           {/* TYPOGRAPHY */}
+          <View onLayout={handleSectionLayout('typography')}>
           <Section title="Typography">
             <Label>3.1 TYPE SCALE</Label>
             <View style={styles.typeScaleContainer}>
@@ -467,8 +487,10 @@ export default function StyleGuideScreen() {
               <TokenLabel token="ShimmerText" />
             </View>
           </Section>
+          </View>
 
           {/* SPACING & RADIUS */}
+          <View onLayout={handleSectionLayout('spacing')}>
           <Section title="Spacing & Radius">
             <Label>4.1 SPACING</Label>
             <View style={styles.spacingGrid}>
@@ -496,8 +518,10 @@ export default function StyleGuideScreen() {
               ))}
             </View>
           </Section>
+          </View>
 
           {/* BUTTONS */}
+          <View onLayout={handleSectionLayout('buttons')}>
           <Section title="Buttons">
             <Label>5.1 SOLID & OUTLINE</Label>
             <View style={styles.btn2x2Grid}>
@@ -676,8 +700,10 @@ export default function StyleGuideScreen() {
               </View>
             </View>
           </Section>
+          </View>
 
           {/* FORMS */}
+          <View onLayout={handleSectionLayout('inputs')}>
           <Section title="Form Components">
 
             <Label>6.1 GHOST VARIANT (Theme Adaptive)</Label>
@@ -771,6 +797,7 @@ export default function StyleGuideScreen() {
             </GhostTheme>
 
             </Section>
+          </View>
 
           <View style={{ height: 40 }} />
         </ScrollView>
