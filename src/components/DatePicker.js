@@ -28,6 +28,7 @@ const DatePicker = ({
   themeColor, // For ghost variant - auto-detected from context if not provided
 }) => {
   const [showPicker, setShowPicker] = useState(false);
+  const [tempDate, setTempDate] = useState(null); // iOS: track spinner value before confirming
   const isGhost = variant === 'ghost';
 
   // Use context theme if themeColor not explicitly provided
@@ -42,13 +43,33 @@ const DatePicker = ({
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   };
 
-  const handleDateChange = (event, selectedDate) => {
-    if (Platform.OS === 'android') {
-      setShowPicker(false);
-    }
-    if (selectedDate) {
+  // Android: handle date selection or dismissal
+  const handleAndroidDateChange = (event, selectedDate) => {
+    setShowPicker(false);
+    if (event.type === 'set' && selectedDate) {
       onChange(selectedDate);
     }
+  };
+
+  // iOS: track spinner changes (don't save yet)
+  const handleIOSDateChange = (event, selectedDate) => {
+    if (selectedDate) {
+      setTempDate(selectedDate);
+    }
+  };
+
+  // iOS: confirm selection
+  const handleIOSDone = () => {
+    const dateToSave = tempDate || value || defaultDate;
+    onChange(dateToSave);
+    setShowPicker(false);
+    setTempDate(null);
+  };
+
+  // iOS: cancel without saving
+  const handleIOSCancel = () => {
+    setShowPicker(false);
+    setTempDate(null);
   };
 
   const handleWebDateChange = (e) => {
@@ -126,7 +147,7 @@ const DatePicker = ({
     );
   }
 
-  // iOS: Show modal with spinner picker
+  // iOS: Use inline picker that we control with our own modal
   if (Platform.OS === 'ios') {
     return (
       <View style={styles.container}>
@@ -134,7 +155,10 @@ const DatePicker = ({
 
         <TouchableOpacity
           style={[styles.field, !isGhost && shadows.card, getFieldStyle()]}
-          onPress={() => setShowPicker(true)}
+          onPress={() => {
+            setTempDate(value || defaultDate);
+            setShowPicker(true);
+          }}
           activeOpacity={0.7}
         >
           <Text style={[styles.fieldText, { color: value ? getTextColor() : getPlaceholderColor() }]}>
@@ -146,31 +170,36 @@ const DatePicker = ({
         <FormError message={error} variant={variant} />
 
         <Modal visible={showPicker} transparent animationType="slide">
-          <View style={styles.overlay}>
+          <TouchableOpacity
+            style={styles.overlay}
+            activeOpacity={1}
+            onPress={handleIOSCancel}
+          >
             <View style={styles.modal}>
               <View style={styles.header}>
-                <TouchableOpacity onPress={() => setShowPicker(false)}>
+                <TouchableOpacity onPress={handleIOSCancel} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                   <Text style={styles.cancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <Text style={styles.title}>Date of Birth</Text>
-                <TouchableOpacity onPress={() => setShowPicker(false)}>
+                <TouchableOpacity onPress={handleIOSDone} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                   <Text style={styles.doneText}>Done</Text>
                 </TouchableOpacity>
               </View>
 
               {DateTimePicker && (
                 <DateTimePicker
-                  value={value || defaultDate}
+                  value={tempDate || defaultDate}
                   mode="date"
                   display="spinner"
-                  onChange={handleDateChange}
+                  onChange={handleIOSDateChange}
                   maximumDate={new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate())}
                   minimumDate={new Date(new Date().getFullYear() - 100, 0, 1)}
                   style={styles.picker}
+                  textColor={color.charcoal}
                 />
               )}
             </View>
-          </View>
+          </TouchableOpacity>
         </Modal>
       </View>
     );
@@ -199,7 +228,7 @@ const DatePicker = ({
           value={value || defaultDate}
           mode="date"
           display="default"
-          onChange={handleDateChange}
+          onChange={handleAndroidDateChange}
           maximumDate={new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate())}
           minimumDate={new Date(new Date().getFullYear() - 100, 0, 1)}
         />
