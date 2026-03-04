@@ -67,7 +67,7 @@ const Button = ({
   onPress,
   variant = 'solid',
   color = 'blue',
-  size = 'md',
+  size = 'lg',
   fullWidth = false,
   disabled = false,
   loading = false,
@@ -120,9 +120,8 @@ const Button = ({
 
   // Size configurations
   const sizeConfig = {
-    sm: { height: 36, paddingHorizontal: 12 },
-    md: { height: 48, paddingHorizontal: 20 },
-    lg: { height: 56, paddingHorizontal: 24 },
+    sm: { height: 32, paddingHorizontal: 12, fontSize: 12 },
+    lg: { height: 48, paddingHorizontal: 24 },
   };
 
   const getTextColor = () => {
@@ -134,6 +133,9 @@ const Button = ({
     return colorScheme.default;
   };
 
+  // Font size for small buttons
+  const textSizeStyle = sizeConfig[size].fontSize ? { fontSize: sizeConfig[size].fontSize } : {};
+
   // Shared button content
   const buttonContent = (
     <View style={styles.content}>
@@ -142,7 +144,7 @@ const Button = ({
       ) : (
         <>
           {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
-          <Text style={[styles.text, { color: getTextColor() }, textStyle]}>
+          <Text style={[styles.text, { color: getTextColor() }, textSizeStyle, textStyle]}>
             {children}
           </Text>
           {rightIcon && <View style={styles.iconRight}>{rightIcon}</View>}
@@ -231,7 +233,7 @@ const Button = ({
                 {React.cloneElement(leftIcon, { color: ghostColor })}
               </View>
             )}
-            <Text style={[styles.ghostText, { color: ghostColor }, textStyle]}>
+            <Text style={[styles.ghostText, { color: ghostColor }, textSizeStyle, textStyle]}>
               {children}
             </Text>
             {rightIcon && (
@@ -295,7 +297,7 @@ const Button = ({
           ]}
         />
 
-        <Text style={[styles.text, { color: txtColor, zIndex: 2 }, textStyle]}>
+        <Text style={[styles.text, { color: txtColor, zIndex: 2 }, textSizeStyle, textStyle]}>
           {children}
         </Text>
       </TouchableOpacity>

@@ -167,7 +167,7 @@ export default function LocationScreen({ navigation }) {
                 fullWidth
                 onPress={handleOpenSettings}
               >
-                Open Settings
+                Location Settings
               </Button>
             ) : (
               <Button

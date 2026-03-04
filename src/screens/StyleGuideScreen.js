@@ -691,12 +691,12 @@ export default function StyleGuideScreen() {
             <Label>5.5 SIZES</Label>
             <View style={styles.btnColorGrid}>
               <View style={styles.btnColorItem}>
-                <Button size="sm" variant="solid" color="blue">Small</Button>
-                <TokenLabel token="Button.size.sm" />
+                <Button size="lg" variant="solid" color="blue">Large (48px)</Button>
+                <TokenLabel token="Button.size.lg (default)" />
               </View>
               <View style={styles.btnColorItem}>
-                <Button size="lg" variant="solid" color="blue">Large</Button>
-                <TokenLabel token="Button.size.lg" />
+                <Button size="sm" variant="solid" color="blue">Small (32px)</Button>
+                <TokenLabel token="Button.size.sm" />
               </View>
             </View>
           </Section>
