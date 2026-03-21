@@ -5,13 +5,13 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Eye, Type, MousePointer, FormInput, Mail, Lock, Search, Palette, Grid, Circle } from 'lucide-react-native';
+import { Eye, Type, MousePointer, FormInput, Mail, Lock, Search, Palette, Grid, Circle, ArrowLeft, LayoutGrid, Navigation } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 // LEAN tokens
 import { color, spacing, radius, typography } from '../theme';
 // Legacy (for components not yet migrated)
 import { colors, fontFamily, fontFamilySecondary } from '../theme';
-import { Button, Input, OTPInput, Chip, DatePicker, GhostInput, GoogleIcon, AppleIcon, LogoMark, LogoWithText, AppIcon, ShimmerText } from '../components';
+import { Button, Input, OTPInput, Chip, DatePicker, GhostInput, GoogleIcon, AppleIcon, LogoMark, LogoWithText, AppIcon, ShimmerText, VenueCard, BottomNav, PeopleMarker } from '../components';
 import { GhostTheme } from '../theme';
 
 const sections = [
@@ -21,6 +21,8 @@ const sections = [
   { id: 'spacing', label: 'Spacing', icon: Grid },
   { id: 'buttons', label: 'Buttons', icon: MousePointer },
   { id: 'inputs', label: 'Forms', icon: FormInput },
+  { id: 'cards', label: 'Cards', icon: LayoutGrid },
+  { id: 'navigation', label: 'Nav', icon: Navigation },
 ];
 
 // Token label (copyable) - simplified naming
@@ -60,7 +62,7 @@ const ColorGroup = ({ title, tokens }) => (
 );
 
 // Sidebar
-const Sidebar = ({ active, onNav }) => (
+const Sidebar = ({ active, onNav, onGoToFlows }) => (
   <View style={styles.sidebar}>
     <View style={styles.sidebarHeader}>
       <Text style={styles.sidebarTitle}>hactually</Text>
@@ -72,6 +74,12 @@ const Sidebar = ({ active, onNav }) => (
           <Text style={[styles.navText, active === id && styles.navTextActive]}>{label}</Text>
         </TouchableOpacity>
       ))}
+    </View>
+    <View style={styles.sidebarFooter}>
+      <TouchableOpacity onPress={onGoToFlows} style={styles.navItem}>
+        <ArrowLeft size={16} color={color.olive.dark} />
+        <Text style={styles.navText}>Flows</Text>
+      </TouchableOpacity>
     </View>
   </View>
 );
@@ -132,7 +140,7 @@ const ThemeSwitcher = ({ selected, onSelect }) => (
   </View>
 );
 
-export default function StyleGuideScreen() {
+export default function StyleGuideScreen({ navigation }) {
   const [active, setActive] = useState('colors');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [formTheme, setFormTheme] = useState('light');
@@ -158,7 +166,7 @@ export default function StyleGuideScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.layout}>
-        <Sidebar active={active} onNav={handleNav} />
+        <Sidebar active={active} onNav={handleNav} onGoToFlows={() => navigation.navigate('Flows')} />
         <ScrollView ref={scrollViewRef} style={styles.content} contentContainerStyle={styles.contentInner}>
 
           {/* COLORS */}
@@ -799,6 +807,53 @@ export default function StyleGuideScreen() {
             </Section>
           </View>
 
+          {/* Cards Section */}
+          <View onLayout={handleSectionLayout('cards')}>
+            <Section title="Cards">
+              <Label>Venue Card</Label>
+              <View style={{ height: 180 }}>
+                <VenueCard
+                  venue={{
+                    name: 'LIV',
+                    image: 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=600&h=400&fit=crop',
+                    category: 'Nightclub',
+                    area: 'Marina',
+                    distance: '1.2km',
+                    people: [
+                      { photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' },
+                      { photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop' },
+                    ],
+                    peopleCount: 16,
+                  }}
+                  onPress={() => {}}
+                />
+              </View>
+              <TokenLabel token="VenueCard" />
+
+              <Divider />
+
+              <Label>People Marker</Label>
+              <PeopleMarker
+                people={[
+                  { photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' },
+                  { photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop' },
+                ]}
+                count={29}
+                venueName="Coya"
+              />
+              <TokenLabel token="PeopleMarker" />
+            </Section>
+          </View>
+
+          {/* Navigation Section */}
+          <View onLayout={handleSectionLayout('navigation')}>
+            <Section title="Navigation">
+              <Label>Bottom Nav</Label>
+              <BottomNav activeTab="nearby" onTabChange={() => {}} />
+              <TokenLabel token="BottomNav" />
+            </Section>
+          </View>
+
           <View style={{ height: 40 }} />
         </ScrollView>
       </View>
@@ -812,7 +867,8 @@ const styles = StyleSheet.create({
   sidebar: { width: 180, backgroundColor: color.beige, borderRadius: radius.lg, margin: spacing.md, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8 },
   sidebarHeader: { padding: spacing.lg, borderBottomWidth: 1, borderBottomColor: color.olive.light },
   sidebarTitle: { ...typography.h3, color: color.blue.dark },
-  sidebarNav: { padding: spacing.sm },
+  sidebarNav: { padding: spacing.sm, flex: 1 },
+  sidebarFooter: { padding: spacing.sm, borderTopWidth: 1, borderTopColor: color.olive.light },
   navItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: 10, paddingHorizontal: spacing.md, borderRadius: radius.md, marginBottom: 4 },
   navItemActive: { backgroundColor: color.blue.dark },
   navText: { ...typography.body, color: color.olive.dark },

@@ -28,6 +28,7 @@ export const color = {
   },
 
   // Neutrals
+  white: '#FFFFFF',
   beige: colors.olive.lighter,
   mid: colors.olive.mid, // #EDE5D5 - for cards/surfaces
   charcoal: '#1A1A1A', // true charcoal black
@@ -98,6 +99,12 @@ export const typography = {
     fontFamily: fontFamilyPrimary,
     fontSize: 20,
     lineHeight: 28,
+  },
+  h4: {
+    fontFamily: fontFamilyPrimary,
+    fontSize: 24,
+    fontWeight: '700',
+    lineHeight: 30,
   },
   body: {
     fontFamily: fontFamilyBody,

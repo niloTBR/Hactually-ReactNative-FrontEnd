@@ -23,7 +23,9 @@ const FLOW_SECTIONS = [
     screens: [
       { id: '1A', name: 'See the app introduction', path: 'Welcome', active: true },
       { id: '1B', name: 'Sign up or log in with email', path: 'AuthOptions', active: true },
-      { id: '1C', name: 'Set up my Hactually profile', path: 'ProfileSetup', active: true },
+      { id: '1C', name: 'Verify OTP code', path: 'OTP', active: true },
+      { id: '1D', name: 'Set up my Hactually profile', path: 'ProfileSetup', active: true },
+      { id: '1E', name: 'Enable location permission', path: 'Location', active: true },
     ],
   },
   {
@@ -31,7 +33,7 @@ const FLOW_SECTIONS = [
     title: 'Home & Discovery',
     description: 'Enables the user to find and explore venues where real people are right now.',
     screens: [
-      { id: '2A', name: 'Discover nearby venues on map', active: false },
+      { id: '2A', name: 'Discover nearby venues on map', path: 'Home', active: true },
       { id: '2B', name: 'See message when no venues nearby', active: false },
     ],
   },
@@ -40,9 +42,9 @@ const FLOW_SECTIONS = [
     title: 'Venue Experience',
     description: 'Lets the user check into a location and engage with people in the same space.',
     screens: [
-      { id: '3A', name: 'View details on a venue', active: false },
-      { id: '3B', name: 'Check into a venue', active: false },
-      { id: '3C', name: 'Chat with everyone at venue', active: false },
+      { id: '3A', name: 'Check into a venue', path: 'VenueCheckIn', pathParams: { venue: { id: '1', name: 'White Dubai', image: null, category: 'Nightclub', area: 'Atlantis', distance: '8.2km', people: [], peopleCount: 16 } }, active: true },
+      { id: '3B', name: 'Checked-in experience', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '3C', name: 'Chat with everyone at venue', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
     ],
   },
   {
@@ -50,11 +52,11 @@ const FLOW_SECTIONS = [
     title: 'Profiles & Spotting',
     description: 'Gives the user a way to learn about someone and express interest.',
     screens: [
-      { id: '4A', name: 'See who is checked in', active: false },
-      { id: '4B', name: 'View someone\'s profile', active: false },
-      { id: '4C', name: 'Spot someone', active: false },
-      { id: '4D', name: 'Receive spot notification', active: false },
-      { id: '4E', name: 'Spot back or decline', active: false },
+      { id: '4A', name: 'See who is checked in', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '4B', name: 'View someone\'s profile', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '4C', name: 'Spot someone', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '4D', name: 'Receive spot notification', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '4E', name: 'Spot back or decline', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
     ],
   },
   {
@@ -62,9 +64,8 @@ const FLOW_SECTIONS = [
     title: 'Messaging',
     description: 'Provides a private space for matched users to get to know each other.',
     screens: [
-      { id: '5A', name: 'See all conversations', active: false },
-      { id: '5B', name: 'Private conversation with match', active: false },
-      { id: '5C', name: 'Send photos in chat', active: false },
+      { id: '5A', name: 'Group chat at venue', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '5B', name: 'Private conversation with match', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
     ],
   },
   {
@@ -72,10 +73,9 @@ const FLOW_SECTIONS = [
     title: 'Matches & Interest',
     description: 'Helps the user keep track of their connections.',
     screens: [
-      { id: '6A', name: 'View all matches', active: false },
-      { id: '6B', name: 'See who spotted me', active: false },
-      { id: '6C', name: 'Review spots I\'ve sent', active: false },
-      { id: '6D', name: 'Unmatch with someone', active: false },
+      { id: '6A', name: 'View all spots', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '6B', name: 'See who spotted me', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '6C', name: 'Review spots I\'ve sent', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
     ],
   },
   {
@@ -93,10 +93,10 @@ const FLOW_SECTIONS = [
     title: 'Settings & My Profile',
     description: 'Puts the user in control of how they present themselves.',
     screens: [
-      { id: '8A', name: 'View or edit my profile', active: false },
-      { id: '8B', name: 'Manage privacy preferences', active: false },
-      { id: '8C', name: 'Manage notifications', active: false },
-      { id: '8D', name: 'Manage my account', active: false },
+      { id: '8A', name: 'View or edit my profile', path: 'Profile', active: true },
+      { id: '8B', name: 'Manage privacy preferences', path: 'Profile', active: true },
+      { id: '8C', name: 'Manage notifications', path: 'Profile', active: true },
+      { id: '8D', name: 'Manage my account', path: 'Profile', active: true },
     ],
   },
 ];
@@ -109,7 +109,7 @@ const ScreenItem = ({ screen, onPress }) => {
   return (
     <TouchableOpacity
       style={styles.screenItem}
-      onPress={() => hasPath && isActive && onPress(screen.path)}
+      onPress={() => hasPath && isActive && onPress(screen.path, screen.pathParams)}
       disabled={!hasPath || !isActive}
       activeOpacity={0.7}
     >
@@ -172,8 +172,8 @@ export default function FlowsScreen({ navigation }) {
     setExpandedFlow(prev => prev === flowId ? null : flowId);
   };
 
-  const handleNavigate = (path) => {
-    navigation.navigate(path);
+  const handleNavigate = (path, params) => {
+    navigation.navigate(path, params);
   };
 
   const handleLogout = () => {

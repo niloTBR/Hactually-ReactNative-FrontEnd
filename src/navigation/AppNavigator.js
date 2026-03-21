@@ -20,6 +20,10 @@ import LocationScreen from '../screens/auth/LocationScreen';
 // Main Screens
 import StyleGuideScreen from '../screens/StyleGuideScreen';
 import HomeScreen from '../screens/HomeScreen';
+import VenueCheckInScreen from '../screens/VenueCheckInScreen';
+import CheckedInScreen from '../screens/CheckedInScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import MatchesScreen from '../screens/MatchesScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,8 +48,12 @@ export default function AppNavigator() {
         <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
         <Stack.Screen name="Location" component={LocationScreen} />
 
-        {/* Main App */}
-        <Stack.Screen name="Home" component={HomeScreen} />
+        {/* Main App — tab screens use fade, others slide */}
+        <Stack.Screen name="Home" component={HomeScreen} options={{ animation: 'fade' }} />
+        <Stack.Screen name="VenueCheckIn" component={VenueCheckInScreen} />
+        <Stack.Screen name="CheckedIn" component={CheckedInScreen} />
+        <Stack.Screen name="Matches" component={MatchesScreen} options={{ animation: 'fade' }} />
+        <Stack.Screen name="Profile" component={ProfileScreen} options={{ animation: 'fade' }} />
         <Stack.Screen name="StyleGuide" component={StyleGuideScreen} />
       </Stack.Navigator>
     </NavigationContainer>

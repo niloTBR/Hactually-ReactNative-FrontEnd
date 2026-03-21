@@ -76,6 +76,7 @@ const Button = ({
   caption,
   fillColor,
   themeColor, // For ghost variant on dark backgrounds
+  onSlideProgress, // Callback for checkin variant slide progress (0-1)
   style,
   textStyle,
 }) => {
@@ -334,6 +335,7 @@ const Button = ({
         const newX = Math.max(0, Math.min(clientX - dragRef.current.startX, maxDrag));
         dragRef.current.currentDragX = newX;
         setDragX(newX);
+        if (onSlideProgress) onSlideProgress(maxDrag > 0 ? newX / maxDrag : 0);
       };
 
       const handleMouseUp = () => {
@@ -341,10 +343,12 @@ const Button = ({
         dragRef.current.isDragging = false;
         if (dragRef.current.currentDragX > maxDrag * 0.7) {
           setDragX(maxDrag);
+          if (onSlideProgress) onSlideProgress(1);
           onPress && onPress();
-          setTimeout(() => setDragX(0), 300);
+          setTimeout(() => { setDragX(0); if (onSlideProgress) onSlideProgress(0); }, 300);
         } else {
           setDragX(0);
+          if (onSlideProgress) onSlideProgress(0);
         }
         dragRef.current.currentDragX = 0;
       };
@@ -369,10 +373,12 @@ const Button = ({
       dragRef.current.startX = clientX - dragX;
     };
 
-    const fillWidth = dragX + circleSize + 4;
-    const fillColor = isDark ? 'rgba(212, 228, 165, 0.4)' : 'rgba(224, 90, 61, 0.3)';
+    const fillWidth = dragX + circleSize + 8;
+    const fillColor = isDark ? 'rgba(212, 228, 165, 0.4)' : colors.blue.default + '80';
     const circleColor = isDark ? colors.green.light : colors.orange.default;
     const arrowColor = isDark ? colors.olive.dark : colors.white;
+    const dragProgress = maxDrag > 0 ? dragX / maxDrag : 0;
+    const dynamicTxtColor = isDark ? txtColor : (dragProgress > 0.3 ? colors.white : txtColor);
 
     return (
       <View
@@ -427,7 +433,7 @@ const Button = ({
             <Text
               style={[
                 styles.text,
-                { color: txtColor, marginLeft: 12, position: 'absolute', left: circleSize + 8 },
+                { color: dynamicTxtColor, marginLeft: 12, position: 'absolute', left: circleSize + 8 },
                 textStyle,
               ]}
             >
@@ -435,7 +441,7 @@ const Button = ({
             </Text>
 
             {caption && (
-              <Text style={[styles.caption, { color: txtColor, position: 'absolute', right: 16 }]}>
+              <Text style={[styles.caption, { color: dynamicTxtColor, position: 'absolute', right: 16 }]}>
                 {caption}
               </Text>
             )}

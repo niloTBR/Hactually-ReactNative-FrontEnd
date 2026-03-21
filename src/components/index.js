@@ -15,3 +15,8 @@ export { default as FormError } from './FormError';
 export { default as ProfileMarquee } from './ProfileMarquee';
 export { default as ShimmerText } from './ShimmerText';
 export { GoogleIcon, AppleIcon } from './Icons';
+export { default as MeMarker } from './MeMarker';
+export { default as PeopleMarker } from './PeopleMarker';
+export { default as VenueCard } from './VenueCard';
+export { default as LocationDropdown } from './LocationDropdown';
+export { default as BottomNav } from './BottomNav';
