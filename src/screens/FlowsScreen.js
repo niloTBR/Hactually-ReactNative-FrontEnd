@@ -61,21 +61,23 @@ const FLOW_SECTIONS = [
   },
   {
     id: 'communication',
-    title: 'Messaging',
+    title: 'Inbox',
     description: 'Provides a private space for matched users to get to know each other.',
     screens: [
       { id: '5A', name: 'Group chat at venue', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
-      { id: '5B', name: 'Private conversation with match', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '5B', name: 'View inbox and conversations', path: 'Matches', active: true },
+      { id: '5C', name: 'Private conversation with match', path: 'Matches', active: true },
     ],
   },
   {
-    id: 'matches',
-    title: 'Matches & Interest',
-    description: 'Helps the user keep track of their connections.',
+    id: 'spots',
+    title: 'Spots & Interest',
+    description: 'Helps the user keep track of who spotted them and who they spotted.',
     screens: [
-      { id: '6A', name: 'View all spots', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
-      { id: '6B', name: 'See who spotted me', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
-      { id: '6C', name: 'Review spots I\'ve sent', path: 'CheckedIn', pathParams: { venue: { id: 1, name: 'White Dubai', area: 'Meydan' } }, active: true },
+      { id: '6A', name: 'View all spots (received & sent)', path: 'Spots', active: true },
+      { id: '6B', name: 'See who spotted me', path: 'Spots', active: true },
+      { id: '6C', name: 'Review spots I\'ve sent', path: 'Spots', active: true },
+      { id: '6D', name: 'Spot back or decline from spots', path: 'Spots', active: true },
     ],
   },
   {

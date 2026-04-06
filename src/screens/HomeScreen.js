@@ -14,7 +14,6 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Navigation } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { color, spacing, radius, typography } from '../theme';
 import {
@@ -23,7 +22,9 @@ import {
   PeopleMarker,
   VenueCard,
   BottomNav,
+  NearbyIcon,
 } from '../components';
+import { useVenueStore } from '../store/venueStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.72;
@@ -122,6 +123,7 @@ export default function HomeScreen({ navigation }) {
   const [activeTab, setActiveTab] = useState('nearby');
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const checkedInVenue = useVenueStore((s) => s.checkedInVenue);
   const scrollX = useRef(new Animated.Value(0)).current;
   const scrollRef = useRef(null);
   const currentIndex = useRef(0);
@@ -257,7 +259,7 @@ export default function HomeScreen({ navigation }) {
         {/* Bottom nav - floating over content */}
         <View style={styles.expandedNavWrapper}>
           <SafeAreaView edges={['bottom']}>
-            <BottomNav activeTab={activeTab} onTabChange={(tab) => { if (tab === 'profile') navigation.navigate('Profile'); else if (tab === 'likes') navigation.navigate('Matches'); else setActiveTab(tab); }} />
+            <BottomNav activeTab={activeTab} checkedInVenue={checkedInVenue} onTabChange={(tab) => { if (tab === 'venue') navigation.navigate('CheckedIn', { venue: checkedInVenue }); else if (tab === 'profile') navigation.navigate('Profile'); else if (tab === 'spots') navigation.navigate('Spots'); else if (tab === 'likes') navigation.navigate('Matches'); else setActiveTab(tab); }} />
           </SafeAreaView>
         </View>
       </View>
@@ -277,17 +279,9 @@ export default function HomeScreen({ navigation }) {
                 onSelect={setSelectedLocation}
               />
             </View>
-            {/* Heart button */}
-            <TouchableOpacity style={styles.heartButton} activeOpacity={0.9} onPress={() => navigation.navigate('Matches')}>
-              <Svg width={20} height={20} viewBox="0 0 24 24" fill={color.orange.dark}>
-                <Path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </Svg>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.centerButtonRow}>
-            <View style={{ flex: 1 }} />
-            <TouchableOpacity style={styles.centerButton} activeOpacity={0.8}>
-              <Navigation size={20} color={color.blue.dark} />
+            {/* Near me button */}
+            <TouchableOpacity style={styles.heartButton} activeOpacity={0.8}>
+              <NearbyIcon size={22} color={color.blue.dark} />
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -353,7 +347,7 @@ export default function HomeScreen({ navigation }) {
 
             const translateY = scrollX.interpolate({
               inputRange,
-              outputRange: [8, 0, 8],
+              outputRange: [0, -60, 0],
               extrapolate: 'clamp',
             });
 
@@ -372,7 +366,7 @@ export default function HomeScreen({ navigation }) {
         </Animated.ScrollView>
 
         <SafeAreaView edges={['bottom']} style={styles.bottomNavWrapper}>
-          <BottomNav activeTab={activeTab} onTabChange={(tab) => { if (tab === 'profile') navigation.navigate('Profile'); else if (tab === 'likes') navigation.navigate('Matches'); else setActiveTab(tab); }} />
+          <BottomNav activeTab={activeTab} checkedInVenue={checkedInVenue} onTabChange={(tab) => { if (tab === 'venue') navigation.navigate('CheckedIn', { venue: checkedInVenue }); else if (tab === 'profile') navigation.navigate('Profile'); else if (tab === 'spots') navigation.navigate('Spots'); else if (tab === 'likes') navigation.navigate('Matches'); else setActiveTab(tab); }} />
         </SafeAreaView>
       </View>
     </View>
@@ -417,24 +411,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  centerButtonRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  centerButton: {
-    width: spacing['3xl'],
-    height: spacing['3xl'],
-    borderRadius: spacing['3xl'] / 2,
-    backgroundColor: color.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: color.charcoal,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
   meMarkerPosition: {
     position: 'absolute',
     top: '50%',
@@ -475,12 +451,14 @@ const styles = StyleSheet.create({
   },
   cardsContainer: {
     paddingHorizontal: SIDE_PADDING,
-    paddingTop: spacing.md,
+    paddingTop: spacing.md + 60,
     paddingBottom: spacing.xl,
+    zIndex: 10,
   },
   cardWrapper: {
     width: CARD_WIDTH,
     marginRight: CARD_GAP,
+    zIndex: 10,
   },
   bottomNavWrapper: {
     position: 'absolute',
@@ -489,6 +467,7 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.sm,
+    zIndex: 1,
   },
 
   // ─── Expanded list view ───

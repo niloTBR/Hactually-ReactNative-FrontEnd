@@ -84,8 +84,8 @@ const Input = ({
   };
 
   const getTextColor = () => {
-    // Ghost: 100% theme color when typing
-    return isGhost ? resolvedThemeColor : colors.olive.dark;
+    // Ghost: beige text when typing
+    return isGhost ? color.beige : colors.olive.dark;
   };
 
   const getPlaceholderColor = () => {
@@ -94,8 +94,8 @@ const Input = ({
   };
 
   const getLabelColor = () => {
-    // Labels: always 100% contrast color
-    return isGhost ? resolvedThemeColor : colors.olive.dark;
+    // Ghost labels: light blue for contrast
+    return isGhost ? color.blue.light : colors.olive.dark;
   };
 
   const getIconColor = () => {

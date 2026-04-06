@@ -29,18 +29,15 @@ const ShimmerText = ({
             0% { background-position: 150% 0; }
             100% { background-position: -50% 0; }
           }
-          .shimmer-text {
-            background: linear-gradient(90deg, ${textColor} 0%, ${textColor} 40%, ${shimmerColor} 50%, ${textColor} 60%, ${textColor} 100%);
-            background-size: 250% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer ${duration}ms linear infinite;
-          }
         `}</style>
         <span
-          className="shimmer-text"
           style={{
+            background: `linear-gradient(90deg, ${textColor} 0%, ${textColor} 35%, ${shimmerColor} 50%, ${textColor} 65%, ${textColor} 100%)`,
+            backgroundSize: '250% 100%',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            animation: `shimmer ${duration}ms linear infinite`,
             fontSize,
             fontFamily,
             lineHeight: `${lineHeight}px`,

@@ -69,7 +69,7 @@ export default function VenueCard({ venue, onPress }) {
 
           {/* Chevron */}
           <View style={styles.chevronContainer}>
-            <ChevronRight size={16} color={color.white} />
+            <ChevronRight size={20} color={color.white} />
           </View>
         </View>
       </View>
@@ -121,9 +121,9 @@ const styles = StyleSheet.create({
     color: color.white + 'B3',
   },
   chevronContainer: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: color.white + '33',
     alignItems: 'center',
     justifyContent: 'center',

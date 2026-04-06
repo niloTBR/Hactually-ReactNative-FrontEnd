@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   backButton: { width: 40, height: 40, borderRadius: radius.full, backgroundColor: themeColor + '20', alignItems: 'center', justifyContent: 'center' },
   scrollView: { flex: 1 },
   scrollContent: { paddingHorizontal: spacing['2xl'], paddingBottom: spacing.lg },
-  title: { ...typography.h2, color: themeColor, marginBottom: spacing.xl },
+  title: { ...typography.h2, color: color.blue.light, marginBottom: spacing.xl },
 
   // Photo
   photoSection: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, marginBottom: spacing.xl },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
 
   // Bio
   bioSection: { marginTop: spacing.xl },
-  sectionLabel: { ...typography.caption, fontWeight: '700', color: themeColor, marginBottom: spacing.sm },
+  sectionLabel: { ...typography.caption, fontWeight: '700', color: color.blue.light, marginBottom: spacing.sm },
 
   // Interests
   interestsSection: { marginTop: spacing.xl },

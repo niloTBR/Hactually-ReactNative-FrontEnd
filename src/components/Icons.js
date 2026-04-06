@@ -1,46 +1,80 @@
 /**
- * Hactually Icon Components
- * Social auth and app icons
- *
- * Supports light/dark variants for different backgrounds
+ * Custom SVG icons for Hactually
+ * Nearby, Group Chat, Home, Matches, Profile — all default to 32px
  */
 import React from 'react';
-import Svg, { Path } from 'react-native-svg';
-import { colors, color } from '../theme';
+import Svg, { Path, Circle } from 'react-native-svg';
 
-export const GoogleIcon = ({ size = 20, color: iconColor, variant = 'light' }) => {
-  // Default colors based on variant
-  const fillColor = iconColor || (variant === 'dark' ? color.green.dark : color.green.light);
-
+export function NearbyIcon({ size = 32, color = '#000' }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24">
-      <Path
-        fill={fillColor}
-        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-      />
-      <Path
-        fill={fillColor}
-        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-      />
-      <Path
-        fill={fillColor}
-        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-      />
-      <Path
-        fill={fillColor}
-        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-      />
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path clipRule="evenodd" fill={color} fillRule="evenodd" d="M12 4c-3.854 0-7 3.167-7 7.1 0 2.225 1.694 4.441 3.67 6.222.956.863 1.917 1.568 2.641 2.059.268.181.501.332.689.45.188-.118.422-.269.689-.45.724-.491 1.685-1.196 2.641-2.059C17.306 15.541 19 13.325 19 11.1 19 7.167 15.854 4 12 4Zm0 17-.493.87-.001-.001-.002-.001-.006-.003-.021-.012a8.712 8.712 0 0 1-.344-.206 25.377 25.377 0 0 1-.944-.61c-.776-.527-1.815-1.288-2.859-2.229C5.306 16.883 3 14.149 3 11.1 3 6.086 7.018 2 12 2s9 4.086 9 9.1c0 3.149-2.306 5.883-4.33 7.708a27.166 27.166 0 0 1-2.859 2.229 25.377 25.377 0 0 1-1.218.773l-.074.043-.021.012-.006.003-.002.001-.001.001L12 21Zm0 0 .492.87a1.125 1.125 0 0 1-.985 0L12 21Z" />
+      <Path clipRule="evenodd" fill={color} fillRule="evenodd" d="M12 7.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM8.5 9a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0Z" />
+      <Path clipRule="evenodd" fill={color} fillRule="evenodd" d="M12 15a5.001 5.001 0 0 0-4.282 2.417l-1.711-1.035A7.001 7.001 0 0 1 12 13c2.543 0 4.769 1.357 5.993 3.382l-1.711 1.035A5.001 5.001 0 0 0 12 15Z" />
     </Svg>
   );
-};
+}
 
-export const AppleIcon = ({ size = 24, color: iconColor, variant = 'light' }) => {
-  // Default colors based on variant
-  const fillColor = iconColor || (variant === 'dark' ? color.green.dark : color.green.light);
-
+export function GroupChatIcon({ size = 32, color = '#000' }) {
   return (
-    <Svg width={size} height={size} fill={fillColor} viewBox="0 0 24 24">
-      <Path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+    <Svg width={size} height={size} viewBox="0 0 512 512" fill={color}>
+      <Path d="M317,31H45C20.1,31 0,51.1 0,76v180c0,24.9 20.1,45 45,45h15v45c0,10.8 11.2,18.7 22.2,13.2.3-.3.9-.3 1.2-.6 82.5-55.3 64-43 82.5-55.2 2.4-1.5 5.1-2.4 8.1-2.4h143c24.9,0 45-20.1 45-45V76C362,51.1 341.9,31 317,31ZM197,211H75c-19.8,0-19.9-30 0-30h122c19.8,0 19.9,30 0,30ZM287,151H75c-19.8,0-19.9-30 0-30h212c19.8,0 19.9,30 0,30Z" />
+      <Path d="M467,151h-75v105c0,41.4-33.6,75-75,75H178.5l-28.5,18.9V376c0,24.9 20.1,45 45,45h147.5l86.1,57.6c11.8,6.5 23.4-1.4 23.4-12.6V421h15c24.9,0 45-20.1 45-45V196C512,171.1 491.9,151 467,151Z" />
     </Svg>
   );
-};
+}
+
+export function HomeIcon({ size = 32, color = '#000' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 20 20" fill={color}>
+      <Path d="M10 0C6.7 0 4 2.7 4 6s6 11 6 11 6-7.7 6-11S13.3 0 10 0Zm0 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2Z" />
+      <Path d="M16.3 11.1c-.3.6-.6 1.2-1 1.8 1.7.6 2.7 1.4 2.7 2.1 0 1.2-3.2 3-8 3s-8-1.8-8-3c0-.7 1-1.5 2.7-2.2-.4-.6-.7-1.2-1-1.8C1.4 12.1 0 13.5 0 15.1c0 2.8 4.2 5 9.8 5 5 0 10.2-1.7 10.2-5 0-1.6-1.4-3-3.7-3.9Z" />
+    </Svg>
+  );
+}
+
+export function MatchesIcon({ size = 32, color = '#000' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 67.949 67.949" fill={color}>
+      <Path d="M62.49,11.239c-7.39-7.388-19.412-7.388-26.8,0l-1.716,1.715-1.715-1.715c-7.388-7.389-19.411-7.389-26.799,0-7.238,7.238-7.285,18.711-.109,26.688 6.545,7.273 25.848,22.986 26.667,23.651.556.452 1.225.672 1.89.672.022,0 .044,0 .065-.001.688.032 1.381-.204 1.955-.671.819-.665 20.124-16.378 26.671-23.652C69.774,29.95 69.727,18.477 62.49,11.239ZM58.139,33.913c-5.103,5.669-19.13,17.361-24.166,21.51-5.036-4.148-19.06-15.839-24.162-21.509C4.805,28.35 4.758,20.426 9.702,15.482c2.525-2.524 5.841-3.787 9.157-3.787s6.632,1.262 9.157,3.787l3.772,3.772c.449.449 1.015.717 1.609.811.964.207 2.01-.062 2.76-.81l3.774-3.773c5.051-5.049 13.267-5.048 18.315,0C63.19,20.426 63.143,28.35 58.139,33.913Z" />
+    </Svg>
+  );
+}
+
+export function SpotsIcon({ size = 32, color = '#000' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <Circle cx={12} cy={12} r={3} stroke={color} strokeWidth={2} fill="none" />
+    </Svg>
+  );
+}
+
+export function GoogleIcon({ size = 24, color, variant = 'light' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z" fill="#4285F4" />
+      <Path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23Z" fill="#34A853" />
+      <Path d="M5.84 14.09A6.97 6.97 0 0 1 5.48 12c0-.72.13-1.43.36-2.09V7.07H2.18A11.95 11.95 0 0 0 .96 12c0 1.94.46 3.77 1.22 5.33l3.66-2.84Z" fill="#FBBC05" />
+      <Path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53Z" fill="#EA4335" />
+    </Svg>
+  );
+}
+
+export function AppleIcon({ size = 24, color = '#000', variant = 'light' }) {
+  const fill = variant === 'light' ? '#fff' : '#000';
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.52-3.23 0-1.44.62-2.2.44-3.06-.4C3.79 16.17 4.36 9.02 8.72 8.76c1.29.07 2.19.72 2.95.78.84-.17 1.64-.84 2.56-.76 1.09.1 1.91.58 2.46 1.46-2.24 1.35-1.72 4.31.36 5.14-.42 1.11-.97 2.2-1.83 3.08l1.83-1.79v3.61ZM12.03 8.7C11.88 6.58 13.58 4.83 15.57 4.69c.27 2.44-2.22 4.27-3.54 4.01Z" fill={fill} />
+    </Svg>
+  );
+}
+
+export function ProfileIcon({ size = 32, color = '#000' }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <Circle cx={15.757} cy={10} r={6} stroke={color} strokeWidth={2.5} fill="none" />
+      <Path d="M25.757 29v-4.996c0-2.211-1.792-4.004-4.003-4.004H9.761c-2.211 0-4.004 1.793-4.004 4.004V29" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </Svg>
+  );
+}

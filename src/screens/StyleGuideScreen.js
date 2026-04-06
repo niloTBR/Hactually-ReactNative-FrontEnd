@@ -96,60 +96,18 @@ const Section = ({ title, children }) => (
 const Label = ({ children }) => <Text style={styles.label}>{children}</Text>;
 const Divider = () => <View style={styles.divider} />;
 
-/**
- * Form Theme Tokens
- * Two themes for ghost/outline form components:
- * - Light: Beige background
- * - Dark: Green background
- */
-const FORM_THEMES = {
-  light: {
-    id: 'light',
-    label: 'Light (Olive)',
-    bg: color.olive.light,
-    text: color.charcoal,
-    theme: color.charcoal,
-  },
-  dark: {
-    id: 'dark',
-    label: 'Dark (Green)',
-    bg: color.green.dark,
-    text: color.green.light,
-    theme: color.green.light,
-  },
+// Form theme — dark green only
+const FORM_THEME = {
+  bg: color.green.dark,
+  text: color.green.light,
+  theme: color.green.light,
 };
-
-// Theme switcher component
-const ThemeSwitcher = ({ selected, onSelect }) => (
-  <View style={styles.themeSwitcher}>
-    {Object.values(FORM_THEMES).map((theme) => (
-      <TouchableOpacity
-        key={theme.id}
-        onPress={() => onSelect(theme.id)}
-        style={[
-          styles.themeSwitcherOption,
-          { backgroundColor: theme.bg },
-          selected === theme.id && styles.themeSwitcherOptionActive,
-        ]}
-      >
-        <Text style={[styles.themeSwitcherText, { color: theme.text }]}>
-          {theme.label}
-        </Text>
-      </TouchableOpacity>
-    ))}
-  </View>
-);
 
 export default function StyleGuideScreen({ navigation }) {
   const [active, setActive] = useState('colors');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [formTheme, setFormTheme] = useState('light');
-
   const scrollViewRef = useRef(null);
   const sectionPositions = useRef({});
-
-  // Get current form theme
-  const currentTheme = FORM_THEMES[formTheme];
 
   const handleNav = (sectionId) => {
     setActive(sectionId);
@@ -714,92 +672,89 @@ export default function StyleGuideScreen({ navigation }) {
           <View onLayout={handleSectionLayout('inputs')}>
           <Section title="Form Components">
 
-            <Label>6.1 GHOST VARIANT (Theme Adaptive)</Label>
-            <ThemeSwitcher selected={formTheme} onSelect={setFormTheme} />
-
             <GhostTheme
-              themeColor={currentTheme.theme}
-              isDark={formTheme === 'dark'}
-              style={[styles.formShowcase, { backgroundColor: currentTheme.bg }]}
+              themeColor={FORM_THEME.theme}
+              isDark={true}
+              style={[styles.formShowcase, { backgroundColor: FORM_THEME.bg }]}
             >
-              {/* Row 1: With Label & OTP */}
+              {/* Row 1: Input & OTP */}
               <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>With Label</Text>
-                  <Input label="Email" placeholder="you@example.com" variant="ghost" />
-                  <TokenLabel token="Input.ghost + label" />
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Input</Text>
+                  <Input placeholder="Enter text..." variant="ghost" />
+                  <TokenLabel token="Input" />
                 </View>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>OTP</Text>
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>OTP</Text>
                   <View style={{ alignSelf: 'flex-start' }}>
                     <OTPInput value={otp} onChange={setOtp} variant="ghost" />
                   </View>
-                  <TokenLabel token="OTPInput.ghost" />
+                  <TokenLabel token="OTPInput" />
                 </View>
               </View>
-              <View style={[styles.formDivider, { borderColor: currentTheme.theme + '30' }]} />
+              <View style={[styles.formDivider, { borderColor: FORM_THEME.theme + '30' }]} />
 
-              {/* Row 2: Input & With Icon */}
+              {/* Row 2: With Icon & With Label */}
               <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Input</Text>
-                  <Input placeholder="Enter text..." variant="ghost" />
-                  <TokenLabel token="Input.ghost" />
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>With Icon</Text>
+                  <Input placeholder="Search..." variant="ghost" leftIcon={<Search size={18} />} />
+                  <TokenLabel token="Input + leftIcon" />
                 </View>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>With Icon</Text>
-                  <Input placeholder="Search..." variant="ghost" leftIcon={<Search size={18} />} />
-                  <TokenLabel token="Input.ghost + leftIcon" />
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>With Label</Text>
+                  <Input label="Email" placeholder="you@example.com" variant="ghost" />
+                  <TokenLabel token="Input + label" />
                 </View>
               </View>
-              <View style={[styles.formDivider, { borderColor: currentTheme.theme + '30' }]} />
+              <View style={[styles.formDivider, { borderColor: FORM_THEME.theme + '30' }]} />
 
               {/* Row 3: Password & With Error */}
               <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Password</Text>
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Password</Text>
                   <Input placeholder="Password" variant="ghost" secureTextEntry leftIcon={<Lock size={18} />} />
-                  <TokenLabel token="Input.ghost + secureTextEntry" />
+                  <TokenLabel token="Input + secureTextEntry" />
                 </View>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>With Error</Text>
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>With Error</Text>
                   <Input placeholder="Email" variant="ghost" error="Invalid email" />
-                  <TokenLabel token="Input.ghost + error" />
+                  <TokenLabel token="Input + error" />
                 </View>
               </View>
-              <View style={[styles.formDivider, { borderColor: currentTheme.theme + '30' }]} />
+              <View style={[styles.formDivider, { borderColor: FORM_THEME.theme + '30' }]} />
 
               {/* Row 4: DatePicker & Multiline */}
               <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>DatePicker</Text>
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>DatePicker</Text>
                   <DatePicker placeholder="Date of birth" variant="ghost" onChange={() => {}} />
-                  <TokenLabel token="DatePicker.ghost" />
+                  <TokenLabel token="DatePicker" />
                 </View>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Multiline</Text>
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Multiline</Text>
                   <Input placeholder="Write your bio..." variant="ghost" multiline numberOfLines={2} />
-                  <TokenLabel token="Input.ghost + multiline" />
+                  <TokenLabel token="Input + multiline" />
                 </View>
               </View>
-              <View style={[styles.formDivider, { borderColor: currentTheme.theme + '30' }]} />
+              <View style={[styles.formDivider, { borderColor: FORM_THEME.theme + '30' }]} />
 
               {/* Row 5: Email Action & Chips */}
               <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Email Action</Text>
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Email Action</Text>
                   <GhostInput placeholder="Enter email..." leftIcon={<Mail />} onSubmit={() => {}} />
                   <TokenLabel token="GhostInput" />
                 </View>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Chips</Text>
+                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Chips</Text>
                   <View style={styles.chipRow}>
                     <Chip label="Default" variant="ghost" />
                     <Chip label="Selected" variant="ghost" selected onRemove={() => {}} />
                     <Chip label="Emoji" emoji="🔥" variant="ghost" />
                     <Chip label="Disabled" variant="ghost" disabled />
                   </View>
-                  <TokenLabel token="Chip.ghost" />
+                  <TokenLabel token="Chip" />
                 </View>
               </View>
             </GhostTheme>
@@ -952,10 +907,6 @@ const styles = StyleSheet.create({
   btnGradientLabel: { fontSize: 11, fontWeight: '600', color: colors.olive.dark },
   btnGradientSubLabel: { fontSize: 12, fontWeight: '600', color: color.olive.dark, marginBottom: spacing.sm, marginTop: spacing.sm },
   // Forms - Theme switcher
-  themeSwitcher: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl },
-  themeSwitcherOption: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderRadius: radius.md, borderWidth: 2, borderColor: 'transparent' },
-  themeSwitcherOptionActive: { borderColor: color.charcoal },
-  themeSwitcherText: { ...typography.caption, fontWeight: '600' },
   // Forms - Showcase
   formShowcase: { padding: spacing.xl, borderRadius: radius.lg, gap: spacing.lg },
   formRow: { flexDirection: 'row', gap: spacing.xl },

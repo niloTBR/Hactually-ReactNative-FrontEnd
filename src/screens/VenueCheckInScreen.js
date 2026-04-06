@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { color, spacing, radius, typography } from '../theme';
-import { ShimmerText, Button } from '../components';
+import { Button } from '../components';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -223,29 +223,17 @@ export default function VenueCheckInScreen({ route, navigation }) {
               </View>
             </View>
 
-            {/* Venue name overlay */}
+            {/* Venue info overlay */}
             <View style={styles.venueNameOverlay}>
-              <Text style={styles.venueNameText}>{venue.name}</Text>
+              <Text style={styles.bannerText}>It's{' '}
+                <Text style={{ color: color.blue.light }}>hactually</Text>
+                {' '}happening at
+              </Text>
+              <Text style={styles.bannerText}>{venue.name}</Text>
               <Text style={styles.venuePeopleText}>
-              <Text style={{ fontWeight: '700', color: color.white }}>{venue.peopleCount}</Text> people checked in
-            </Text>
+                <Text style={{ fontWeight: '700', color: color.white }}>{venue.peopleCount}</Text> people checked in
+              </Text>
             </View>
-          </View>
-        </View>
-
-        {/* Headline — vertically centered between shape and button */}
-        <View style={styles.headlineWrapper}>
-          <View style={styles.headlineContainer}>
-            <Text style={[styles.headlineText, { color: textColorMuted }]}>It's </Text>
-            <ShimmerText
-              color={color.blue.dark}
-              shimmerColor={color.blue.light}
-              duration={2000}
-              style={styles.shimmerWord}
-            >
-              hactually
-            </ShimmerText>
-            <Text style={[styles.headlineText, { color: textColorMuted }]}> happening.</Text>
           </View>
         </View>
 
@@ -256,6 +244,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
             color="orange"
             size="lg"
             fullWidth
+            fillColor={color.olive.light}
             onPress={handleCheckIn}
             onSlideProgress={setSlideProgress}
             caption="1 credit"
@@ -356,8 +345,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing['2xl'],
     zIndex: 20,
   },
-  venueNameText: {
+  bannerText: {
     ...typography.h1,
+    fontSize: 28,
+    lineHeight: 36,
     color: color.white,
     textShadowColor: color.charcoal + '80',
     textShadowOffset: { width: 0, height: 2 },
@@ -372,27 +363,9 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
 
-  // ─── Headline — centered between shape and button ───
-  headlineWrapper: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-  },
-  headlineContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'baseline',
-  },
-  headlineText: {
-    ...typography.h2,
-  },
-  shimmerWord: {
-    fontSize: typography.h2.fontSize,
-    lineHeight: typography.h2.lineHeight,
-  },
-
   // ─── Check-in area ───
   checkinArea: {
+    marginTop: 'auto',
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xl,
   },

@@ -310,10 +310,10 @@ const Button = ({
   // ══════════════════════════════════════════════════════════════════════════
   if (variant === 'checkin') {
     const borderWidth = 2;
-    const btnHeight = sizeConfig[size].height;
+    const btnHeight = sizeConfig[size].height * 2;
     const defaultWidth = 320;
     const isDark = color === 'dark';
-    const innerBg = isDark ? colors.olive.dark : colors.olive.light;
+    const innerBg = fillColor || (isDark ? colors.olive.dark : colors.olive.lighter);
     const txtColor = isDark ? colors.white : colors.olive.dark;
     const circleSize = btnHeight - borderWidth * 2 - 6;
     const borderColors = isDark ? gradients.borderDark : gradients.borderLight;
@@ -374,7 +374,7 @@ const Button = ({
     };
 
     const fillWidth = dragX + circleSize + 8;
-    const fillColor = isDark ? 'rgba(212, 228, 165, 0.4)' : colors.blue.default + '80';
+    const dragFillColor = isDark ? 'rgba(212, 228, 165, 0.4)' : colors.blue.default + '80';
     const circleColor = isDark ? colors.green.light : colors.orange.default;
     const arrowColor = isDark ? colors.olive.dark : colors.white;
     const dragProgress = maxDrag > 0 ? dragX / maxDrag : 0;
@@ -409,7 +409,7 @@ const Button = ({
           ]}
         >
           {/* Progress fill */}
-          <View style={[styles.checkinFill, { width: fillWidth, backgroundColor: fillColor }]} />
+          <View style={[styles.checkinFill, { width: fillWidth, backgroundColor: dragFillColor }]} />
 
           {/* Draggable circle and text */}
           <View style={styles.checkinContent}>
@@ -424,16 +424,37 @@ const Button = ({
                   borderRadius: circleSize / 2,
                   transform: [{ translateX: dragX }],
                   backgroundColor: circleColor,
+                  overflow: 'hidden',
                 },
               ]}
             >
+              {Platform.OS === 'web' && (
+                <>
+                  <style>{`
+                    @keyframes circleShimmer {
+                      0% { transform: translateX(-100%); }
+                      100% { transform: translateX(100%); }
+                    }
+                  `}</style>
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    overflow: 'hidden', borderRadius: circleSize / 2,
+                  }}>
+                    <div style={{
+                      position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                      background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)`,
+                      animation: 'circleShimmer 2s ease-in-out infinite',
+                    }} />
+                  </div>
+                </>
+              )}
               <Text style={[styles.checkinArrow, { color: arrowColor }]}>→</Text>
             </View>
 
             <Text
               style={[
                 styles.text,
-                { color: dynamicTxtColor, marginLeft: 12, position: 'absolute', left: circleSize + 8 },
+                { color: dynamicTxtColor, position: 'absolute', left: 0, right: 0, textAlign: 'center' },
                 textStyle,
               ]}
             >
@@ -441,7 +462,7 @@ const Button = ({
             </Text>
 
             {caption && (
-              <Text style={[styles.caption, { color: dynamicTxtColor, position: 'absolute', right: 16 }]}>
+              <Text style={[styles.caption, { color: dynamicTxtColor, position: 'absolute', right: 24 }]}>
                 {caption}
               </Text>
             )}

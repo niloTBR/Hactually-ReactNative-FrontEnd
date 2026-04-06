@@ -18,9 +18,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { X, LogOut, ChevronUp, ChevronRight, ArrowUp, Eye, EyeOff, Ban, AlertTriangle } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, Circle as SvgCircle } from 'react-native-svg';
 import { color, spacing, radius, typography } from '../theme';
-import { LogoMark, Button } from '../components';
+import { LogoMark, Button, BottomNav, GroupChatIcon, ShimmerText } from '../components';
+import { useVenueStore } from '../store/venueStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -54,216 +55,296 @@ const MOCK_MESSAGES = [
   { id: 4, user: 'Jake', avatar: PROFILE_IMAGES[5], message: 'Table 12 if anyone wants to join', time: '12m ago' },
 ];
 
-// ─── CAROUSEL ───
-const SMALL_SIZE = 120;
-const FOCUSED_SIZE = 200;
-const GAP = -8;
-const ROW_GAP = -55;
-const NUM_ROWS = 5;
-const COL_WIDTH = FOCUSED_SIZE + GAP;
-const SMALL_SCALE = SMALL_SIZE / FOCUSED_SIZE;
-const POSITIONS = [-2, -1, 0, 1, 2];
+// ─── PEOPLE GRID (single swipe controls all rows, alternating directions, infinite) ───
+const CELL_SIZE = 140;
+const CELL_GAP = 16;
+const NUM_ROWS = 3;
+const ROW_OFFSET = CELL_SIZE / 2 + CELL_GAP / 2;
+const ITEM_WIDTH = CELL_SIZE + CELL_GAP;
 
-function AlternatingSizeCarousel({ people, onPersonClick, activeIndex, onActiveChange, spotted = [], requests = [], matched = [] }) {
-  const [swipeOffset, setSwipeOffset] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [isAutoScrolling, setIsAutoScrolling] = useState(false);
-  const [flipCount, setFlipCount] = useState(0);
-  const isDragging = useRef(false);
-  const isAnimatingRef = useRef(false);
-  const startX = useRef(0);
+// Circular progress ring for "just joined" people
+function JoinRing({ progress }) {
+  const size = CELL_SIZE + 8;
+  const strokeWidth = 3;
+  const r = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * r;
+  const dashOffset = circumference * (1 - progress);
 
-  isAnimatingRef.current = isAnimating;
+  return (
+    <View style={{ position: 'absolute', top: -4, left: -4, width: size, height: size }} pointerEvents="none">
+      <Svg width={size} height={size}>
+        <SvgCircle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke={color.blue.light + '40'}
+          strokeWidth={strokeWidth}
+          fill="none"
+        />
+        <SvgCircle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke={color.blue.light}
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeDasharray={`${circumference}`}
+          strokeDashoffset={dashOffset}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      </Svg>
+    </View>
+  );
+}
 
-  // Auto-scroll every 3s
+// Orange ring border for spotted people
+function SpotRing() {
+  const size = CELL_SIZE + 6;
+  const strokeWidth = 3;
+  const r = (size - strokeWidth) / 2;
+
+  return (
+    <View style={{ position: 'absolute', top: -3, left: -3, width: size, height: size }} pointerEvents="none">
+      <Svg width={size} height={size}>
+        <SvgCircle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke={color.orange.dark}
+          strokeWidth={strokeWidth}
+          fill="none"
+        />
+      </Svg>
+    </View>
+  );
+}
+
+const JOIN_DURATION = 15000; // 15 seconds visible in full color
+
+function PeopleGrid({ people, onPersonClick, spotted = [], requests = [], matched = [], joining = {}, leaving = {} }) {
+  const [scrollX, setScrollX] = useState(0);
+  const LEAVE_DURATION = 2000;
+
+  // Update join progress for animation
+  const [, forceUpdate] = useState(0);
   useEffect(() => {
-    let lastTime = Date.now();
-    const interval = setInterval(() => {
-      const now = Date.now();
-      if (now - lastTime >= 3000 && !isDragging.current && !isAnimatingRef.current) {
-        lastTime = now;
-        setIsAnimating(true);
-        setIsAutoScrolling(true);
-        setFlipCount(c => c + 1);
-        setSwipeOffset(-COL_WIDTH);
+    const tick = setInterval(() => forceUpdate(n => n + 1), 100);
+    return () => clearInterval(tick);
+  }, []);
+  // Center offset so content starts in the middle of the repeated strip
+  const centerOffset = -(people.length * 4 * ITEM_WIDTH);
+  const dragRef = useRef({ isDragging: false, startX: 0, startScroll: 0 });
+  const velocityRef = useRef(0);
+  const lastMoveRef = useRef({ x: 0, time: 0 });
+  const animRef = useRef(null);
 
-        setTimeout(() => {
-          onActiveChange((prev) => (prev + 1) % people.length);
-          setSwipeOffset(0);
-          setIsAnimating(false);
-          setIsAutoScrolling(false);
-        }, 500);
+  // Repeat people enough for seamless looping
+  const repeatCount = 10;
+  const getRowPeople = (rowIndex) => {
+    const off = rowIndex * Math.ceil(people.length / NUM_ROWS);
+    const rowPeople = people.slice(off).concat(people.slice(0, off));
+    const repeated = [];
+    for (let i = 0; i < repeatCount; i++) repeated.push(...rowPeople);
+    return repeated;
+  };
+
+  // Wrap scroll to keep it in a reasonable range
+  const segment = people.length * ITEM_WIDTH;
+  const wrapScroll = (val) => {
+    while (val > segment * 2) val -= segment;
+    while (val < -segment * 2) val += segment;
+    return val;
+  };
+
+  // Momentum animation
+  const AUTO_SPEED = 0.3; // slow constant drift
+  const isInteracting = useRef(false);
+  const autoDirection = useRef(1); // 1 = right, -1 = left
+  const wheelTimeout = useRef(null);
+
+  // Momentum — decays then hands off to auto-scroll in same direction
+  const startMomentum = (vel) => {
+    cancelAnimationFrame(animRef.current);
+    // Remember swipe direction for auto-scroll
+    if (Math.abs(vel) > 0.5) autoDirection.current = vel > 0 ? 1 : -1;
+    let v = vel;
+    const tick = () => {
+      v *= 0.96;
+      if (Math.abs(v) < AUTO_SPEED) {
+        isInteracting.current = false;
+        return;
       }
-    }, 100);
-    return () => clearInterval(interval);
+      setScrollX(prev => wrapScroll(prev + v));
+      animRef.current = requestAnimationFrame(tick);
+    };
+    animRef.current = requestAnimationFrame(tick);
+  };
+
+  // Slow constant auto-scroll in last swipe direction
+  useEffect(() => {
+    const autoTick = () => {
+      if (!isInteracting.current) {
+        setScrollX(prev => wrapScroll(prev + AUTO_SPEED * autoDirection.current));
+      }
+      autoAnimRef.current = requestAnimationFrame(autoTick);
+    };
+    const autoAnimRef = { current: requestAnimationFrame(autoTick) };
+    return () => cancelAnimationFrame(autoAnimRef.current);
   }, []);
 
-  const getRowPeople = (rowIndex) => {
-    const off = (rowIndex * 3) % people.length;
-    return [...people.slice(off), ...people.slice(0, off)];
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!dragRef.current.isDragging) return;
+      const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+      const diff = x - dragRef.current.startX;
+      const now = Date.now();
+      velocityRef.current = (x - lastMoveRef.current.x) / Math.max(1, now - lastMoveRef.current.time) * 16;
+      lastMoveRef.current = { x, time: now };
+      setScrollX(wrapScroll(dragRef.current.startScroll + diff));
+    };
+    const onUp = () => {
+      if (!dragRef.current.isDragging) return;
+      dragRef.current.isDragging = false;
+      startMomentum(velocityRef.current);
+    };
+    // Trackpad swipe — accumulate into velocity then momentum on stop
+    const onWheel = (e) => {
+      e.preventDefault();
+      isInteracting.current = true;
+      cancelAnimationFrame(animRef.current);
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      setScrollX(prev => wrapScroll(prev - delta));
+      velocityRef.current = -delta;
+      // After trackpad stops firing, kick off momentum
+      clearTimeout(wheelTimeout.current);
+      wheelTimeout.current = setTimeout(() => {
+        startMomentum(velocityRef.current);
+      }, 100);
+    };
+    const el = containerRef.current;
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('touchend', onUp);
+    if (el) el.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+      if (el) el.removeEventListener('wheel', onWheel);
+      clearTimeout(wheelTimeout.current);
+    };
+  }, []);
+
+  const handleDown = (e) => {
+    isInteracting.current = true;
+    cancelAnimationFrame(animRef.current);
+    const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    dragRef.current = { isDragging: true, startX: x, startScroll: scrollX };
+    lastMoveRef.current = { x, time: Date.now() };
+    velocityRef.current = 0;
   };
 
-  // Drag handlers — works with touch AND mouse/trackpad
-  const handleDragStart = (clientX) => {
-    if (isAnimating) return;
-    isDragging.current = true;
-    startX.current = clientX;
+  const renderCell = (person, index, rowIndex) => {
+    const pid = person.id;
+    const isMatch = matched.includes(pid);
+    const isIncoming = requests.includes(pid) && !isMatch;
+    const isOutgoing = spotted.includes(pid) && !isMatch;
+    const joinState = joining[pid];
+    const leaveState = leaving[pid];
+    const isFirstInstance = index < people.length;
+    const isJoining = !!joinState && isFirstInstance && rowIndex === 1;
+    const isLeaving = !!leaveState && isFirstInstance && rowIndex === 1;
+    const isHighlighted = isOutgoing || isIncoming || isMatch || isJoining;
+
+    // Join: progress ring fills over JOIN_DURATION, photo goes full color
+    const joinProgress = isJoining ? Math.min(1, (Date.now() - joinState.startTime) / JOIN_DURATION) : 0;
+
+    // Leave: fade from 0.5 → 0 over LEAVE_DURATION
+    const leaveElapsed = isLeaving ? (Date.now() - leaveState.startTime) / LEAVE_DURATION : 0;
+    const leaveOpacity = isLeaving ? Math.max(0, 0.5 * (1 - leaveElapsed)) : null;
+
+    // Default 0.5, joining = 1, leaving = fading to 0
+    const imgOpacity = isLeaving ? leaveOpacity : (isHighlighted ? 1 : 0.5);
+
+    return (
+      <View key={`${rowIndex}-${index}`} style={s.gridCellWrapper}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => !dragRef.current.isDragging && onPersonClick(person, index % people.length)}
+          style={s.gridCell}
+        >
+          <Image source={person.avatar} style={[s.gridImage, { opacity: imgOpacity }]} />
+        </TouchableOpacity>
+        {isJoining && <JoinRing progress={joinProgress} />}
+        {isOutgoing && (
+          <View style={[s.statusBadge, { backgroundColor: color.blue.dark, overflow: 'hidden' }]}>
+            <style>{`
+              @keyframes arrowUpRight {
+                0% { transform: translate(-10px, 10px); opacity: 0; }
+                30% { opacity: 1; }
+                70% { opacity: 1; }
+                100% { transform: translate(10px, -10px); opacity: 0; }
+              }
+            `}</style>
+            <div style={{ animation: 'arrowUpRight 1.5s ease-in-out infinite' }}>
+              <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                <Path d="M7 17L17 7M17 7H7M17 7V17" stroke={color.beige} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </div>
+          </View>
+        )}
+        {isIncoming && (
+          <View style={[s.statusBadge, { backgroundColor: color.green.dark, overflow: 'hidden' }]}>
+            <style>{`
+              @keyframes arrowDownLeft {
+                0% { transform: translate(10px, -10px); opacity: 0; }
+                30% { opacity: 1; }
+                70% { opacity: 1; }
+                100% { transform: translate(-10px, 10px); opacity: 0; }
+              }
+            `}</style>
+            <div style={{ animation: 'arrowDownLeft 1.5s ease-in-out infinite' }}>
+              <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                <Path d="M17 7L7 17M7 17H17M7 17V7" stroke={color.beige} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </div>
+          </View>
+        )}
+        {isMatch && (
+          <View style={[s.statusBadge, { backgroundColor: color.orange.dark }]}>
+            <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+              <Path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill={color.beige} />
+            </Svg>
+          </View>
+        )}
+      </View>
+    );
   };
-
-  const handleDragMove = (clientX) => {
-    if (isAnimating || !isDragging.current) return;
-    const diff = clientX - startX.current;
-    const clamped = Math.max(-COL_WIDTH * 1.2, Math.min(COL_WIDTH * 1.2, diff));
-    setSwipeOffset(clamped);
-  };
-
-  const handleDragEnd = () => {
-    if (isAnimating || !isDragging.current) return;
-    isDragging.current = false;
-
-    if (Math.abs(swipeOffset) > COL_WIDTH * 0.25) {
-      const direction = swipeOffset < 0 ? -1 : 1;
-      setIsAnimating(true);
-      setFlipCount(c => c + 1);
-      setSwipeOffset(direction * COL_WIDTH);
-
-      setTimeout(() => {
-        if (direction < 0) {
-          onActiveChange((activeIndex + 1) % people.length);
-        } else {
-          onActiveChange((activeIndex - 1 + people.length) % people.length);
-        }
-        setSwipeOffset(0);
-        setIsAnimating(false);
-      }, 150);
-    } else {
-      setSwipeOffset(0);
-    }
-  };
-
-  // Touch events
-  const handleTouchStart = (e) => handleDragStart(e.nativeEvent.pageX);
-  const handleTouchMove = (e) => handleDragMove(e.nativeEvent.pageX);
-  const handleTouchEnd = () => handleDragEnd();
-
-  // Mouse events for web/trackpad
-  const handleMouseDown = (e) => { e.preventDefault?.(); handleDragStart(e.nativeEvent?.pageX || e.pageX); };
-  const handleMouseMove = (e) => handleDragMove(e.nativeEvent?.pageX || e.pageX);
-  const handleMouseUp = () => handleDragEnd();
-  const handleMouseLeave = () => { if (isDragging.current) handleDragEnd(); };
-
-  const avgRowHeight = (SMALL_SIZE + FOCUSED_SIZE) / 2;
-  const totalHeight = NUM_ROWS * avgRowHeight + (NUM_ROWS - 1) * ROW_GAP;
 
   return (
     <View
-      style={[s.carouselContainer, { cursor: 'grab', userSelect: 'none' }]}
-      onStartShouldSetResponder={() => true}
-      onMoveShouldSetResponder={() => true}
-      onResponderGrant={handleTouchStart}
-      onResponderMove={handleTouchMove}
-      onResponderRelease={handleTouchEnd}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
+      ref={containerRef}
+      style={[s.gridOuter, { cursor: 'grab', userSelect: 'none' }]}
+      onMouseDown={handleDown}
+      onTouchStart={handleDown}
     >
-      <View style={[s.carouselInner, { height: totalHeight }]}>
-        {POSITIONS.map((position) => {
-          const colIndex = ((activeIndex + position) % people.length + people.length) % people.length;
-          const xPos = position * COL_WIDTH + swipeOffset;
-
-          return (
-            <View
-              key={`col-${colIndex}`}
-              style={[
-                s.carouselColumn,
-                {
-                  gap: ROW_GAP,
-                  transform: [{ translateX: xPos }],
-                  transition: isAnimating
-                    ? `transform ${isAutoScrolling ? '0.5s' : '0.15s'} cubic-bezier(0.4, 0, 0.2, 1)`
-                    : 'none',
-                },
-              ]}
-            >
-              {Array.from({ length: NUM_ROWS }).map((_, rowIndex) => {
-                const rowPeople = getRowPeople(rowIndex);
-                const rowPerson = rowPeople[colIndex];
-                const isLarge = (colIndex + rowIndex + flipCount) % 2 === 0;
-                const scale = isLarge ? 1 : SMALL_SCALE;
-                const isSpotted = spotted.includes(rowPerson.id);
-                const pid = rowPerson.id;
-                const isMatch = matched.includes(pid);
-                const isIncoming = requests.includes(pid) && !isMatch;
-                const isOutgoing = spotted.includes(pid) && !isMatch;
-
-                return (
-                  <View key={`row-${rowIndex}`} style={{ width: FOCUSED_SIZE, height: FOCUSED_SIZE, transform: [{ scale }], transition: 'transform 0.35s ease-out' }}>
-
-                    <TouchableOpacity
-                      activeOpacity={position === 0 ? 0.8 : 1}
-                      onPress={() => position === 0 && onPersonClick(rowPerson, colIndex)}
-                      style={s.carouselCell}
-                    >
-                      {/* Photo — desaturated for pending states */}
-                      <Image
-                        source={rowPerson.avatar}
-                        style={[
-                          s.carouselImage,
-                          (isOutgoing || isIncoming) && { filter: 'grayscale(1)' },
-                        ]}
-                      />
-
-                      {/* Outgoing: blue gradient dark→light */}
-                      {isOutgoing && (
-                        <LinearGradient
-                          colors={[color.blue.dark + 'CC', color.blue.dark + '40']}
-                          start={{ x: 0, y: 1 }}
-                          end={{ x: 0, y: 0 }}
-                          style={[s.colorShade, { borderRadius: FOCUSED_SIZE / 2 }]}
-                        />
-                      )}
-
-                      {/* Incoming: green gradient dark→light */}
-                      {isIncoming && (
-                        <LinearGradient
-                          colors={[color.green.light + 'CC', color.green.light + '40']}
-                          start={{ x: 0, y: 1 }}
-                          end={{ x: 0, y: 0 }}
-                          style={[s.colorShade, { borderRadius: FOCUSED_SIZE / 2 }]}
-                        />
-                      )}
-
-                      {/* Outgoing/Incoming: spinner in center */}
-                      {(isOutgoing || isIncoming) && (
-                        <View style={s.pendingCenter}>
-                          <View style={s.pendingCircle}>
-                            <ActivityIndicator
-                              size="small"
-                              color={color.white}
-                            />
-                          </View>
-                        </View>
-                      )}
-
-                      {/* Matched: shimmer overlay on photo */}
-                      {isMatch && (
-                        <View style={s.matchShimmer} />
-                      )}
-                    </TouchableOpacity>
-
-                    {/* Matched: orange glow ring — OUTSIDE clipped cell */}
-                    {isMatch && (
-                      <View style={s.matchGlow} pointerEvents="none" />
-                    )}
-                  </View>
-                );
-              })}
+      {Array.from({ length: NUM_ROWS }).map((_, rowIndex) => {
+        const direction = rowIndex % 2 === 0 ? 1 : -1;
+        const rowScroll = centerOffset + scrollX * direction;
+        const offset = rowIndex % 2 === 1 ? ROW_OFFSET : 0;
+        return (
+          <View key={rowIndex} style={[s.gridRowClip]}>
+            <View style={[s.gridRow, { transform: [{ translateX: rowScroll + offset }] }]}>
+              {getRowPeople(rowIndex).map((person, i) => renderCell(person, i, rowIndex))}
             </View>
-          );
-        })}
-      </View>
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -293,12 +374,18 @@ function ChatChip({ onToggle, currentMessage }) {
 
 // ─── MAIN SCREEN ───
 export default function CheckedInScreen({ route, navigation }) {
-  const venue = route?.params?.venue || { id: 1, name: 'White Dubai', area: 'Meydan' };
+  const venue = route?.params?.venue || { id: '1', name: 'White Dubai', area: 'Meydan', image: require('../../assets/venues/1.jpg') };
+  const { checkIn, checkOut } = useVenueStore();
+
+  useEffect(() => {
+    checkIn(venue);
+  }, []);
   const [activeIndex, setActiveIndex] = useState(0);
   const [spotted, setSpotted] = useState([]);             // outgoing (you spotted them)
-  const [requests, setRequests] = useState([1, 3, 5, 7]); // 4 incoming (they spotted you)
+  const [requests, setRequests] = useState([1, 5]); // incoming (they spotted you)
   const [matched, setMatched] = useState([]);             // mutual matches
   const [openPanel, setOpenPanel] = useState(null);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [focusedPerson, setFocusedPerson] = useState(null);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
@@ -314,6 +401,34 @@ export default function CheckedInScreen({ route, navigation }) {
 
   const pendingRequests = requests.filter(id => !matched.includes(id)).length;
 
+  // Join/leave animations — managed here, passed to PeopleGrid
+  const [gridJoining, setGridJoining] = useState({});
+  const [gridLeaving, setGridLeaving] = useState({});
+  const joinEventCount = useRef(0);
+  const nextJoinEventAt = useRef(Date.now() + 3000);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      if (now < nextJoinEventAt.current) return;
+
+      const isJoin = joinEventCount.current % 2 === 0;
+      joinEventCount.current++;
+      const person = PEOPLE[Math.floor(Math.random() * PEOPLE.length)];
+
+      if (isJoin) {
+        setGridJoining({ [person.id]: { startTime: now } });
+        setTimeout(() => setGridJoining({}), JOIN_DURATION);
+        nextJoinEventAt.current = now + JOIN_DURATION + 5000 + Math.random() * 10000;
+      } else {
+        setGridLeaving({ [person.id]: { startTime: now } });
+        setTimeout(() => setGridLeaving({}), 2000);
+        nextJoinEventAt.current = now + 2000 + 5000 + Math.random() * 10000;
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
   // Inject CSS keyframes for match shimmer
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -327,21 +442,17 @@ export default function CheckedInScreen({ route, navigation }) {
     }
   }, []);
 
-  // Blinking notification dot
+  // Blinking notification dot (chat activity)
   const blinkAnim = useRef(new Animated.Value(1)).current;
   useEffect(() => {
-    if (pendingRequests > 0) {
-      const anim = Animated.loop(
-        Animated.sequence([
-          Animated.timing(blinkAnim, { toValue: 0.2, duration: 600, useNativeDriver: false }),
-          Animated.timing(blinkAnim, { toValue: 1, duration: 600, useNativeDriver: false }),
-        ])
-      );
-      anim.start();
-      return () => anim.stop();
-    } else {
-      blinkAnim.setValue(1);
-    }
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnim, { toValue: 0.2, duration: 600, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 1, duration: 600, useNativeDriver: false }),
+      ])
+    );
+    anim.start();
+    return () => anim.stop();
   }, [pendingRequests]);
 
   // Cycle chat messages
@@ -358,14 +469,23 @@ export default function CheckedInScreen({ route, navigation }) {
   const isActiveIncoming = requests.includes(activePerson?.id) && !matched.includes(activePerson?.id);
   const isActiveMatched = matched.includes(activePerson?.id);
 
+  const [expandProgress, setExpandProgress] = useState(0);
+  const expandTimerRef = useRef(null);
+
   const handleProfileClick = (person) => {
     setFocusedPerson(person);
     setIsFocusMode(true);
+    setExpandProgress(0);
+    // Animate from 0 to 1 over 400ms
+    requestAnimationFrame(() => setExpandProgress(1));
   };
 
   const handleCloseFocus = () => {
-    setIsFocusMode(false);
-    setFocusedPerson(null);
+    setExpandProgress(0);
+    setTimeout(() => {
+      setIsFocusMode(false);
+      setFocusedPerson(null);
+    }, 300);
   };
 
   const handleSpot = () => {
@@ -416,7 +536,18 @@ export default function CheckedInScreen({ route, navigation }) {
     <View style={s.container}>
       {/* ─── Focus Mode (full screen profile) ─── */}
       {isFocusMode && focusedPerson && (
-        <View style={s.focusOverlay}>
+        <View style={[
+          s.focusOverlay,
+          {
+            clipPath: expandProgress === 1
+              ? 'circle(150% at 50% 50%)'
+              : `circle(${CELL_SIZE / 2}px at 50% 50%)`,
+            WebkitClipPath: expandProgress === 1
+              ? 'circle(150% at 50% 50%)'
+              : `circle(${CELL_SIZE / 2}px at 50% 50%)`,
+            transition: 'clip-path 0.4s ease-out, -webkit-clip-path 0.4s ease-out',
+          },
+        ]}>
           <Image source={focusedPerson.avatar} style={s.focusImage} />
           {/* Gradient overlay */}
           <LinearGradient
@@ -433,28 +564,15 @@ export default function CheckedInScreen({ route, navigation }) {
           </SafeAreaView>
           {/* Profile info + actions at bottom */}
           <SafeAreaView edges={['bottom']} style={s.focusBottom}>
-            {/* Name row — with "spotted you" badge if incoming */}
             <View style={s.focusNameRow}>
               <Text style={s.focusName}>{focusedPerson.name}</Text>
               {isActiveIncoming && (
                 <Text style={s.spottedYouLabel}>spotted you</Text>
               )}
             </View>
-            {/* Age + bio on second line */}
             <Text style={s.focusAge}>{focusedPerson.age}, "{focusedPerson.bio}"</Text>
 
-            {/* Interests */}
-            {focusedPerson.interests && (
-              <View style={s.focusInterests}>
-                {focusedPerson.interests.map((i) => (
-                  <View key={i} style={s.focusInterestTag}>
-                    <Text style={s.focusInterestText}>{i}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            <View style={{ marginTop: spacing.lg, width: '100%', gap: spacing.md }}>
+            <View style={{ marginTop: spacing.lg, width: '100%', gap: spacing.sm }}>
               {/* STATE: Matched — message button */}
               {isActiveMatched && (
                 <Button variant="solid" color="orange" size="lg" fullWidth onPress={() => { handleCloseFocus(); setOpenPanel('spots'); openDm(focusedPerson); }}>
@@ -464,7 +582,7 @@ export default function CheckedInScreen({ route, navigation }) {
 
               {/* STATE: Incoming request — spot back + not interested */}
               {isActiveIncoming && (
-                <View style={{ gap: spacing.sm }}>
+                <>
                   <Button variant="solid" color="orange" size="lg" fullWidth onPress={() => { handleAcceptMatch(focusedPerson.id); handleCloseFocus(); }}>
                     Spot Back
                   </Button>
@@ -474,7 +592,7 @@ export default function CheckedInScreen({ route, navigation }) {
                   >
                     <Text style={s.notInterestedText}>Not interested?</Text>
                   </TouchableOpacity>
-                </View>
+                </>
               )}
 
               {/* STATE: Outgoing spot — waiting + cancel */}
@@ -498,26 +616,25 @@ export default function CheckedInScreen({ route, navigation }) {
                   Spot {focusedPerson.name}
                 </Button>
               )}
+            </View>
 
-              {/* Safety actions */}
-              <View style={s.focusSafetyRow}>
-                <Text style={s.focusSafetyDisclaimer}>
-                  Your safety matters. If something feels off, let us know — all reports are confidential and reviewed within 24 hours.
-                </Text>
-                <View style={s.focusSafetyActions}>
-                  <TouchableOpacity style={s.focusSafetyBtn} onPress={handleCloseFocus}>
-                    <EyeOff size={13} color={color.white + '80'} />
-                    <Text style={s.focusSafetyLabel}>Ignore</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={s.focusSafetyBtn} onPress={() => setShowBlock(true)}>
-                    <Ban size={13} color={color.white + '80'} />
-                    <Text style={s.focusSafetyLabel}>Block</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[s.focusSafetyBtn, { backgroundColor: color.error.light + '26' }]} onPress={() => setShowReport(true)}>
-                    <AlertTriangle size={13} color={color.error.light} />
-                    <Text style={[s.focusSafetyLabel, { color: color.error.light }]}>Report</Text>
-                  </TouchableOpacity>
-                </View>
+            <View style={s.focusSafetyRow}>
+              <Text style={s.focusSafetyDisclaimer}>
+                Your safety matters. If something feels off, let us know.
+              </Text>
+              <View style={s.focusSafetyActions}>
+                <TouchableOpacity style={s.focusSafetyBtn} onPress={handleCloseFocus}>
+                  <EyeOff size={16} color={color.white + 'CC'} />
+                  <Text style={s.focusSafetyLabel}>Ignore</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={s.focusSafetyBtn} onPress={() => setShowBlock(true)}>
+                  <Ban size={16} color={color.white + 'CC'} />
+                  <Text style={s.focusSafetyLabel}>Block</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[s.focusSafetyBtn, { borderColor: color.error.light + '66' }]} onPress={() => setShowReport(true)}>
+                  <AlertTriangle size={16} color={color.error.light} />
+                  <Text style={[s.focusSafetyLabel, { color: color.error.light }]}>Report</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </SafeAreaView>
@@ -529,48 +646,54 @@ export default function CheckedInScreen({ route, navigation }) {
         <View style={s.headerBar}>
           <View style={s.venueBar}>
             <Text style={s.venueName}>{venue.name || 'White Dubai'}</Text>
-            <TouchableOpacity style={s.leaveButton} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={s.leaveButton} onPress={() => setShowLeaveModal(true)}>
               <Text style={s.leaveText}>Leave</Text>
               <LogOut size={12} color={color.olive.dark} />
             </TouchableOpacity>
           </View>
-          {/* Heart button */}
+          {/* Chat button */}
           <TouchableOpacity
             style={s.heartButton}
-            onPress={() => setOpenPanel(openPanel === 'spots' ? null : 'spots')}
+            onPress={() => setOpenPanel(openPanel === 'chat' ? null : 'chat')}
             activeOpacity={0.9}
           >
-            <Svg width={20} height={20} viewBox="0 0 24 24" fill={color.orange.dark}>
-              <Path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </Svg>
-            {pendingRequests > 0 && (
-              <Animated.View style={[s.notificationDot, { opacity: blinkAnim }]} />
-            )}
+            <GroupChatIcon size={22} color={color.olive.dark} />
+            <Animated.View style={[s.notificationDot, { opacity: blinkAnim }]} />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
 
-      {/* ─── Carousel ─── */}
+      {/* ─── People Grid ─── */}
       {!isFocusMode && (
-        <View style={s.carouselWrapper}>
-          <AlternatingSizeCarousel
+        <View style={s.gridWrapper}>
+          <PeopleGrid
             people={PEOPLE}
             onPersonClick={(person) => handleProfileClick(person)}
-            activeIndex={activeIndex}
-            onActiveChange={setActiveIndex}
             spotted={spotted}
             requests={requests}
             matched={matched}
+            joining={gridJoining}
+            leaving={gridLeaving}
           />
         </View>
       )}
 
-      {/* ─── Chat Chip (collapsed) ─── */}
+      {/* ─── Bottom Nav ─── */}
       {!isFocusMode && openPanel === null && (
-        <ChatChip
-          onToggle={() => setOpenPanel('chat')}
-          currentMessage={MOCK_MESSAGES[currentMessageIndex]}
-        />
+        <View style={s.bottomNavWrapper}>
+          <SafeAreaView edges={['bottom']}>
+            <BottomNav
+              activeTab="venue"
+              checkedInVenue={venue}
+              onTabChange={(tab) => {
+                if (tab === 'nearby') navigation.navigate('Home');
+                else if (tab === 'spots') navigation.navigate('Spots');
+                else if (tab === 'likes') navigation.navigate('Matches');
+                else if (tab === 'profile') navigation.navigate('Profile');
+              }}
+            />
+          </SafeAreaView>
+        </View>
       )}
 
       {/* ─── Expanded Panel (Chat or Spots) ─── */}
@@ -958,7 +1081,7 @@ export default function CheckedInScreen({ route, navigation }) {
               <Image source={matchPopup.avatar} style={s.matchPhoto} />
             </View>
 
-            <Text style={s.matchTitle}>It's a match!</Text>
+            <Text style={s.matchTitle}>It's hactually happening!</Text>
             <Text style={s.matchSubtext}>
               You and {matchPopup.name} spotted each other and made a connection. Say hello!
             </Text>
@@ -982,6 +1105,34 @@ export default function CheckedInScreen({ route, navigation }) {
           </View>
         </View>
       )}
+
+      {/* ─── LEAVE MODAL ─── */}
+      {showLeaveModal && (
+        <View style={s.leaveOverlay}>
+          <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={() => setShowLeaveModal(false)} />
+          <View style={s.leaveModal}>
+            <View style={s.leaveModalHandle} />
+            <Text style={s.leaveModalTitle}>Are you sure you want to leave?</Text>
+            <Text style={s.leaveModalBody}>
+              You can check back in anytime, but you'll lose your active credit for this session.
+            </Text>
+            <View style={{ marginTop: spacing.xl }}>
+              <Button
+                variant="checkin"
+                color="orange"
+                size="lg"
+                fullWidth
+                onPress={() => { setShowLeaveModal(false); checkOut(); navigation.goBack(); }}
+              >
+                Slide to Leave
+              </Button>
+            </View>
+            <TouchableOpacity style={s.leaveModalCancel} onPress={() => setShowLeaveModal(false)} activeOpacity={0.7}>
+              <Text style={s.leaveModalCancelText}>Stay checked in</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -992,6 +1143,12 @@ const s = StyleSheet.create({
     flex: 1,
     backgroundColor: color.beige,
     overflow: 'hidden',
+  },
+
+  // Bottom nav
+  bottomNavWrapper: {
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    paddingHorizontal: spacing.xl, paddingBottom: spacing.sm, zIndex: 20,
   },
 
   // Header
@@ -1007,7 +1164,7 @@ const s = StyleSheet.create({
   },
   venueName: { ...typography.body, fontWeight: '700', color: color.charcoal, flex: 1 },
   leaveButton: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radius.full, backgroundColor: color.beige },
-  leaveText: { ...typography.caption, fontSize: 11, color: color.olive.dark },
+  leaveText: { ...typography.caption, fontSize: 11, fontWeight: '700', color: color.olive.dark },
   heartButton: {
     width: spacing['3xl'], height: spacing['3xl'], borderRadius: spacing['3xl'] / 2,
     backgroundColor: color.white + 'CC', borderWidth: 1, borderColor: color.olive.light + '4D',
@@ -1021,24 +1178,25 @@ const s = StyleSheet.create({
   },
 
   // Carousel
-  carouselWrapper: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', zIndex: 0 },
-  carouselContainer: { width: '100%' },
-  carouselInner: { alignItems: 'center', justifyContent: 'center' },
-  carouselColumn: { position: 'absolute', alignItems: 'center' },
-  carouselCell: { width: FOCUSED_SIZE, height: FOCUSED_SIZE, borderRadius: FOCUSED_SIZE / 2, overflow: 'hidden' },
-  carouselImage: { width: '100%', height: '100%' },
-  colorShade: { ...StyleSheet.absoluteFillObject, borderRadius: FOCUSED_SIZE / 2 },
+  gridWrapper: { flex: 1, zIndex: 0, justifyContent: 'center' },
+  gridOuter: { gap: CELL_GAP, overflow: 'hidden' },
+  gridRowClip: { overflow: 'hidden' },
+  gridRow: { flexDirection: 'row', gap: CELL_GAP },
+  gridCellWrapper: { width: CELL_SIZE, height: CELL_SIZE },
+  gridCell: { width: CELL_SIZE, height: CELL_SIZE, borderRadius: CELL_SIZE / 2, overflow: 'hidden', borderWidth: 0 },
+  gridImage: { width: '100%', height: '100%' },
+  statusBadge: { position: 'absolute', top: 4, right: 4, width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: color.beige },
+  colorShade: { ...StyleSheet.absoluteFillObject, borderRadius: CELL_SIZE / 2 },
   matchGlow: {
     position: 'absolute',
-    top: -4, left: -4, right: -4, bottom: -4,
-    borderRadius: (FOCUSED_SIZE + 8) / 2,
-    borderWidth: 2,
-    borderColor: color.orange.dark,
-    boxShadow: `0 0 16px ${color.orange.dark}AA, 0 0 32px ${color.orange.dark}66, inset 0 0 8px ${color.orange.dark}33`,
+    top: 0, left: 0, right: 0, bottom: 0,
+    borderRadius: CELL_SIZE / 2,
+    borderWidth: 3,
+    borderColor: color.green.light,
   },
   matchShimmer: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: FOCUSED_SIZE / 2,
+    borderRadius: CELL_SIZE / 2,
     background: `linear-gradient(105deg, transparent 40%, ${color.orange.light}66 50%, transparent 60%)`,
     backgroundSize: '250% 100%',
     animation: 'matchShimmerAnim 2.5s ease-in-out infinite',
@@ -1057,6 +1215,36 @@ const s = StyleSheet.create({
     backgroundColor: color.charcoal + '40',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  pendingText: {
+    ...typography.caption,
+    fontSize: 9,
+    fontWeight: '700',
+    color: color.white,
+    textAlign: 'center',
+  },
+  pendingLabel: {
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fontSize: 14,
+    fontWeight: '600',
+    color: color.white,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  outgoingGlow: {
+    position: 'absolute',
+    top: -4, left: -4, right: -4, bottom: -4,
+    borderRadius: (CELL_SIZE + 8) / 2,
+    borderWidth: 2,
+    borderColor: color.blue.dark,
+    boxShadow: `0 0 16px ${color.blue.dark}AA, 0 0 32px ${color.blue.dark}66`,
+  },
+  incomingGlow: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+    borderRadius: CELL_SIZE / 2,
+    borderWidth: 3,
+    borderColor: color.orange.dark,
   },
 
   // Focus mode
@@ -1082,11 +1270,11 @@ const s = StyleSheet.create({
   focusInterests: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.sm },
   focusInterestTag: { backgroundColor: color.white + '26', borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
   focusInterestText: { ...typography.caption, fontSize: 12, color: color.white + 'CC' },
-  focusSafetyRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, paddingTop: spacing.lg },
-  focusSafetyDisclaimer: { ...typography.caption, fontSize: 10, color: color.white + '4D', flex: 1, lineHeight: 14 },
-  focusSafetyActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  focusSafetyBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.full, backgroundColor: color.white + '14' },
-  focusSafetyLabel: { ...typography.caption, fontSize: 11, fontWeight: '600', color: color.white + '80' },
+  focusSafetyRow: { marginTop: spacing.lg, gap: spacing.sm },
+  focusSafetyDisclaimer: { ...typography.caption, fontSize: 10, color: color.white + '4D', textAlign: 'center', lineHeight: 14 },
+  focusSafetyActions: { flexDirection: 'row', gap: spacing.sm },
+  focusSafetyBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, paddingVertical: spacing.md, borderRadius: radius.full, borderWidth: 1, borderColor: color.white + '26' },
+  focusSafetyLabel: { ...typography.body, color: color.white + 'CC' },
   notInterestedBtn: {
     width: '100%', height: spacing['3xl'], borderRadius: radius.full,
     backgroundColor: color.white + '26', alignItems: 'center', justifyContent: 'center',
@@ -1102,7 +1290,7 @@ const s = StyleSheet.create({
   waitingText: { ...typography.caption, fontSize: 12, fontWeight: '500', color: color.white + 'CC' },
 
   // Chat chip (collapsed)
-  chatChip: { position: 'absolute', bottom: spacing.xl, left: spacing.lg, right: spacing.lg, zIndex: 50 },
+  chatChip: { position: 'absolute', bottom: 80, left: spacing.lg, right: spacing.lg, zIndex: 50 },
   chatChipInner: {
     borderRadius: radius.lg, backgroundColor: color.white + 'E6',
     borderWidth: 1, borderColor: color.white + '80',
@@ -1253,4 +1441,13 @@ const s = StyleSheet.create({
   spotsEmpty: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: spacing['3xl'] * 2 },
   spotsEmptyTitle: { ...typography.body, color: color.white + '80', marginTop: spacing.md },
   spotsEmptySubtitle: { ...typography.caption, fontSize: 11, color: color.white + '4D', marginTop: spacing.xs },
+
+  // Leave modal
+  leaveOverlay: { ...StyleSheet.absoluteFillObject, zIndex: 80, backgroundColor: color.charcoal + 'B3', justifyContent: 'flex-end', padding: spacing.xl },
+  leaveModal: { backgroundColor: color.beige, borderRadius: radius.xl, padding: spacing.xl, paddingTop: spacing.lg },
+  leaveModalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: color.olive.light, alignSelf: 'center', marginBottom: spacing.lg },
+  leaveModalTitle: { ...typography.h3, color: color.charcoal, textAlign: 'center', marginBottom: spacing.sm },
+  leaveModalBody: { ...typography.body, color: color.olive.dark, textAlign: 'center', lineHeight: 22, fontSize: 14 },
+  leaveModalCancel: { alignItems: 'center', paddingTop: spacing.lg },
+  leaveModalCancelText: { ...typography.caption, color: color.olive.dark + '80', textDecorationLine: 'underline' },
 });

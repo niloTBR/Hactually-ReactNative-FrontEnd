@@ -22,6 +22,7 @@ import {
 import { color, spacing, radius, typography } from '../theme';
 import { useAuthStore } from '../store/authStore';
 import { BottomNav, Input, Chip, Button } from '../components';
+import { useVenueStore } from '../store/venueStore';
 import { GhostTheme } from '../theme';
 
 // ─── DATA ───
@@ -402,6 +403,7 @@ function PrivacyView({ onBack }) {
 
 // ─── MAIN PROFILE SCREEN ───
 export default function ProfileScreen({ navigation }) {
+  const checkedInVenue = useVenueStore((s) => s.checkedInVenue);
   const { user, logout } = useAuthStore();
   const [activeView, setActiveView] = useState(null);
   const [profileData, setProfileData] = useState(DEMO_USER);
@@ -485,7 +487,7 @@ export default function ProfileScreen({ navigation }) {
       {!activeView && (
         <View style={p.bottomNavWrap}>
           <SafeAreaView edges={['bottom']}>
-            <BottomNav activeTab="profile" onTabChange={(tab) => { if (tab === 'nearby') navigation.navigate('Home'); else if (tab === 'likes') navigation.navigate('Matches'); }} />
+            <BottomNav activeTab="profile" checkedInVenue={checkedInVenue} onTabChange={(tab) => { if (tab === 'venue') navigation.navigate('CheckedIn', { venue: checkedInVenue }); else if (tab === 'nearby') navigation.navigate('Home'); else if (tab === 'spots') navigation.navigate('Spots'); else if (tab === 'likes') navigation.navigate('Matches'); }} />
           </SafeAreaView>
         </View>
       )}
@@ -592,7 +594,7 @@ const p = StyleSheet.create({
   // Profile card
   profileCardWrap: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: spacing.xl },
   profileCard: { backgroundColor: color.white + '99', borderRadius: radius.lg, borderWidth: 1, borderColor: color.olive.light + '33', padding: spacing.xl, alignItems: 'center' },
-  avatarWrap: { marginBottom: spacing.md },
+  avatarWrap: { marginTop: 40, marginBottom: spacing.md },
   avatar: { width: 96, height: 96, borderRadius: 48, borderWidth: 3, borderColor: color.white },
   editAvatarBtn: { position: 'absolute', bottom: 0, right: 0, width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, backgroundColor: color.orange.dark, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: color.white },
   profileName: { ...typography.h3, color: color.charcoal },
