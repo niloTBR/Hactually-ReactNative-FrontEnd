@@ -1268,7 +1268,7 @@ const s = StyleSheet.create({
   focusContext: { ...typography.body, color: color.white, marginTop: spacing.xs },
   spottedYouLabel: { ...typography.caption, fontSize: 12, fontWeight: '700', color: color.green.light, letterSpacing: 1, textTransform: 'uppercase', textShadowColor: color.charcoal + '60', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   focusName: { ...typography.h1, color: color.white },
-  focusAge: { ...typography.body, color: color.beige, marginTop: spacing.xs },
+  focusAge: { fontSize: 20, lineHeight: 28, color: color.beige, marginTop: spacing.xs },
   focusInterests: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.sm },
   focusInterestTag: { backgroundColor: color.white + '26', borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
   focusInterestText: { ...typography.caption, fontSize: 12, color: color.white + 'CC' },
