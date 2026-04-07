@@ -321,29 +321,29 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: color.green.dark },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.md },
   headerSpacer: { flex: 1 },
-  backButton: { width: 40, height: 40, borderRadius: radius.full, backgroundColor: themeColor + '20', alignItems: 'center', justifyContent: 'center' },
+  backButton: { width: 40, height: 40, borderRadius: radius.full, backgroundColor: themeColor + '33', alignItems: 'center', justifyContent: 'center' },
   scrollView: { flex: 1 },
   scrollContent: { paddingHorizontal: spacing['2xl'], paddingBottom: spacing.lg },
   title: { ...typography.h2, color: color.blue.light, marginBottom: spacing.xl },
 
   // Photo
   photoSection: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, marginBottom: spacing.xl },
-  photoButton: { width: 96, height: 96, borderRadius: radius.lg, overflow: 'hidden', borderWidth: 1, borderColor: themeColor + '60' },
-  photoPlaceholder: { width: '100%', height: '100%', backgroundColor: themeColor + '10', alignItems: 'center', justifyContent: 'center' },
+  photoButton: { width: 96, height: 96, borderRadius: radius.lg, overflow: 'hidden', borderWidth: 1, borderColor: themeColor + '4D' },
+  photoPlaceholder: { width: '100%', height: '100%', backgroundColor: themeColor + '1A', alignItems: 'center', justifyContent: 'center' },
   photoImage: { width: '100%', height: '100%' },
   photoText: { flex: 1 },
   photoLabel: { ...typography.caption, fontWeight: '700', color: themeColor },
   photoActions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
-  photoActionBtn: { width: 32, height: 32, borderRadius: radius.full, backgroundColor: themeColor + '20', alignItems: 'center', justifyContent: 'center' },
+  photoActionBtn: { width: 32, height: 32, borderRadius: radius.full, backgroundColor: themeColor + '33', alignItems: 'center', justifyContent: 'center' },
 
   // Form
   formSection: { gap: spacing.md },
   inputGroup: {},
-  selectButton: { height: 48, borderRadius: radius.full, borderWidth: 1, borderColor: themeColor + '60', paddingHorizontal: spacing.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  selectError: { borderColor: color.orange.light },
-  selectButtonText: { ...typography.body, color: themeColor },
-  placeholderText: { color: themeColor + '80' },
-  errorText: { ...typography.caption, color: color.orange.light, marginTop: spacing.xs, marginLeft: spacing.sm },
+  selectButton: { height: 48, borderRadius: radius.full, borderWidth: 1, borderColor: themeColor + '80', paddingHorizontal: spacing.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  selectError: { borderColor: color.error.light },
+  selectButtonText: { ...typography.body, color: color.beige },
+  placeholderText: { color: color.beige + '80' },
+  errorText: { ...typography.caption, color: color.error.light, marginTop: spacing.xs, marginLeft: spacing.sm },
 
   // Bio
   bioSection: { marginTop: spacing.xl },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
 
   // Interests
   interestsSection: { marginTop: spacing.xl },
-  interestsSubtitle: { ...typography.caption, color: themeColor + '80', marginBottom: spacing.md },
+  interestsSubtitle: { ...typography.caption, color: color.beige + '80', marginBottom: spacing.md },
   selectedInterests: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
   interestSearchContainer: { marginBottom: spacing.md },
   interestSuggestions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
@@ -361,10 +361,10 @@ const styles = StyleSheet.create({
 
   // Modal
   modalContainer: { flex: 1, backgroundColor: color.green.dark },
-  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: themeColor + '30' },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: themeColor + '33' },
   modalTitle: { ...typography.h3, color: themeColor },
-  countryItem: { paddingHorizontal: spacing.lg, paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: themeColor + '20' },
-  countryItemSelected: { backgroundColor: themeColor + '30' },
+  countryItem: { paddingHorizontal: spacing.lg, paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: themeColor + '33' },
+  countryItemSelected: { backgroundColor: themeColor + '33' },
   countryItemText: { ...typography.body, color: themeColor },
   countryItemTextSelected: { color: themeColor, fontWeight: '700' },
 });

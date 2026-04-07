@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Logo, ProfileMarquee, Button, ShimmerText } from '../../components';
-import { color, spacing, typography } from '../../theme';
+import { color, spacing, typography, radius } from '../../theme';
 
 const { width } = Dimensions.get('window');
 
@@ -50,7 +50,7 @@ const AnimatedText = memo(({ lines, center, slideIndex }) => {
                   <ShimmerText
                     style={center ? styles.slideTextCenter : styles.slideText}
                     color={color.orange.dark}
-                    shimmerColor="rgba(255,255,255,0.7)"
+                    shimmerColor={color.white + 'B3'}
                   >
                     {word}
                   </ShimmerText>
@@ -131,7 +131,7 @@ export default function WelcomeScreen({ navigation }) {
             isMuted
             rate={current.isFinal ? 0.5 : 1}
           />
-          <LinearGradient colors={['transparent', 'rgba(88,101,242,0.6)', 'rgba(88,101,242,0.9)']} locations={[0.4, 0.7, 1]} style={StyleSheet.absoluteFill} />
+          <LinearGradient colors={['transparent', color.blue.dark + '99', color.blue.dark + 'E6']} locations={[0.4, 0.7, 1]} style={StyleSheet.absoluteFill} />
         </View>
       )}
 
@@ -207,8 +207,8 @@ const styles = StyleSheet.create({
   tapLeft: { flex: 1 },
   tapRight: { flex: 1 },
   progressRow: { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing['2xl'], paddingVertical: spacing['2xl'] },
-  progressBar: { flex: 1, height: 4, borderRadius: 99, backgroundColor: 'rgba(200,227,244,0.3)', overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: color.blue.light, borderRadius: 99 },
+  progressBar: { flex: 1, height: 4, borderRadius: radius.full, backgroundColor: color.blue.light + '4D', overflow: 'hidden' },
+  progressFill: { height: '100%', backgroundColor: color.blue.light, borderRadius: radius.full },
   logo: { paddingHorizontal: spacing['2xl'] },
   content: { flex: 1 },
   profilesWrap: { flex: 1, justifyContent: 'space-between', paddingVertical: spacing['2xl'] },

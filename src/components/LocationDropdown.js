@@ -89,7 +89,7 @@ export default function LocationDropdown({ selected, onSelect, locations = LOCAT
         activeOpacity={0.8}
         onPress={() => setOpen(!open)}
       >
-        <MapPin size={18} color={color.blue.dark} />
+        <Search size={18} color={color.blue.dark} />
         <Text style={styles.triggerText} numberOfLines={1}>
           {current.name}, {current.city}
         </Text>

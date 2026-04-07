@@ -23,16 +23,16 @@ const PROFILE_IMAGES = [
 ];
 
 const MOCK_SPOTTED_YOU = [
-  { id: 101, name: 'Nadia', age: 25, avatar: PROFILE_IMAGES[4], venue: 'Coya', time: '20 min ago' },
-  { id: 102, name: 'Karim', age: 27, avatar: PROFILE_IMAGES[2], venue: 'White Dubai', time: '1h ago' },
-  { id: 103, name: 'Amara', age: 23, avatar: PROFILE_IMAGES[3], venue: 'Nammos', time: '3h ago' },
-  { id: 104, name: 'Leo', age: 29, avatar: PROFILE_IMAGES[1], venue: 'Soho Garden', time: '5h ago' },
+  { id: 101, name: 'Nadia', age: 25, bio: 'Coffee addict & sunset chaser', avatar: PROFILE_IMAGES[4], venue: 'Coya', time: '20 min ago' },
+  { id: 102, name: 'Karim', age: 27, bio: 'Architect by day, DJ by night', avatar: PROFILE_IMAGES[2], venue: 'White Dubai', time: '1h ago' },
+  { id: 103, name: 'Amara', age: 23, bio: 'Beach lover & foodie', avatar: PROFILE_IMAGES[3], venue: 'Nammos', time: '3h ago' },
+  { id: 104, name: 'Leo', age: 29, bio: 'Travel, tennis, tacos', avatar: PROFILE_IMAGES[1], venue: 'Soho Garden', time: '5h ago' },
 ];
 
 const MOCK_SENT = [
-  { id: 201, name: 'Yasmin', age: 24, avatar: PROFILE_IMAGES[0], venue: 'White Dubai', time: '10 min ago' },
-  { id: 202, name: 'Rami', age: 26, avatar: PROFILE_IMAGES[2], venue: 'Coya', time: '1h ago' },
-  { id: 203, name: 'Dina', age: 23, avatar: PROFILE_IMAGES[3], venue: 'Nammos', time: '3h ago' },
+  { id: 201, name: 'Yasmin', age: 24, bio: 'Yoga & vinyl collector', avatar: PROFILE_IMAGES[0], venue: 'White Dubai', time: '10 min ago' },
+  { id: 202, name: 'Rami', age: 26, bio: 'Film nerd & home cook', avatar: PROFILE_IMAGES[2], venue: 'Coya', time: '1h ago' },
+  { id: 203, name: 'Dina', age: 23, bio: 'Art, adventures & aperol', avatar: PROFILE_IMAGES[3], venue: 'Nammos', time: '3h ago' },
 ];
 
 export default function SpotsScreen({ navigation }) {
@@ -211,11 +211,9 @@ export default function SpotsScreen({ navigation }) {
             </TouchableOpacity>
           </SafeAreaView>
           <SafeAreaView edges={['bottom']} style={s.focusBottom}>
-            <View style={s.focusNameRow}>
-              <Text style={s.focusName}>{focusedSpot.name}</Text>
-              <Text style={s.spottedYouLabel}>spotted you</Text>
-            </View>
-            <Text style={s.focusAge}>{focusedSpot.age}, "{focusedSpot.venue}"</Text>
+            <Text style={s.focusName}>{focusedSpot.name}</Text>
+            <Text style={s.focusAge}>{focusedSpot.age}, "{focusedSpot.bio}"</Text>
+            <Text style={s.focusContext}>Spotted you at {focusedSpot.venue} · {focusedSpot.time}</Text>
             <View style={{ marginTop: spacing.lg, width: '100%', gap: spacing.sm }}>
               <Button variant="solid" color="orange" size="lg" fullWidth onPress={() => { handleAcceptSpot(focusedSpot.id); setFocusedSpot(null); }}>
                 Spot Back
@@ -258,7 +256,8 @@ export default function SpotsScreen({ navigation }) {
           </SafeAreaView>
           <SafeAreaView edges={['bottom']} style={s.focusBottom}>
             <Text style={s.focusName}>{focusedSent.name}</Text>
-            <Text style={s.focusAge}>{focusedSent.age}, "{focusedSent.venue}"</Text>
+            <Text style={s.focusAge}>{focusedSent.age}, "{focusedSent.bio}"</Text>
+            <Text style={s.focusContext}>You spotted at {focusedSent.venue} · {focusedSent.time}</Text>
             <View style={{ marginTop: spacing.lg, width: '100%' }}>
               <View style={s.waitingRow}>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -315,7 +314,7 @@ export default function SpotsScreen({ navigation }) {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: color.green.dark },
   header: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: spacing.md },
-  title: { ...typography.h2, color: color.green.light },
+  title: { ...typography.h4, fontSize: 36, lineHeight: 44, color: color.blue.light },
 
 
   cardsScroll: { paddingHorizontal: spacing.xl, paddingBottom: spacing['3xl'] },
@@ -345,17 +344,16 @@ const s = StyleSheet.create({
   focusHeader: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: spacing.md },
   focusClose: { width: 40, height: 40, borderRadius: 20, backgroundColor: color.charcoal + '80', alignItems: 'center', justifyContent: 'center' },
   focusBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.xl, paddingBottom: spacing.lg },
-  focusNameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  focusName: { ...typography.h2, color: color.white },
-  focusAge: { ...typography.body, color: color.white + 'CC', marginTop: spacing.xs },
-  spottedYouLabel: { ...typography.caption, fontSize: 11, fontWeight: '600', color: color.green.light, backgroundColor: color.green.light + '26', paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: radius.full, overflow: 'hidden' },
+  focusName: { ...typography.h1, color: color.white },
+  focusAge: { ...typography.h3, color: color.white, marginTop: spacing.xs },
+  focusContext: { ...typography.body, color: color.white, marginTop: spacing.xs },
   notInterestedBtn: { alignItems: 'center', paddingVertical: spacing.md, borderWidth: 1, borderColor: color.white + '33', borderRadius: radius.full },
   notInterestedText: { ...typography.body, color: color.white + 'CC', fontWeight: '500' },
   waitingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 48, paddingLeft: spacing.lg, paddingRight: spacing.sm, borderRadius: radius.full, borderWidth: 1, borderColor: color.white + '33' },
   cancelCircle: { width: 32, height: 32, borderRadius: 16, backgroundColor: color.orange.dark, alignItems: 'center', justifyContent: 'center' },
 
   safetyRow: { marginTop: spacing.lg, gap: spacing.sm },
-  safetyDisclaimer: { ...typography.caption, fontSize: 10, color: color.white + '4D', textAlign: 'center', lineHeight: 14 },
+  safetyDisclaimer: { ...typography.body, color: color.white + '4D', textAlign: 'center' },
   safetyActions: { flexDirection: 'row', gap: spacing.sm },
   safetyBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, paddingVertical: spacing.md, borderRadius: radius.full, borderWidth: 1, borderColor: color.white + '26' },
   safetyLabel: { ...typography.body, color: color.white + 'CC' },

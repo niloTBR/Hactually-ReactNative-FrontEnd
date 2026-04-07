@@ -84,13 +84,15 @@ const Input = ({
   };
 
   const getTextColor = () => {
-    // Ghost: beige text when typing
-    return isGhost ? color.beige : colors.olive.dark;
+    // Ghost dark: 100% beige when typing. Ghost light: 100% charcoal when typing.
+    if (isGhost) return isDarkBg ? color.beige : color.charcoal;
+    return colors.olive.dark;
   };
 
   const getPlaceholderColor = () => {
-    // Ghost: 75% opacity for placeholder (BF hex)
-    return isGhost ? resolvedThemeColor + 'BF' : colors.olive.default + 'BF';
+    // Ghost dark: 50% beige. Ghost light: 50% charcoal.
+    if (isGhost) return isDarkBg ? color.beige + '80' : color.charcoal + '80';
+    return colors.olive.default + 'BF';
   };
 
   const getLabelColor = () => {

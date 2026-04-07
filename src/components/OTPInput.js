@@ -24,6 +24,7 @@ const OTPInput = ({
   // Use context theme if themeColor not explicitly provided
   const ghostTheme = useGhostTheme();
   const resolvedThemeColor = themeColor || ghostTheme.themeColor;
+  const isDarkBg = ghostTheme.isDark;
 
   useEffect(() => {
     if (autoFocus) {
@@ -66,7 +67,7 @@ const OTPInput = ({
           ? resolvedThemeColor  // 100% when filled
           : resolvedThemeColor + '80', // 50% when empty
         backgroundColor: 'transparent',
-        color: resolvedThemeColor, // 100%
+        color: isDarkBg ? color.beige : color.charcoal,
       };
     }
 

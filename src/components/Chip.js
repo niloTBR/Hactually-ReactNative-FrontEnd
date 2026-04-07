@@ -43,8 +43,8 @@ const Chip = ({
       return {
         backgroundColor: 'transparent',
         borderColor: resolvedThemeColor + '80', // 50%
-        textColor: resolvedThemeColor, // 100%
-        emojiColor: resolvedThemeColor,
+        textColor: isDarkBg ? color.beige : color.charcoal,
+        emojiColor: isDarkBg ? color.beige : color.charcoal,
       };
     }
 

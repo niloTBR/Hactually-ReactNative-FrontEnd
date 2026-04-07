@@ -95,10 +95,10 @@ const DatePicker = ({
     };
   };
 
-  const getTextColor = () => isGhost ? resolvedThemeColor : color.charcoal; // 100%
-  const getPlaceholderColor = () => isGhost ? resolvedThemeColor + 'BF' : color.olive.dark + 'BF'; // 75%
-  const getIconColor = () => isGhost ? resolvedThemeColor : color.olive.dark; // 100%
-  const getLabelColor = () => isGhost ? resolvedThemeColor : color.olive.dark; // 100%
+  const getTextColor = () => isGhost ? (isDarkBg ? color.beige : color.charcoal) : color.charcoal;
+  const getPlaceholderColor = () => isGhost ? (isDarkBg ? color.beige + '80' : color.charcoal + '80') : color.olive.dark + 'BF';
+  const getIconColor = () => isGhost ? resolvedThemeColor : color.olive.dark;
+  const getLabelColor = () => isGhost ? color.blue.light : color.olive.dark;
 
   // Web: Use native HTML date input with custom icon
   if (Platform.OS === 'web') {

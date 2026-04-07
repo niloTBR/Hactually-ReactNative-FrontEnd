@@ -196,14 +196,14 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   errorContainer: {
-    backgroundColor: 'rgba(224,90,61,0.2)',
+    backgroundColor: color.error.dark + '33',
     borderRadius: radius.full,
     padding: spacing.md,
     marginBottom: spacing.lg,
   },
   errorText: {
     ...typography.caption,
-    color: color.orange.light,
+    color: color.error.light,
     fontWeight: '700',
     textAlign: 'center',
   },

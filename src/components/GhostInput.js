@@ -64,12 +64,12 @@ const GhostInput = ({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={resolvedThemeColor + 'BF'}
+        placeholderTextColor={isDarkBg ? color.beige + '80' : color.charcoal + '80'}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
         editable={!disabled}
         onSubmitEditing={onSubmit}
-        style={[styles.input, { color: resolvedThemeColor }]}
+        style={[styles.input, { color: isDarkBg ? color.beige : color.charcoal }]}
       />
         <TouchableOpacity
           onPress={onSubmit}

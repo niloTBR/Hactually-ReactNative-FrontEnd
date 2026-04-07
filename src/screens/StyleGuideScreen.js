@@ -3,15 +3,16 @@
  * Using LEAN Design Token Standard
  */
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Eye, Type, MousePointer, FormInput, Mail, Lock, Search, Palette, Grid, Circle, ArrowLeft, LayoutGrid, Navigation } from 'lucide-react-native';
+import { Eye, Type, MousePointer, FormInput, Mail, Lock, Search, Palette, Grid, Circle, ArrowLeft, LayoutGrid, Navigation, Layers, X, Check, LogOut } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 // LEAN tokens
 import { color, spacing, radius, typography } from '../theme';
 // Legacy (for components not yet migrated)
 import { colors, fontFamily, fontFamilySecondary } from '../theme';
-import { Button, Input, OTPInput, Chip, DatePicker, GhostInput, GoogleIcon, AppleIcon, LogoMark, LogoWithText, AppIcon, ShimmerText, VenueCard, BottomNav, PeopleMarker } from '../components';
+import { Button, Input, OTPInput, Chip, DatePicker, GhostInput, GoogleIcon, AppleIcon, LogoMark, LogoWithText, AppIcon, ShimmerText, VenueCard, BottomNav, PeopleMarker, MeMarker, LocationDropdown, GroupChatIcon, NearbyIcon, SpotsIcon } from '../components';
+import Svg, { Path } from 'react-native-svg';
 import { GhostTheme } from '../theme';
 
 const sections = [
@@ -22,6 +23,7 @@ const sections = [
   { id: 'buttons', label: 'Buttons', icon: MousePointer },
   { id: 'inputs', label: 'Forms', icon: FormInput },
   { id: 'cards', label: 'Cards', icon: LayoutGrid },
+  { id: 'patterns', label: 'Patterns', icon: Layers },
   { id: 'navigation', label: 'Nav', icon: Navigation },
 ];
 
@@ -96,18 +98,51 @@ const Section = ({ title, children }) => (
 const Label = ({ children }) => <Text style={styles.label}>{children}</Text>;
 const Divider = () => <View style={styles.divider} />;
 
-// Form theme — dark green only
-const FORM_THEME = {
-  bg: color.green.dark,
-  text: color.green.light,
-  theme: color.green.light,
+// Form themes — dark and light
+const FORM_THEMES = {
+  dark: {
+    id: 'dark',
+    label: 'Dark (Green)',
+    bg: color.green.dark,
+    text: color.green.light,
+    theme: color.green.light,
+  },
+  light: {
+    id: 'light',
+    label: 'Light (Olive)',
+    bg: color.olive.light,
+    text: color.charcoal,
+    theme: color.charcoal,
+  },
 };
+
+const ThemeSwitcher = ({ selected, onSelect }) => (
+  <View style={styles.themeSwitcher}>
+    {Object.values(FORM_THEMES).map((theme) => (
+      <TouchableOpacity
+        key={theme.id}
+        onPress={() => onSelect(theme.id)}
+        style={[
+          styles.themeSwitcherOption,
+          { backgroundColor: theme.bg },
+          selected === theme.id && styles.themeSwitcherOptionActive,
+        ]}
+      >
+        <Text style={[styles.themeSwitcherText, { color: theme.text }]}>
+          {theme.label}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+);
 
 export default function StyleGuideScreen({ navigation }) {
   const [active, setActive] = useState('colors');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [formTheme, setFormTheme] = useState('dark');
   const scrollViewRef = useRef(null);
   const sectionPositions = useRef({});
+  const currentTheme = FORM_THEMES[formTheme];
 
   const handleNav = (sectionId) => {
     setActive(sectionId);
@@ -672,82 +707,79 @@ export default function StyleGuideScreen({ navigation }) {
           <View onLayout={handleSectionLayout('inputs')}>
           <Section title="Form Components">
 
+            <ThemeSwitcher selected={formTheme} onSelect={setFormTheme} />
+
             <GhostTheme
-              themeColor={FORM_THEME.theme}
-              isDark={true}
-              style={[styles.formShowcase, { backgroundColor: FORM_THEME.bg }]}
+              themeColor={currentTheme.theme}
+              isDark={formTheme === 'dark'}
+              style={[styles.formShowcase, { backgroundColor: currentTheme.bg }]}
             >
               {/* Row 1: Input & OTP */}
               <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Input</Text>
+                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Input</Text>
                   <Input placeholder="Enter text..." variant="ghost" />
                   <TokenLabel token="Input" />
                 </View>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>OTP</Text>
+                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>OTP</Text>
                   <View style={{ alignSelf: 'flex-start' }}>
                     <OTPInput value={otp} onChange={setOtp} variant="ghost" />
                   </View>
                   <TokenLabel token="OTPInput" />
                 </View>
               </View>
-              <View style={[styles.formDivider, { borderColor: FORM_THEME.theme + '30' }]} />
+              <View style={[styles.formDivider, { borderColor: currentTheme.theme + '33' }]} />
 
-              {/* Row 2: With Icon & With Label */}
+              {/* Row 2: With Icon & Password */}
               <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>With Icon</Text>
+                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>With Icon</Text>
                   <Input placeholder="Search..." variant="ghost" leftIcon={<Search size={18} />} />
                   <TokenLabel token="Input + leftIcon" />
                 </View>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>With Label</Text>
-                  <Input label="Email" placeholder="you@example.com" variant="ghost" />
-                  <TokenLabel token="Input + label" />
-                </View>
-              </View>
-              <View style={[styles.formDivider, { borderColor: FORM_THEME.theme + '30' }]} />
-
-              {/* Row 3: Password & With Error */}
-              <View style={styles.formRow}>
-                <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Password</Text>
+                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Password</Text>
                   <Input placeholder="Password" variant="ghost" secureTextEntry leftIcon={<Lock size={18} />} />
                   <TokenLabel token="Input + secureTextEntry" />
                 </View>
+              </View>
+              <View style={[styles.formDivider, { borderColor: currentTheme.theme + '33' }]} />
+
+              {/* Row 3: With Error & DatePicker */}
+              <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>With Error</Text>
+                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>With Error</Text>
                   <Input placeholder="Email" variant="ghost" error="Invalid email" />
                   <TokenLabel token="Input + error" />
                 </View>
-              </View>
-              <View style={[styles.formDivider, { borderColor: FORM_THEME.theme + '30' }]} />
-
-              {/* Row 4: DatePicker & Multiline */}
-              <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>DatePicker</Text>
+                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>DatePicker</Text>
                   <DatePicker placeholder="Date of birth" variant="ghost" onChange={() => {}} />
                   <TokenLabel token="DatePicker" />
                 </View>
+              </View>
+              <View style={[styles.formDivider, { borderColor: currentTheme.theme + '33' }]} />
+
+              {/* Row 4: Multiline & Email Action */}
+              <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Multiline</Text>
+                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Multiline</Text>
                   <Input placeholder="Write your bio..." variant="ghost" multiline numberOfLines={2} />
                   <TokenLabel token="Input + multiline" />
                 </View>
-              </View>
-              <View style={[styles.formDivider, { borderColor: FORM_THEME.theme + '30' }]} />
-
-              {/* Row 5: Email Action & Chips */}
-              <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Email Action</Text>
+                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Email Action</Text>
                   <GhostInput placeholder="Enter email..." leftIcon={<Mail />} onSubmit={() => {}} />
                   <TokenLabel token="GhostInput" />
                 </View>
+              </View>
+              <View style={[styles.formDivider, { borderColor: currentTheme.theme + '33' }]} />
+
+              {/* Row 5: Chips */}
+              <View style={styles.formRow}>
                 <View style={styles.formCol}>
-                  <Text style={[styles.formLabel, { color: color.blue.light }]}>Chips</Text>
+                  <Text style={[styles.formLabel, { color: currentTheme.text }]}>Chips</Text>
                   <View style={styles.chipRow}>
                     <Chip label="Default" variant="ghost" />
                     <Chip label="Selected" variant="ghost" selected onRemove={() => {}} />
@@ -762,50 +794,269 @@ export default function StyleGuideScreen({ navigation }) {
             </Section>
           </View>
 
-          {/* Cards Section */}
+          {/* Cards & Markers */}
           <View onLayout={handleSectionLayout('cards')}>
-            <Section title="Cards">
-              <Label>Venue Card</Label>
-              <View style={{ height: 180 }}>
-                <VenueCard
-                  venue={{
-                    name: 'LIV',
-                    image: 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=600&h=400&fit=crop',
-                    category: 'Nightclub',
-                    area: 'Marina',
-                    distance: '1.2km',
-                    people: [
-                      { photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' },
-                      { photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop' },
-                    ],
-                    peopleCount: 16,
-                  }}
-                  onPress={() => {}}
-                />
+            <Section title="Cards & Markers">
+              <View style={{ flexDirection: 'row', gap: spacing.xl }}>
+                <View style={{ width: 480 }}>
+                  <Label>7.1 VENUE CARD</Label>
+                  <View style={{ height: 180 }}>
+                    <VenueCard
+                      venue={{
+                        name: 'LIV',
+                        image: 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=600&h=400&fit=crop',
+                        category: 'Nightclub',
+                        area: 'Marina',
+                        distance: '1.2km',
+                        people: [
+                          { photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' },
+                          { photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop' },
+                        ],
+                        peopleCount: 16,
+                      }}
+                      onPress={() => {}}
+                    />
+                  </View>
+                  <TokenLabel token="VenueCard" />
+                </View>
+                <View style={{ flex: 1, paddingLeft: spacing.xl }}>
+                  <Label>7.2 MAP MARKERS</Label>
+                  <View style={{ gap: spacing.lg }}>
+                    <View style={{ flexDirection: 'row', gap: spacing.lg, alignItems: 'flex-start' }}>
+                      <View style={{ flex: 1, gap: spacing.xs }}>
+                        <PeopleMarker people={[{ photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' }, { photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop' }]} count={29} venueName="Coya" />
+                        <TokenLabel token="With name — many" />
+                      </View>
+                      <View style={{ flex: 1, gap: spacing.xs }}>
+                        <PeopleMarker people={[{ photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' }]} count={5} venueName="LIV" />
+                        <TokenLabel token="With name — few" />
+                      </View>
+                      <View style={{ flex: 1, gap: spacing.xs }}>
+                        <MeMarker />
+                        <TokenLabel token="MeMarker" />
+                      </View>
+                    </View>
+                    <Divider />
+                    <View style={{ flexDirection: 'row', gap: spacing.lg }}>
+                      <View style={{ flex: 1, gap: spacing.xs }}>
+                        <PeopleMarker people={[{ photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' }, { photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop' }]} count={12} />
+                        <TokenLabel token="No name — many" />
+                      </View>
+                      <View style={{ flex: 1, gap: spacing.xs }}>
+                        <PeopleMarker people={[{ photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' }]} count={3} />
+                        <TokenLabel token="No name — few" />
+                      </View>
+                      <View style={{ flex: 1 }} />
+                    </View>
+                  </View>
+                </View>
               </View>
-              <TokenLabel token="VenueCard" />
-
-              <Divider />
-
-              <Label>People Marker</Label>
-              <PeopleMarker
-                people={[
-                  { photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' },
-                  { photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop' },
-                ]}
-                count={29}
-                venueName="Coya"
-              />
-              <TokenLabel token="PeopleMarker" />
             </Section>
           </View>
 
-          {/* Navigation Section */}
+          {/* Patterns — app-specific components */}
+          <View onLayout={handleSectionLayout('patterns')} style={{ zIndex: 10 }}>
+            <Section title="Patterns">
+
+              <style>{`
+                @keyframes sgArrowOut { 0% { transform: translate(-8px, 8px); opacity: 0; } 30% { opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(8px, -8px); opacity: 0; } }
+                @keyframes sgArrowIn { 0% { transform: translate(8px, -8px); opacity: 0; } 30% { opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(-8px, 8px); opacity: 0; } }
+                @keyframes sgWave { 0%, 40%, 100% { transform: translateY(0); opacity: 0.5; } 20% { transform: translateY(-4px); opacity: 1; } }
+              `}</style>
+
+              <Label>9.1 AVATARS</Label>
+              <View style={{ flexDirection: 'row', gap: spacing['2xl'], alignItems: 'flex-start' }}>
+                <View style={{ gap: spacing.xs }}>
+                  <View style={{ width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: color.green.light, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    <Image source={{ uri: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop' }} style={{ width: 48, height: 48, borderRadius: 24 }} />
+                  </View>
+                  <TokenLabel token="SM — online" />
+                </View>
+                <View style={{ gap: spacing.xs }}>
+                  <View style={{ width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: color.olive.light, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    <Image source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop' }} style={{ width: 48, height: 48, borderRadius: 24 }} />
+                  </View>
+                  <TokenLabel token="SM — offline" />
+                </View>
+                <View style={{ gap: spacing.xs }}>
+                  <View style={{ width: 82, height: 82, borderRadius: 41, borderWidth: 2, borderColor: color.green.light, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    <Image source={{ uri: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=160&h=160&fit=crop' }} style={{ width: 72, height: 72, borderRadius: 36 }} />
+                  </View>
+                  <TokenLabel token="LG — online" />
+                </View>
+                <View style={{ gap: spacing.xs }}>
+                  <View style={{ width: 82, height: 82, borderRadius: 41, borderWidth: 2, borderColor: color.olive.light, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    <Image source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&h=160&fit=crop' }} style={{ width: 72, height: 72, borderRadius: 36 }} />
+                  </View>
+                  <TokenLabel token="LG — offline" />
+                </View>
+              </View>
+
+              <Divider />
+
+              <Label>9.2 GRID AVATAR WITH STATUS</Label>
+              <View style={{ flexDirection: 'row', gap: spacing.xl, alignItems: 'flex-start' }}>
+                <View style={{ gap: spacing.xs }}>
+                  <View style={{ width: 100, height: 100 }}>
+                    <Image source={{ uri: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop' }} style={{ width: 100, height: 100, borderRadius: 50, opacity: 0.5 }} />
+                  </View>
+                  <TokenLabel token="Default (faded)" />
+                </View>
+                <View style={{ gap: spacing.xs }}>
+                  <View style={{ width: 100, height: 100, overflow: 'visible' }}>
+                    <Image source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' }} style={{ width: 100, height: 100, borderRadius: 50 }} />
+                    <View style={{ position: 'absolute', top: -2, right: -2, width: 36, height: 36, borderRadius: 18, backgroundColor: color.blue.dark, borderWidth: 2, borderColor: color.beige, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      <div style={{ animation: 'sgArrowOut 1.5s ease-in-out infinite' }}>
+                        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                          <Path d="M7 17L17 7M17 7H7M17 7V17" stroke={color.beige} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+                        </Svg>
+                      </div>
+                    </View>
+                  </View>
+                  <TokenLabel token="Outgoing (blue ↗)" />
+                </View>
+                <View style={{ gap: spacing.xs }}>
+                  <View style={{ width: 100, height: 100, overflow: 'visible' }}>
+                    <Image source={{ uri: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop' }} style={{ width: 100, height: 100, borderRadius: 50 }} />
+                    <View style={{ position: 'absolute', top: -2, right: -2, width: 36, height: 36, borderRadius: 18, backgroundColor: color.green.dark, borderWidth: 2, borderColor: color.beige, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      <div style={{ animation: 'sgArrowIn 1.5s ease-in-out infinite' }}>
+                        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                          <Path d="M17 7L7 17M7 17H17M7 17V7" stroke={color.beige} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+                        </Svg>
+                      </div>
+                    </View>
+                  </View>
+                  <TokenLabel token="Incoming (green ↙)" />
+                </View>
+                <View style={{ gap: spacing.xs }}>
+                  <View style={{ width: 100, height: 100, overflow: 'visible' }}>
+                    <Image source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' }} style={{ width: 100, height: 100, borderRadius: 50 }} />
+                    <View style={{ position: 'absolute', top: -2, right: -2, width: 36, height: 36, borderRadius: 18, backgroundColor: color.orange.dark, borderWidth: 2, borderColor: color.beige, alignItems: 'center', justifyContent: 'center' }}>
+                      <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                        <Path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill={color.beige} />
+                      </Svg>
+                    </View>
+                  </View>
+                  <TokenLabel token="Matched (orange ♥)" />
+                </View>
+              </View>
+
+              <Divider />
+
+              <Label>9.3 SPOT CARDS</Label>
+              <View style={{ backgroundColor: color.green.dark, borderRadius: radius.lg, padding: spacing.xl }}>
+                <View style={{ flexDirection: 'row', gap: spacing.lg }}>
+                  <View style={{ flex: 1, backgroundColor: color.green.light + '14', borderRadius: radius.xl, padding: spacing.lg, alignItems: 'center', gap: spacing.md }}>
+                    <View style={{ alignItems: 'center', gap: spacing.xs }}>
+                      <View style={{ overflow: 'visible' }}>
+                        <Image source={{ uri: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop' }} style={{ width: 72, height: 72, borderRadius: 36 }} />
+                        <View style={{ position: 'absolute', top: -2, right: -2, width: 28, height: 28, borderRadius: 14, backgroundColor: color.green.dark, borderWidth: 2, borderColor: color.green.dark, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                          <div style={{ animation: 'sgArrowIn 1.5s ease-in-out infinite' }}>
+                            <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                              <Path d="M17 7L7 17M7 17H17M7 17V7" stroke={color.beige} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+                            </Svg>
+                          </div>
+                        </View>
+                      </View>
+                      <Text style={{ ...typography.body, fontWeight: '600', color: color.blue.light, textAlign: 'center' }}>Nadia, 25</Text>
+                      <Text style={{ ...typography.caption, color: color.beige, textAlign: 'center' }}>Coya · 20 min ago</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: spacing.sm, alignSelf: 'stretch' }}>
+                      <TouchableOpacity style={{ flex: 1, height: 36, borderRadius: 18, backgroundColor: color.green.light, alignItems: 'center', justifyContent: 'center' }}>
+                        <Eye size={18} color={color.green.dark} strokeWidth={2.5} />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={{ flex: 1, height: 36, borderRadius: 18, backgroundColor: color.orange.dark, alignItems: 'center', justifyContent: 'center' }}>
+                        <X size={18} color={color.white} strokeWidth={2.5} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View style={{ flex: 1, backgroundColor: color.green.light + '14', borderRadius: radius.xl, padding: spacing.lg, alignItems: 'center', gap: spacing.md }}>
+                    <View style={{ alignItems: 'center', gap: spacing.xs }}>
+                      <View style={{ overflow: 'visible' }}>
+                        <Image source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' }} style={{ width: 72, height: 72, borderRadius: 36 }} />
+                        <View style={{ position: 'absolute', top: -2, right: -2, width: 28, height: 28, borderRadius: 14, backgroundColor: color.blue.dark, borderWidth: 2, borderColor: color.green.dark, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                          <div style={{ animation: 'sgArrowOut 1.5s ease-in-out infinite' }}>
+                            <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                              <Path d="M7 17L17 7M17 7H7M17 7V17" stroke={color.beige} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+                            </Svg>
+                          </div>
+                        </View>
+                      </View>
+                      <Text style={{ ...typography.body, fontWeight: '600', color: color.blue.light, textAlign: 'center' }}>Rami, 26</Text>
+                      <Text style={{ ...typography.caption, color: color.beige, textAlign: 'center' }}>Coya · 1h ago</Text>
+                    </View>
+                    <View style={{ height: 36, borderRadius: 18, borderWidth: 1, borderColor: color.green.light + '60', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 2, alignSelf: 'stretch' }}>
+                      {'Waiting'.split('').map((ch, i) => (
+                        <div key={i} style={{ animation: `sgWave 1.8s ease-in-out ${i * 0.12}s infinite`, display: 'inline-block' }}>
+                          <Text style={{ ...typography.caption, color: color.green.light, fontWeight: '600' }}>{ch}</Text>
+                        </div>
+                      ))}
+                    </View>
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row', gap: spacing.lg, marginTop: spacing.sm }}>
+                  <View style={{ flex: 1 }}><TokenLabel token="SpotCard — received" /></View>
+                  <View style={{ flex: 1 }}><TokenLabel token="SpotCard — sent" /></View>
+                </View>
+              </View>
+
+              <Divider />
+
+              <Label>9.4 CHECKED-IN BAR</Label>
+              <View style={{ flexDirection: 'row', gap: spacing.lg }}>
+                <View style={{ flex: 1, gap: spacing.xs }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, backgroundColor: color.beige, borderRadius: radius.full, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm }}>
+                    <Text style={{ ...typography.body, fontWeight: '700', color: color.charcoal, flex: 1 }}>White Dubai</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radius.full, backgroundColor: color.beige }}>
+                      <Text style={{ ...typography.caption, fontSize: 11, fontWeight: '700', color: color.olive.dark }}>Leave</Text>
+                      <LogOut size={12} color={color.olive.dark} />
+                    </View>
+                  </View>
+                  <TokenLabel token="CheckedInBar" />
+                </View>
+                <View style={{ flex: 1, gap: spacing.xs }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, backgroundColor: color.beige, borderRadius: radius.full, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm }}>
+                    <Text style={{ ...typography.body, fontWeight: '700', color: color.charcoal, flex: 1 }}>Coya Dubai</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radius.full, backgroundColor: color.beige }}>
+                      <Text style={{ ...typography.caption, fontSize: 11, fontWeight: '700', color: color.olive.dark }}>Leave</Text>
+                      <LogOut size={12} color={color.olive.dark} />
+                    </View>
+                  </View>
+                  <TokenLabel token="CheckedInBar" />
+                </View>
+              </View>
+
+              <Divider />
+
+              <Label>9.5 LOCATION DROPDOWN</Label>
+              <View style={{ width: 300, zIndex: 100 }}>
+                <LocationDropdown onLocationChange={() => {}} />
+              </View>
+              <TokenLabel token="LocationDropdown" />
+
+            </Section>
+          </View>
+
+          {/* Navigation */}
           <View onLayout={handleSectionLayout('navigation')}>
             <Section title="Navigation">
-              <Label>Bottom Nav</Label>
-              <BottomNav activeTab="nearby" onTabChange={() => {}} />
-              <TokenLabel token="BottomNav" />
+
+              <Label>BOTTOM NAV</Label>
+              <View style={{ flexDirection: 'row', gap: spacing.xl }}>
+                <View style={{ flex: 1, gap: spacing.xs }}>
+                  <BottomNav activeTab="nearby" hasNewMatches={false} onTabChange={() => {}} />
+                  <TokenLabel token="Default" />
+                </View>
+                <View style={{ flex: 1, gap: spacing.xs }}>
+                  <BottomNav activeTab="nearby" hasNewMatches={false} checkedInVenue={{ id: '1', name: 'White Dubai' }} onTabChange={() => {}} />
+                  <TokenLabel token="Checked in" />
+                </View>
+                <View style={{ flex: 1, gap: spacing.xs }}>
+                  <BottomNav activeTab="nearby" hasNewMatches={true} onTabChange={() => {}} />
+                  <TokenLabel token="Notifications" />
+                </View>
+              </View>
+
             </Section>
           </View>
 
@@ -830,8 +1081,8 @@ const styles = StyleSheet.create({
   navTextActive: { color: color.blue.light },
   content: { flex: 1 },
   contentInner: { padding: spacing.lg },
-  section: { marginBottom: spacing.xl },
-  card: { backgroundColor: colors.olive.mid, borderRadius: radius.lg, padding: spacing['3xl'] },
+  section: { marginBottom: spacing.xl, overflow: 'visible', zIndex: 1 },
+  card: { backgroundColor: colors.olive.mid, borderRadius: radius.lg, padding: spacing['3xl'], overflow: 'visible' },
   sectionTitle: { ...typography.h1, color: color.charcoal, marginBottom: spacing['2xl'] },
   label: { ...typography.button, color: color.charcoal, marginBottom: spacing.xl, marginTop: spacing.sm },
   divider: { height: 1, backgroundColor: color.olive.dark, marginVertical: spacing['2xl'] },
@@ -907,6 +1158,11 @@ const styles = StyleSheet.create({
   btnGradientLabel: { fontSize: 11, fontWeight: '600', color: colors.olive.dark },
   btnGradientSubLabel: { fontSize: 12, fontWeight: '600', color: color.olive.dark, marginBottom: spacing.sm, marginTop: spacing.sm },
   // Forms - Theme switcher
+  // Forms - Theme switcher
+  themeSwitcher: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl },
+  themeSwitcherOption: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderRadius: radius.md, borderWidth: 2, borderColor: 'transparent' },
+  themeSwitcherOptionActive: { borderColor: color.charcoal },
+  themeSwitcherText: { ...typography.caption, fontWeight: '600' },
   // Forms - Showcase
   formShowcase: { padding: spacing.xl, borderRadius: radius.lg, gap: spacing.lg },
   formRow: { flexDirection: 'row', gap: spacing.xl },

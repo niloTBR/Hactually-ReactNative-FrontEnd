@@ -344,11 +344,9 @@ export default function MatchesScreen({ navigation }) {
             </TouchableOpacity>
           </SafeAreaView>
           <SafeAreaView edges={['bottom']} style={ms.focusBottom}>
-            <View style={ms.focusNameRow}>
-              <Text style={ms.focusName}>{focusedSpot.name}</Text>
-              <Text style={ms.spottedYouLabel}>spotted you</Text>
-            </View>
-            <Text style={ms.focusAge}>{focusedSpot.age}, "{focusedSpot.venue}"</Text>
+            <Text style={ms.focusName}>{focusedSpot.name}</Text>
+            <Text style={ms.focusAge}>{focusedSpot.age}, "{focusedSpot.bio || focusedSpot.venue}"</Text>
+            <Text style={{ ...typography.body, color: color.white, marginTop: spacing.xs }}>Spotted you at {focusedSpot.venue} · {focusedSpot.time}</Text>
 
             <View style={{ marginTop: spacing.lg, width: '100%', gap: spacing.sm }}>
               <Button variant="solid" color="orange" size="lg" fullWidth onPress={() => { handleAcceptSpot(focusedSpot.id); setFocusedSpot(null); }}>
@@ -403,7 +401,7 @@ export default function MatchesScreen({ navigation }) {
           <SafeAreaView edges={['bottom']} style={ms.focusBottom}>
             <Text style={ms.focusName}>{focusedMatch.name}</Text>
             <Text style={ms.focusAge}>{focusedMatch.age}, "{focusedMatch.bio}"</Text>
-            <Text style={[ms.focusAge, { marginTop: spacing.xs, color: color.white + '66' }]}>Matched at {focusedMatch.venue} · {focusedMatch.time}</Text>
+            <Text style={{ ...typography.body, color: color.white, marginTop: spacing.xs }}>Matched at {focusedMatch.venue} · {focusedMatch.time}</Text>
 
             <View style={{ marginTop: spacing.lg, width: '100%', gap: spacing.sm }}>
               <Button variant="solid" color="orange" size="lg" fullWidth onPress={() => { setDmPerson(focusedMatch); setFocusedMatch(null); }}>
@@ -597,13 +595,12 @@ const ms = StyleSheet.create({
   focusClose: { width: 40, height: 40, borderRadius: 20, backgroundColor: color.charcoal + '80', alignItems: 'center', justifyContent: 'center' },
   focusBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.xl, paddingBottom: spacing.lg },
   focusNameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  focusName: { ...typography.h2, color: color.white, fontWeight: '700' },
-  spottedYouLabel: { ...typography.caption, fontSize: 11, fontWeight: '600', color: color.green.light, backgroundColor: color.green.light + '26', paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: radius.full, overflow: 'hidden' },
-  focusAge: { ...typography.body, color: color.white + 'CC', marginTop: spacing.xs },
+  focusName: { ...typography.h1, color: color.white },
+  focusAge: { ...typography.h3, color: color.white, marginTop: spacing.xs },
   notInterestedBtn: { alignItems: 'center', paddingVertical: spacing.md, borderWidth: 1, borderColor: color.white + '33', borderRadius: radius.full },
   notInterestedText: { ...typography.body, color: color.white + 'CC', fontWeight: '500' },
   focusSafetyRow: { marginTop: spacing.lg, gap: spacing.sm },
-  focusSafetyDisclaimer: { ...typography.caption, fontSize: 10, color: color.white + '4D', textAlign: 'center', lineHeight: 14 },
+  focusSafetyDisclaimer: { ...typography.body, color: color.white + '4D', textAlign: 'center' },
   focusSafetyActions: { flexDirection: 'row', gap: spacing.sm },
   focusSafetyBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, paddingVertical: spacing.md, borderRadius: radius.full, borderWidth: 1, borderColor: color.white + '26' },
   waitingBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.md, backgroundColor: color.white + '1A', borderRadius: radius.full, paddingVertical: spacing.lg, paddingHorizontal: spacing.xl },

@@ -199,7 +199,7 @@ export default function LocationScreen({ navigation }) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: color.charcoal + 'B3',
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.xl,
@@ -240,7 +240,6 @@ const styles = StyleSheet.create({
     color: color.green.light + 'CC',
     marginBottom: spacing.xl,
     textAlign: 'center',
-    lineHeight: 22,
   },
   benefits: {
     width: '100%',
@@ -255,7 +254,7 @@ const styles = StyleSheet.create({
   checkIcon: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: radius.md,
     backgroundColor: color.green.light,
     alignItems: 'center',
     justifyContent: 'center',

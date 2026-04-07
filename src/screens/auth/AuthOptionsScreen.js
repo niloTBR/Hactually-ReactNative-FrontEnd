@@ -137,7 +137,7 @@ export default function AuthOptionsScreen({ navigation, route }) {
               style={[
                 StyleSheet.absoluteFill,
                 {
-                  backgroundColor: [color.green.dark, color.green.dark, 'rgba(74,124,124,0.8)', 'rgba(74,124,124,0.6)', 'rgba(74,124,124,0.4)'][i],
+                  backgroundColor: [color.green.dark, color.green.dark, color.green.dark + 'CC', color.green.dark + '99', color.green.dark + '66'][i],
                   zIndex: 5 - i,
                   transform: [{ translateX: a.interpolate({ inputRange: [0, 1], outputRange: [0, width] }) }]
                 }
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: color.green.dark },
   scroll: { flexGrow: 1 },
   logoRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing['2xl'], paddingTop: spacing['2xl'], gap: spacing.md },
-  logoText: { ...typography.h2, color: color.green.light, marginTop: 5 },
+  logoText: { ...typography.h2, color: color.green.light, marginTop: spacing.xs },
   profiles: { flex: 1, justifyContent: 'center', gap: spacing.lg, paddingVertical: spacing.lg },
   bottom: { paddingHorizontal: spacing['2xl'], paddingBottom: spacing['2xl'] },
   title: { ...typography.h2, color: color.green.light, marginBottom: spacing.xl },
