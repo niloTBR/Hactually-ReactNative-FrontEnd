@@ -13,7 +13,7 @@ import {
   TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, ChevronRight, ArrowUp, EyeOff, Ban, AlertTriangle } from 'lucide-react-native';
+import { X, ChevronRight, ChevronDown, ArrowUp, EyeOff, Ban, AlertTriangle } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { color, spacing, radius, typography } from '../theme';
