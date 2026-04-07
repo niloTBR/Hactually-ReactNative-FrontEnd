@@ -14,7 +14,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
+
 import { color, spacing, radius, typography } from '../theme';
 import {
   LocationDropdown,
@@ -237,9 +237,7 @@ export default function HomeScreen({ navigation }) {
             {MOCK_VENUES.map((venue, index) => (
               <Animated.View
                 key={venue.id}
-                style={[
-                  styles.expandedCardWrapper,
-                  {
+                style={[{
                     opacity: fadeAnims[index],
                     transform: [{
                       translateY: fadeAnims[index].interpolate({
@@ -506,9 +504,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing['3xl'] * 2,
     gap: spacing.xl,
-  },
-  expandedCardWrapper: {
-    // cards take full width in vertical list
   },
   expandedNavWrapper: {
     position: 'absolute',

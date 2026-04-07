@@ -11,12 +11,11 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ChevronRight, LogOut, User, Bell, Shield, HelpCircle,
-  Camera, MapPin, Pencil, Eye, Globe, Smartphone, Plus, X,
+  Eye, Globe, Smartphone, X,
   RefreshCw, Trash2, AlertTriangle,
 } from 'lucide-react-native';
 import { color, spacing, radius, typography } from '../theme';
@@ -562,7 +561,6 @@ const p = StyleSheet.create({
     backgroundColor: color.olive.dark + '14', alignItems: 'center', justifyContent: 'center',
   },
   subViewTitle: { ...typography.h4, color: color.orange.dark },
-  saveText: { ...typography.body, fontWeight: '700', color: color.orange.dark },
 
   // Section labels
   // Settings section — light olive bg with dark text
@@ -577,28 +575,11 @@ const p = StyleSheet.create({
   settingsRowLabel: { ...typography.body, fontWeight: '500', color: color.charcoal },
   settingsRowDesc: { ...typography.caption, fontSize: 12, color: color.olive.dark + '80', marginTop: 1 },
   fieldRowBorder: { borderTopWidth: 1, borderTopColor: color.olive.light + '80' },
-  warningText: { ...typography.caption, fontSize: 12, color: color.orange.dark, marginTop: spacing.sm, paddingLeft: spacing.xs },
   faqAnswer: { ...typography.caption, color: color.olive.dark + '99', marginTop: spacing.sm, lineHeight: 20 },
 
-  // Profile card
-  profileCardWrap: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: spacing.xl },
-  profileCard: { backgroundColor: color.white + '99', borderRadius: radius.lg, borderWidth: 1, borderColor: color.olive.light + '33', padding: spacing.xl, alignItems: 'center' },
-  avatarWrap: { marginTop: spacing['3xl'], marginBottom: spacing.md },
-  avatar: { width: 96, height: 96, borderRadius: 48, borderWidth: 3, borderColor: color.white },
-  editAvatarBtn: { position: 'absolute', bottom: 0, right: 0, width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, backgroundColor: color.orange.dark, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: color.white },
-  profileName: { ...typography.h3, color: color.charcoal },
-  locationRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.xs },
-  locationText: { ...typography.caption, fontSize: 12, color: color.olive.dark + '80' },
-  bioCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, backgroundColor: color.beige + '99', borderRadius: radius.md + 4, width: '100%' },
-  bioText: { flex: 1, ...typography.caption, color: color.olive.dark + 'B3', textAlign: 'center' },
-  interestTags: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.xs + 2, marginTop: spacing.md },
-  interestTag: { backgroundColor: color.orange.dark + '1A', borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
-  interestTagText: { fontSize: 12, fontWeight: '500', color: color.orange.dark },
 
   // Settings wrap
   settingsWrap: { paddingHorizontal: spacing.xl },
-  logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, paddingVertical: spacing.lg, borderRadius: radius.lg, backgroundColor: color.orange.dark + '14' },
-  logoutText: { ...typography.body, fontWeight: '700', color: color.orange.dark },
   version: { ...typography.caption, fontSize: 10, color: color.olive.dark + '4D', textAlign: 'center', marginTop: spacing.md, paddingBottom: spacing.lg },
 
   // Edit profile — dark green like ProfileSetup
@@ -615,7 +596,6 @@ const p = StyleSheet.create({
   editSectionLabel: { ...typography.caption, fontWeight: '700', color: color.olive.dark, marginBottom: spacing.sm },
   editSubLabel: { ...typography.caption, color: color.olive.dark + '80', marginBottom: spacing.md },
   editChipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.sm },
-  editBottomWrap: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xl },
 
   // Delete account
   deleteAccountBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.lg, borderRadius: radius.lg, backgroundColor: color.orange.dark + '0D' },
@@ -630,29 +610,4 @@ const p = StyleSheet.create({
   deleteCancelBtn: { alignItems: 'center', paddingTop: spacing.md },
   deleteCancelText: { ...typography.caption, fontWeight: '500', color: color.olive.dark + '80', textDecorationLine: 'underline' },
 
-  photosSection: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.xl },
-  photosGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  photoSlot: { width: '31%', aspectRatio: 3 / 4, borderRadius: radius.md + 4, overflow: 'hidden' },
-  photoSlotEmpty: { backgroundColor: color.white + '99', borderWidth: 2, borderStyle: 'dashed', borderColor: color.olive.dark + '26' },
-  photoImage: { width: '100%', height: '100%' },
-  mainBadge: { position: 'absolute', top: spacing.xs + 2, left: spacing.xs + 2, backgroundColor: color.orange.dark, borderRadius: spacing.xs + 2, paddingHorizontal: spacing.xs + 2, paddingVertical: 2 },
-  mainBadgeText: { fontSize: 10, fontWeight: '700', color: color.white, textTransform: 'uppercase' },
-  photoPlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.xs },
-  addPhotoCircle: { width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, backgroundColor: color.orange.dark + '1A', alignItems: 'center', justifyContent: 'center' },
-  addPhotoText: { fontSize: 10, color: color.olive.dark + '4D' },
-
-  // Fields
-  fieldSection: { paddingHorizontal: spacing.xl, marginBottom: spacing.xl },
-  fieldRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, paddingHorizontal: spacing.lg, paddingVertical: spacing.md + 2 },
-  fieldLabel: { ...typography.caption, color: color.olive.dark + '80', minWidth: 72 },
-  fieldInput: { flex: 1, ...typography.body, fontWeight: '500', color: color.charcoal, textAlign: 'right', padding: 0 },
-  bioInput: { ...typography.body, color: color.charcoal, paddingHorizontal: spacing.lg, paddingVertical: spacing.md + 2, minHeight: 80, textAlignVertical: 'top' },
-  bioCount: { fontSize: 10, color: color.olive.dark + '4D', textAlign: 'right', paddingHorizontal: spacing.lg, paddingBottom: spacing.sm },
-  interestsHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: spacing.xs },
-  interestsCount: { fontSize: 12, color: color.olive.dark + '4D' },
-  interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  interestChip: { paddingHorizontal: spacing.md + 2, paddingVertical: spacing.sm, borderRadius: radius.full, backgroundColor: color.white + '99', borderWidth: 1, borderColor: color.olive.light + '33' },
-  interestChipActive: { backgroundColor: color.orange.dark, borderColor: color.orange.dark },
-  interestChipText: { fontSize: 12, fontWeight: '500', color: color.olive.dark + '99' },
-  interestChipTextActive: { color: color.white },
 });

@@ -2,7 +2,7 @@
  * MatchesScreen - View all matches outside of a venue
  * Dark beige background, same spots list pattern as CheckedIn
  */
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,13 +11,9 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-  ImageBackground,
-  Dimensions,
-  ActivityIndicator,
-  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, ChevronRight, ChevronDown, ArrowUp, Check, EyeOff, Ban, AlertTriangle } from 'lucide-react-native';
+import { X, ChevronRight, ArrowUp, EyeOff, Ban, AlertTriangle } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { color, spacing, radius, typography } from '../theme';
@@ -46,19 +42,6 @@ const MOCK_MATCHES = [
   { id: 10, name: 'Omar', age: 30, avatar: PROFILE_IMAGES[4], bio: 'coffee enthusiast & night owl', venue: 'Coya', time: '2 weeks ago', unread: false, lastMsg: 'Let me know next time!' },
   { id: 11, name: 'Layla', age: 22, avatar: PROFILE_IMAGES[0], bio: 'new to dubai, show me around', venue: 'Soho Garden', time: '2 weeks ago', unread: false, lastMsg: 'Was so nice meeting you' },
   { id: 12, name: 'Rayan', age: 26, avatar: PROFILE_IMAGES[2], bio: 'photographer by day, dj by night', venue: 'Nammos', time: '3 weeks ago', unread: false, lastMsg: 'Check out my latest set!' },
-];
-
-const MOCK_SPOTTED_YOU = [
-  { id: 101, name: 'Nadia', age: 25, avatar: PROFILE_IMAGES[4], venue: 'Coya', time: '20 min ago' },
-  { id: 102, name: 'Karim', age: 27, avatar: PROFILE_IMAGES[2], venue: 'White Dubai', time: '1h ago' },
-  { id: 103, name: 'Amara', age: 23, avatar: PROFILE_IMAGES[3], venue: 'Nammos', time: '3h ago' },
-  { id: 104, name: 'Leo', age: 29, avatar: PROFILE_IMAGES[1], venue: 'Soho Garden', time: '5h ago' },
-];
-
-const MOCK_SENT_REQUESTS = [
-  { id: 201, name: 'Yasmin', age: 24, avatar: PROFILE_IMAGES[0], venue: 'White Dubai', time: '10 min ago' },
-  { id: 202, name: 'Rami', age: 26, avatar: PROFILE_IMAGES[2], venue: 'Coya', time: '1h ago' },
-  { id: 203, name: 'Dina', age: 23, avatar: PROFILE_IMAGES[3], venue: 'Nammos', time: '3h ago' },
 ];
 
 const MOCK_DM = [
@@ -90,62 +73,10 @@ const MOCK_DM = [
 export default function MatchesScreen({ navigation }) {
   const checkedInVenue = useVenueStore((s) => s.checkedInVenue);
   const [activeTab, setActiveTab] = useState('all');
-  const [showSentRequests, setShowSentRequests] = useState(false);
-  const [spottedYou, setSpottedYou] = useState(MOCK_SPOTTED_YOU);
-  const [sentRequests, setSentRequests] = useState(MOCK_SENT_REQUESTS);
-  const [focusedSpot, setFocusedSpot] = useState(null);
   const [focusedMatch, setFocusedMatch] = useState(null);
-  const [focusedSent, setFocusedSent] = useState(null);
-  const [undoToast, setUndoToast] = useState(null);
-  const undoSlide = useRef(new Animated.Value(-100)).current;
-  const undoTimer = useRef(null);
   const [dmPerson, setDmPerson] = useState(null);
   const [dmMessages, setDmMessages] = useState(MOCK_DM);
   const [message, setMessage] = useState('');
-
-  const undoType = useRef(null); // 'spotted' or 'sent'
-
-  const showUndoToast = useCallback((person, type) => {
-    if (undoTimer.current) clearTimeout(undoTimer.current);
-    undoType.current = type;
-    setUndoToast(person);
-    undoSlide.setValue(-100);
-    Animated.spring(undoSlide, { toValue: 0, useNativeDriver: true, tension: 80, friction: 12 }).start();
-    undoTimer.current = setTimeout(() => {
-      Animated.timing(undoSlide, { toValue: -100, duration: 250, useNativeDriver: true }).start(() => setUndoToast(null));
-    }, 4000);
-  }, []);
-
-  const handleUndo = useCallback(() => {
-    if (!undoToast) return;
-    if (undoTimer.current) clearTimeout(undoTimer.current);
-    if (undoType.current === 'sent') {
-      setSentRequests(prev => [undoToast, ...prev]);
-    } else {
-      setSpottedYou(prev => [undoToast, ...prev]);
-    }
-    Animated.timing(undoSlide, { toValue: -100, duration: 200, useNativeDriver: true }).start(() => setUndoToast(null));
-  }, [undoToast]);
-
-  const handleIgnore = useCallback((person, closeFn) => {
-    closeFn();
-    showUndoToast(person, 'ignored');
-  }, [showUndoToast]);
-
-  const handleAcceptSpot = (id) => {
-    setSpottedYou(spottedYou.filter(p => p.id !== id));
-  };
-  const handleDeclineSpot = (id) => {
-    const person = spottedYou.find(p => p.id === id);
-    setSpottedYou(spottedYou.filter(p => p.id !== id));
-    if (person) showUndoToast(person, 'spotted');
-  };
-  const handleCancelRequest = (id) => {
-    const person = sentRequests.find(p => p.id === id);
-    setSentRequests(sentRequests.filter(p => p.id !== id));
-    if (sentRequests.length <= 1) setShowSentRequests(false);
-    if (person) showUndoToast(person, 'sent');
-  };
 
   const filteredMatches = activeTab === 'all' ? MOCK_MATCHES
     : activeTab === 'unread' ? MOCK_MATCHES.filter(m => m.unread)
@@ -329,60 +260,6 @@ export default function MatchesScreen({ navigation }) {
       </SafeAreaView>
 
       {/* ─── FOCUS OVERLAY (Spotted profile) ─── */}
-      {focusedSpot && (
-        <View style={ms.focusOverlay}>
-          <Image source={focusedSpot.avatar} style={ms.focusImage} />
-          <LinearGradient
-            colors={[color.charcoal + '4D', 'transparent', 'transparent', color.charcoal + 'B3']}
-            locations={[0, 0.3, 0.5, 1]}
-            style={StyleSheet.absoluteFill}
-          />
-          <SafeAreaView edges={['top']} style={ms.focusHeader}>
-            <LogoMark size={48} color={color.blue.light} />
-            <TouchableOpacity style={ms.focusClose} onPress={() => setFocusedSpot(null)}>
-              <X size={20} color={color.white} />
-            </TouchableOpacity>
-          </SafeAreaView>
-          <SafeAreaView edges={['bottom']} style={ms.focusBottom}>
-            <Text style={ms.focusName}>{focusedSpot.name}</Text>
-            <Text style={ms.focusAge}>{focusedSpot.age}, "{focusedSpot.bio || focusedSpot.venue}"</Text>
-            <Text style={{ ...typography.body, color: color.white, marginTop: spacing.xs }}>Spotted you at {focusedSpot.venue} · {focusedSpot.time}</Text>
-
-            <View style={{ marginTop: spacing.lg, width: '100%', gap: spacing.sm }}>
-              <Button variant="solid" color="orange" size="lg" fullWidth onPress={() => { handleAcceptSpot(focusedSpot.id); setFocusedSpot(null); }}>
-                Spot Back
-              </Button>
-              <TouchableOpacity
-                style={ms.notInterestedBtn}
-                onPress={() => { handleDeclineSpot(focusedSpot.id); setFocusedSpot(null); }}
-              >
-                <Text style={ms.notInterestedText}>Not interested?</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={ms.focusSafetyRow}>
-              <Text style={ms.focusSafetyDisclaimer}>
-                Your safety matters. If something feels off, let us know.
-              </Text>
-              <View style={ms.focusSafetyActions}>
-                <TouchableOpacity style={ms.focusSafetyBtn} onPress={() => handleIgnore(focusedSpot, () => setFocusedSpot(null))}>
-                  <EyeOff size={16} color={color.white + 'CC'} />
-                  <Text style={ms.focusSafetyLabel}>Ignore</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={ms.focusSafetyBtn} onPress={() => setFocusedSpot(null)}>
-                  <Ban size={16} color={color.white + 'CC'} />
-                  <Text style={ms.focusSafetyLabel}>Block</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[ms.focusSafetyBtn, { borderColor: color.error.light + '66' }]} onPress={() => setFocusedSpot(null)}>
-                  <AlertTriangle size={16} color={color.error.light} />
-                  <Text style={[ms.focusSafetyLabel, { color: color.error.light }]}>Report</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </SafeAreaView>
-        </View>
-      )}
-
       {/* ─── MATCH FOCUS OVERLAY ─── */}
       {focusedMatch && (
         <View style={ms.focusOverlay}>
@@ -414,7 +291,7 @@ export default function MatchesScreen({ navigation }) {
                 Your safety matters. If something feels off, let us know.
               </Text>
               <View style={ms.focusSafetyActions}>
-                <TouchableOpacity style={ms.focusSafetyBtn} onPress={() => handleIgnore(focusedMatch, () => setFocusedMatch(null))}>
+                <TouchableOpacity style={ms.focusSafetyBtn} onPress={() => setFocusedMatch(null)}>
                   <EyeOff size={16} color={color.white + 'CC'} />
                   <Text style={ms.focusSafetyLabel}>Ignore</Text>
                 </TouchableOpacity>
@@ -432,78 +309,6 @@ export default function MatchesScreen({ navigation }) {
         </View>
       )}
 
-      {/* ─── SENT/PENDING FOCUS OVERLAY ─── */}
-      {focusedSent && (
-        <View style={ms.focusOverlay}>
-          <Image source={focusedSent.avatar} style={ms.focusImage} />
-          <LinearGradient
-            colors={[color.charcoal + '4D', 'transparent', 'transparent', color.charcoal + 'B3']}
-            locations={[0, 0.3, 0.5, 1]}
-            style={StyleSheet.absoluteFill}
-          />
-          <SafeAreaView edges={['top']} style={ms.focusHeader}>
-            <LogoMark size={48} color={color.blue.light} />
-            <TouchableOpacity style={ms.focusClose} onPress={() => setFocusedSent(null)}>
-              <X size={20} color={color.white} />
-            </TouchableOpacity>
-          </SafeAreaView>
-          <SafeAreaView edges={['bottom']} style={ms.focusBottom}>
-            <Text style={ms.focusName}>{focusedSent.name}</Text>
-            <Text style={ms.focusAge}>{focusedSent.age}, "{focusedSent.venue}"</Text>
-
-            <View style={{ marginTop: spacing.lg, width: '100%', gap: spacing.sm }}>
-              <View style={ms.waitingBtn}>
-                <ActivityIndicator size="small" color={color.white} />
-                <Text style={ms.waitingBtnText}>Waiting for match</Text>
-                <TouchableOpacity onPress={() => { handleCancelRequest(focusedSent.id); setFocusedSent(null); }}>
-                  <X size={16} color={color.white + '80'} />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={ms.focusSafetyRow}>
-              <Text style={ms.focusSafetyDisclaimer}>
-                Your safety matters. If something feels off, let us know.
-              </Text>
-              <View style={ms.focusSafetyActions}>
-                <TouchableOpacity style={ms.focusSafetyBtn} onPress={() => handleIgnore(focusedSent, () => setFocusedSent(null))}>
-                  <EyeOff size={16} color={color.white + 'CC'} />
-                  <Text style={ms.focusSafetyLabel}>Ignore</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={ms.focusSafetyBtn} onPress={() => setFocusedSent(null)}>
-                  <Ban size={16} color={color.white + 'CC'} />
-                  <Text style={ms.focusSafetyLabel}>Block</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[ms.focusSafetyBtn, { borderColor: color.error.light + '66' }]} onPress={() => setFocusedSent(null)}>
-                  <AlertTriangle size={16} color={color.error.light} />
-                  <Text style={[ms.focusSafetyLabel, { color: color.error.light }]}>Report</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </SafeAreaView>
-        </View>
-      )}
-
-      {/* ─── UNDO TOAST ─── */}
-      {undoToast && (
-        <Animated.View style={[ms.undoToast, { transform: [{ translateY: undoSlide }] }]}>
-          <SafeAreaView edges={['top']}>
-            <View style={ms.undoInner}>
-              <Image source={undoToast.avatar} style={ms.undoAvatar} />
-              <Text style={ms.undoText} numberOfLines={2}>
-                {undoType.current === 'ignored'
-                  ? <Text>You won't see messages from <Text style={{ fontWeight: '700' }}>{undoToast.name}</Text> anymore</Text>
-                  : undoType.current === 'sent'
-                  ? <Text>Cancelled spot for <Text style={{ fontWeight: '700' }}>{undoToast.name}</Text></Text>
-                  : <Text>You passed on <Text style={{ fontWeight: '700' }}>{undoToast.name}</Text></Text>}
-              </Text>
-              <TouchableOpacity style={ms.undoBtn} onPress={handleUndo} activeOpacity={0.7}>
-                <Text style={ms.undoBtnText}>Undo</Text>
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
-        </Animated.View>
-      )}
     </View>
   );
 }
@@ -515,31 +320,9 @@ const ms = StyleSheet.create({
   // Header
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.xl, paddingTop: spacing['3xl'], paddingBottom: spacing['3xl'] },
   title: { ...typography.h4, fontSize: 36, lineHeight: 44, color: color.blue.light },
-  closeBtn: { width: spacing['2xl'] + spacing.sm, height: spacing['2xl'] + spacing.sm, borderRadius: (spacing['2xl'] + spacing.sm) / 2, backgroundColor: color.green.light + '1A', alignItems: 'center', justifyContent: 'center' },
-
-  // Spotted You
-  spottedSection: { paddingBottom: spacing.lg, borderBottomWidth: 1, borderBottomColor: color.green.light + '1A', marginBottom: spacing.md },
-  spottedTitle: { ...typography.body, fontWeight: '700', color: color.green.light, paddingHorizontal: spacing.xl, marginBottom: spacing.md },
-  spottedScroll: { paddingHorizontal: spacing.xl, gap: spacing.md },
-  spottedCard: { width: (Dimensions.get('window').width - spacing.xl * 2 - spacing.md * 2) / 2.5, backgroundColor: color.green.light + '14', borderRadius: radius.xl, padding: spacing.lg, alignItems: 'center', gap: spacing.md },
-  spottedProfileTap: { alignItems: 'center', gap: spacing.sm },
-  spottedAvatar: { width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: color.orange.dark },
-  spottedInfo: { alignItems: 'center', gap: 1 },
-  spottedName: { ...typography.body, fontWeight: '600', color: color.blue.light, textAlign: 'center' },
-  spottedVenue: { ...typography.caption, fontSize: 12, color: color.white + '4D', textAlign: 'center' },
-  spottedActions: { flexDirection: 'row', gap: spacing.sm, alignSelf: 'stretch' },
-  spottedAccept: { flex: 1, height: 36, borderRadius: 18, backgroundColor: color.blue.dark, alignItems: 'center', justifyContent: 'center' },
-  spottedDecline: { flex: 1, height: 36, borderRadius: 18, backgroundColor: color.orange.dark, alignItems: 'center', justifyContent: 'center' },
-
   // Tabs
   tabs: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.xl, marginBottom: spacing.md },
   tabsLeft: { flexDirection: 'row', gap: spacing.sm },
-  sentRequestsBtn: { ...typography.caption, fontSize: 14, fontWeight: '600', color: color.green.light + '80' },
-
-  // Sent requests
-  sentActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  sentSpinner: { width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: color.green.light + '1A' },
-  sentCancel: { width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: color.orange.dark },
   tab: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderRadius: radius.full, backgroundColor: color.green.light + '14' },
   tabActive: { backgroundColor: color.green.light },
   tabText: { ...typography.body, fontSize: 14, fontWeight: '600', color: color.green.light + '80' },
@@ -594,24 +377,11 @@ const ms = StyleSheet.create({
   focusHeader: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: spacing.md },
   focusClose: { width: 40, height: 40, borderRadius: 20, backgroundColor: color.charcoal + '80', alignItems: 'center', justifyContent: 'center' },
   focusBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.xl, paddingBottom: spacing.lg },
-  focusNameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   focusName: { ...typography.h1, color: color.white },
   focusAge: { fontSize: 20, lineHeight: 28, color: color.beige, marginTop: spacing.xs },
-  notInterestedBtn: { alignItems: 'center', paddingVertical: spacing.md, borderWidth: 1, borderColor: color.white + '33', borderRadius: radius.full },
-  notInterestedText: { ...typography.body, color: color.white + 'CC', fontWeight: '500' },
   focusSafetyRow: { marginTop: spacing.lg, gap: spacing.sm },
   focusSafetyDisclaimer: { ...typography.body, color: color.white + '4D', textAlign: 'center' },
   focusSafetyActions: { flexDirection: 'row', gap: spacing.sm },
   focusSafetyBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, paddingVertical: spacing.md, borderRadius: radius.full, borderWidth: 1, borderColor: color.white + '26' },
-  waitingBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.md, backgroundColor: color.white + '1A', borderRadius: radius.full, paddingVertical: spacing.lg, paddingHorizontal: spacing.xl },
-  waitingBtnText: { ...typography.body, color: color.white, fontWeight: '600', flex: 1 },
   focusSafetyLabel: { ...typography.body, color: color.white + 'CC' },
-
-  // Undo toast
-  undoToast: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 200, paddingHorizontal: spacing.lg },
-  undoInner: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: color.charcoal, borderRadius: radius.full, padding: spacing.sm, shadowColor: color.charcoal, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 8 },
-  undoAvatar: { width: 32, height: 32, borderRadius: 16 },
-  undoText: { flex: 1, ...typography.body, fontSize: 14, color: color.white },
-  undoBtn: { backgroundColor: color.blue.dark, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radius.full },
-  undoBtnText: { ...typography.caption, fontSize: 12, fontWeight: '700', color: color.white },
 });

@@ -380,7 +380,6 @@ export default function CheckedInScreen({ route, navigation }) {
   useEffect(() => {
     checkIn(venue);
   }, []);
-  const [activeIndex, setActiveIndex] = useState(0);
   const [spotted, setSpotted] = useState([]);             // outgoing (you spotted them)
   const [requests, setRequests] = useState([1, 5]); // incoming (they spotted you)
   const [matched, setMatched] = useState([]);             // mutual matches
@@ -464,13 +463,12 @@ export default function CheckedInScreen({ route, navigation }) {
     return () => clearInterval(interval);
   }, [openPanel]);
 
-  const activePerson = focusedPerson || PEOPLE[activeIndex % PEOPLE.length];
+  const activePerson = focusedPerson || PEOPLE[0];
   const isActiveSpotted = spotted.includes(activePerson?.id);
   const isActiveIncoming = requests.includes(activePerson?.id) && !matched.includes(activePerson?.id);
   const isActiveMatched = matched.includes(activePerson?.id);
 
   const [expandProgress, setExpandProgress] = useState(0);
-  const expandTimerRef = useRef(null);
 
   const handleProfileClick = (person) => {
     setFocusedPerson(person);
@@ -1187,67 +1185,6 @@ const s = StyleSheet.create({
   gridCell: { width: CELL_SIZE, height: CELL_SIZE, borderRadius: CELL_SIZE / 2, overflow: 'hidden', borderWidth: 0 },
   gridImage: { width: '100%', height: '100%' },
   statusBadge: { position: 'absolute', top: 4, right: 4, width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: color.beige },
-  colorShade: { ...StyleSheet.absoluteFillObject, borderRadius: CELL_SIZE / 2 },
-  matchGlow: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    borderRadius: CELL_SIZE / 2,
-    borderWidth: 3,
-    borderColor: color.green.light,
-  },
-  matchShimmer: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: CELL_SIZE / 2,
-    background: `linear-gradient(105deg, transparent 40%, ${color.orange.light}66 50%, transparent 60%)`,
-    backgroundSize: '250% 100%',
-    animation: 'matchShimmerAnim 2.5s ease-in-out infinite',
-  },
-  // Gradient border ring — 1px visible line + beige padding before photo
-  // Faded beige circle in center of pending photos
-  pendingCenter: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pendingCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: color.charcoal + '40',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pendingText: {
-    ...typography.caption,
-    fontSize: 10,
-    fontWeight: '700',
-    color: color.white,
-    textAlign: 'center',
-  },
-  pendingLabel: {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    fontSize: 14,
-    fontWeight: '600',
-    color: color.white,
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  outgoingGlow: {
-    position: 'absolute',
-    top: -4, left: -4, right: -4, bottom: -4,
-    borderRadius: (CELL_SIZE + 8) / 2,
-    borderWidth: 2,
-    borderColor: color.blue.dark,
-    boxShadow: `0 0 16px ${color.blue.dark}AA, 0 0 32px ${color.blue.dark}66`,
-  },
-  incomingGlow: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    borderRadius: CELL_SIZE / 2,
-    borderWidth: 3,
-    borderColor: color.orange.dark,
-  },
-
   // Focus mode
   focusOverlay: { ...StyleSheet.absoluteFillObject, zIndex: 40 },
   focusImage: { width: '100%', height: '100%' },
@@ -1264,7 +1201,6 @@ const s = StyleSheet.create({
     position: 'absolute', left: 0, right: 0, bottom: 0,
     paddingHorizontal: spacing.xl, paddingBottom: spacing['2xl'],
   },
-  focusNameRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
   focusContext: { ...typography.body, color: color.white, marginTop: spacing.xs },
   spottedYouLabel: { ...typography.caption, fontSize: 12, fontWeight: '700', color: color.green.light, letterSpacing: 1, textTransform: 'uppercase', textShadowColor: color.charcoal + '60', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   focusName: { ...typography.h1, color: color.white },
@@ -1302,7 +1238,6 @@ const s = StyleSheet.create({
   },
   chatChipContent: { flex: 1 },
   chatChipHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  chatChipDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: color.green.dark },
   chatChipTitle: { ...typography.body, fontWeight: '700', color: color.charcoal },
   chatChipMessage: { ...typography.caption, color: color.olive.dark + 'B3', marginTop: 2 },
   chatChipUser: { fontWeight: '600', color: color.olive.dark },
@@ -1391,8 +1326,6 @@ const s = StyleSheet.create({
   dmInput: { flex: 1, ...typography.body, color: color.charcoal, paddingVertical: spacing.sm },
   dmSendButton: { width: spacing['2xl'] + spacing.sm, height: spacing['2xl'] + spacing.sm, borderRadius: (spacing['2xl'] + spacing.sm) / 2, backgroundColor: color.olive.dark + '33', alignItems: 'center', justifyContent: 'center' },
   dmSendButtonActive: { backgroundColor: color.orange.dark },
-  dmHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  dmHeaderAvatar: { width: 32, height: 32, borderRadius: 16 },
   dmRow: { flexDirection: 'row' },
   dmRowMe: { justifyContent: 'flex-end' },
   dmBubble: { maxWidth: '75%', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.lg },

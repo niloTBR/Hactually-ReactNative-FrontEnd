@@ -14,7 +14,7 @@ import {
   ScrollView,
   Keyboard,
 } from 'react-native';
-import { MapPin, ChevronDown, Search, X } from 'lucide-react-native';
+import { ChevronDown, Search, X } from 'lucide-react-native';
 import { color, spacing, radius, typography } from '../theme';
 
 const LOCATIONS = [

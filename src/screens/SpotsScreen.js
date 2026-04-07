@@ -4,14 +4,14 @@
 import React, { useState, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Image, Dimensions, ActivityIndicator, Animated,
+  Image, Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, Check, ChevronDown, Eye, EyeOff, Ban, AlertTriangle } from 'lucide-react-native';
+import { X, Eye, EyeOff, Ban, AlertTriangle } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { color, spacing, radius, typography } from '../theme';
-import { BottomNav, LogoMark, Button, ShimmerText } from '../components';
+import { BottomNav, LogoMark, Button } from '../components';
 import { useVenueStore } from '../store/venueStore';
 
 const PROFILE_IMAGES = [
@@ -327,9 +327,7 @@ const s = StyleSheet.create({
   cardActions: { flexDirection: 'row', gap: spacing.sm, alignSelf: 'stretch' },
   cardAccept: { flex: 1, height: 36, borderRadius: 18, backgroundColor: color.green.light, alignItems: 'center', justifyContent: 'center' },
   cardDecline: { flex: 1, height: 36, borderRadius: 18, backgroundColor: color.orange.dark, alignItems: 'center', justifyContent: 'center' },
-  cardSpinner: { flex: 1, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   cardWaiting: { flex: 1, height: 36, borderRadius: 18, borderWidth: 1, borderColor: color.green.light + '60', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm },
-  cardWaitingText: { ...typography.caption, color: color.green.light, fontWeight: '600' },
   cardBadge: { position: 'absolute', top: spacing.sm, right: spacing.sm, width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: color.green.dark, zIndex: 1 },
 
   empty: { alignItems: 'center', paddingTop: spacing['3xl'] },
