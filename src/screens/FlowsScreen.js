@@ -34,7 +34,6 @@ const FLOW_SECTIONS = [
     description: 'Enables the user to find and explore venues where real people are right now.',
     screens: [
       { id: '2A', name: 'Discover nearby venues on map', path: 'Home', active: true },
-      { id: '2B', name: 'See message when no venues nearby', active: false },
     ],
   },
   {
@@ -78,16 +77,6 @@ const FLOW_SECTIONS = [
       { id: '6B', name: 'See who spotted me', path: 'Spots', active: true },
       { id: '6C', name: 'Review spots I\'ve sent', path: 'Spots', active: true },
       { id: '6D', name: 'Spot back or decline from spots', path: 'Spots', active: true },
-    ],
-  },
-  {
-    id: 'monetization',
-    title: 'Premium & Purchases',
-    description: 'Offers the user ways to stand out and get more from the app.',
-    screens: [
-      { id: '7A', name: 'Understand premium features', active: false },
-      { id: '7B', name: 'Purchase credits', active: false },
-      { id: '7C', name: 'Choose subscription plan', active: false },
     ],
   },
   {
