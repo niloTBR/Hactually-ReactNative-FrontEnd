@@ -596,7 +596,7 @@ const ms = StyleSheet.create({
   focusBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.xl, paddingBottom: spacing.lg },
   focusNameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   focusName: { ...typography.h1, color: color.white },
-  focusAge: { ...typography.h3, color: color.white, marginTop: spacing.xs },
+  focusAge: { ...typography.body, color: color.white, marginTop: spacing.xs },
   notInterestedBtn: { alignItems: 'center', paddingVertical: spacing.md, borderWidth: 1, borderColor: color.white + '33', borderRadius: radius.full },
   notInterestedText: { ...typography.body, color: color.white + 'CC', fontWeight: '500' },
   focusSafetyRow: { marginTop: spacing.lg, gap: spacing.sm },

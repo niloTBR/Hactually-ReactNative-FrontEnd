@@ -313,7 +313,7 @@ export default function SpotsScreen({ navigation }) {
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: color.green.dark },
-  header: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: spacing.md },
+  header: { paddingHorizontal: spacing.xl, paddingTop: spacing['3xl'], paddingBottom: spacing['3xl'] },
   title: { ...typography.h4, fontSize: 36, lineHeight: 44, color: color.blue.light },
 
 
@@ -345,7 +345,7 @@ const s = StyleSheet.create({
   focusClose: { width: 40, height: 40, borderRadius: 20, backgroundColor: color.charcoal + '80', alignItems: 'center', justifyContent: 'center' },
   focusBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.xl, paddingBottom: spacing.lg },
   focusName: { ...typography.h1, color: color.white },
-  focusAge: { ...typography.h3, color: color.white, marginTop: spacing.xs },
+  focusAge: { ...typography.body, color: color.white, marginTop: spacing.xs },
   focusContext: { ...typography.body, color: color.white, marginTop: spacing.xs },
   notInterestedBtn: { alignItems: 'center', paddingVertical: spacing.md, borderWidth: 1, borderColor: color.white + '33', borderRadius: radius.full },
   notInterestedText: { ...typography.body, color: color.white + 'CC', fontWeight: '500' },

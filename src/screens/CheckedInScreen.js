@@ -564,13 +564,14 @@ export default function CheckedInScreen({ route, navigation }) {
           </SafeAreaView>
           {/* Profile info + actions at bottom */}
           <SafeAreaView edges={['bottom']} style={s.focusBottom}>
-            <View style={s.focusNameRow}>
-              <Text style={s.focusName}>{focusedPerson.name}</Text>
-              {isActiveIncoming && (
-                <Text style={s.spottedYouLabel}>spotted you</Text>
-              )}
-            </View>
+            <Text style={s.focusName}>{focusedPerson.name}</Text>
             <Text style={s.focusAge}>{focusedPerson.age}, "{focusedPerson.bio}"</Text>
+            {isActiveIncoming && (
+              <Text style={s.focusContext}>Spotted you at {focusedPerson.venue || 'this venue'}</Text>
+            )}
+            {isActiveMatched && (
+              <Text style={s.focusContext}>Matched at {focusedPerson.venue || 'this venue'}</Text>
+            )}
 
             <View style={{ marginTop: spacing.lg, width: '100%', gap: spacing.sm }}>
               {/* STATE: Matched — message button */}
@@ -1264,9 +1265,10 @@ const s = StyleSheet.create({
     paddingHorizontal: spacing.xl, paddingBottom: spacing['2xl'],
   },
   focusNameRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
+  focusContext: { ...typography.body, color: color.white, marginTop: spacing.xs },
   spottedYouLabel: { ...typography.caption, fontSize: 12, fontWeight: '700', color: color.green.light, letterSpacing: 1, textTransform: 'uppercase', textShadowColor: color.charcoal + '60', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
-  focusName: { ...typography.h2, color: color.white, textShadowColor: color.charcoal + '80', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8 },
-  focusAge: { ...typography.body, color: color.white + 'CC', marginTop: spacing.xs, textShadowColor: color.charcoal + '60', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
+  focusName: { ...typography.h1, color: color.white },
+  focusAge: { ...typography.body, color: color.white, marginTop: spacing.xs },
   focusInterests: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.sm },
   focusInterestTag: { backgroundColor: color.white + '26', borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
   focusInterestText: { ...typography.caption, fontSize: 12, color: color.white + 'CC' },

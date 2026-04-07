@@ -246,8 +246,6 @@ function VisibilityView({ onBack }) {
   const [showOnline, setShowOnline] = useState(true);
   const [showDistance, setShowDistance] = useState(true);
   const [showVenue, setShowVenue] = useState(true);
-  const [ghostMode, setGhostMode] = useState(false);
-
   return (
     <View style={p.subView}>
       <SafeAreaView edges={['top']}><SubViewHeader title="Visibility" onBack={onBack} /></SafeAreaView>
@@ -263,14 +261,6 @@ function VisibilityView({ onBack }) {
             <Toggle value={showVenue} onChange={setShowVenue} />
           </SettingsRow>
         </SettingsCard>
-        <View style={{ marginTop: spacing.xl }}>
-          <SettingsCard>
-            <SettingsRow label="Shy Mode" desc="Hide from everyone temporarily" showChevron={false}>
-              <Toggle value={ghostMode} onChange={setGhostMode} />
-            </SettingsRow>
-          </SettingsCard>
-          {ghostMode && <Text style={p.warningText}>You're in shy mode — no one can see or spot you</Text>}
-        </View>
       </ScrollView>
     </View>
   );
@@ -473,10 +463,9 @@ export default function ProfileScreen({ navigation }) {
           ))}
 
           {/* Logout */}
-          <TouchableOpacity style={p.logoutButton} onPress={handleLogout} activeOpacity={0.7}>
-            <LogOut size={18} color={color.orange.dark} />
-            <Text style={p.logoutText}>Log Out</Text>
-          </TouchableOpacity>
+          <Button variant="outline" color="orange" fullWidth leftIcon={<LogOut size={18} />} onPress={handleLogout}>
+            Log Out
+          </Button>
 
           <Text style={p.version}>hactually v1.0.0</Text>
         </View>
