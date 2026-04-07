@@ -1326,7 +1326,7 @@ const s = StyleSheet.create({
   chatRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm, marginBottom: spacing.lg },
   chatRowMe: { flexDirection: 'row-reverse' },
   chatAvatar: { width: 28, height: 28, borderRadius: 14 },
-  chatBubble: { maxWidth: '75%', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: spacing.sm },
+  chatBubble: { maxWidth: '75%', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.md },
   chatBubbleOther: { backgroundColor: color.white + '1A', borderBottomLeftRadius: 0 },
   chatBubbleMe: { backgroundColor: color.orange.dark + 'CC', borderBottomRightRadius: 0 },
   chatBubbleUser: { fontSize: 11, fontWeight: '600', color: color.orange.dark, marginBottom: 2 },

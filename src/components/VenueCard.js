@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   chevronContainer: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: radius.xl,
     backgroundColor: color.white + '33',
     alignItems: 'center',
     justifyContent: 'center',

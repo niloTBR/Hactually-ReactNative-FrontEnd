@@ -27,7 +27,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { colors, gradients, radius, shadows, typography } from '../theme';
+import { color, colors, gradients, radius, spacing, shadows, typography } from '../theme';
 
 // ============================================================================
 // ANIMATED GRADIENT COMPONENT
@@ -374,7 +374,7 @@ const Button = ({
     };
 
     const fillWidth = dragX + circleSize + 8;
-    const dragFillColor = isDark ? 'rgba(212, 228, 165, 0.4)' : colors.blue.default + '80';
+    const dragFillColor = isDark ? colors.green.light + '66' : colors.blue.default + '80';
     const circleColor = isDark ? colors.green.light : colors.orange.default;
     const arrowColor = isDark ? colors.olive.dark : colors.white;
     const dragProgress = maxDrag > 0 ? dragX / maxDrag : 0;
@@ -521,9 +521,9 @@ const styles = StyleSheet.create({
 
   // Variant: Glass
   glassButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: color.white + '26',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
+    borderColor: color.white + '40',
   },
 
   // Variant: Outline
@@ -568,10 +568,10 @@ const styles = StyleSheet.create({
     ...typography.caption,
   },
   iconLeft: {
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   iconRight: {
-    marginLeft: 8,
+    marginLeft: spacing.sm,
   },
 
   // Shimmer effect

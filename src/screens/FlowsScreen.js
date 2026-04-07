@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: color.white + 'E6',
     borderBottomWidth: 1,
     borderBottomColor: color.olive.light + '50',
   },
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   accordion: {
-    backgroundColor: 'white',
+    backgroundColor: color.white,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: color.olive.light + '60',
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   flowNumberText: {
     ...typography.caption,
     fontWeight: '700',
-    color: 'white',
+    color: color.white,
   },
   flowInfo: {
     flex: 1,

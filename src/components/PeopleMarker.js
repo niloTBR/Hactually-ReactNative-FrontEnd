@@ -8,7 +8,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Image, StyleSheet, Animated, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { color, spacing, typography } from '../theme';
+import { color, spacing, radius, typography } from '../theme';
 
 const DEFAULT_SIZE = 36;
 const DEFAULT_OVERLAP = -20;
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs + 2,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-    borderRadius: 9999,
+    borderRadius: radius.full,
     backgroundColor: color.beige + 'F2',
   },
   venueName: {

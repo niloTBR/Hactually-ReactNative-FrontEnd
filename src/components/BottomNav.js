@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   tabActiveVenue: {
     backgroundColor: color.blue.dark,
-    paddingHorizontal: 4,
+    paddingHorizontal: spacing.xs,
     paddingRight: spacing.md,
   },
   tabLabel: {

@@ -609,7 +609,7 @@ const ms = StyleSheet.create({
 
   // Undo toast
   undoToast: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 200, paddingHorizontal: spacing.lg },
-  undoInner: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: color.charcoal, borderRadius: radius.full, padding: spacing.sm, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 8 },
+  undoInner: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: color.charcoal, borderRadius: radius.full, padding: spacing.sm, shadowColor: color.charcoal, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 8 },
   undoAvatar: { width: 32, height: 32, borderRadius: 16 },
   undoText: { flex: 1, ...typography.body, fontSize: 13, color: color.white },
   undoBtn: { backgroundColor: color.blue.dark, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radius.full },

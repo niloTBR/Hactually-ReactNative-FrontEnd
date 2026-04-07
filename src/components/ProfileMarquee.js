@@ -3,6 +3,7 @@
  */
 import React, { useEffect, useRef, memo } from 'react';
 import { View, Image, Animated, StyleSheet, Easing } from 'react-native';
+import { color } from '../theme';
 
 const DEFAULT_PROFILES = [
   require('../../assets/images/profiles/ayo-ogunseinde-6W4F62sN_yI-unsplash.jpg'),
@@ -53,7 +54,7 @@ const ProfileMarquee = memo(({ images = DEFAULT_PROFILES, reverse = false, speed
 const styles = StyleSheet.create({
   container: { overflow: 'hidden', height: SIZE },
   row: { flexDirection: 'row', gap: GAP },
-  img: { width: SIZE, height: SIZE, borderRadius: SIZE / 2, borderWidth: 2, borderColor: 'rgba(200,227,244,0.25)' },
+  img: { width: SIZE, height: SIZE, borderRadius: SIZE / 2, borderWidth: 2, borderColor: color.blue.light + '40' },
 });
 
 export default ProfileMarquee;
