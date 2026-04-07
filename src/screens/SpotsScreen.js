@@ -166,7 +166,7 @@ export default function SpotsScreen({ navigation }) {
                             {'Waiting'.split('').map((char, i) => (
                               <div key={i} style={{
                                 color: color.green.light,
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontFamily: 'system-ui, sans-serif',
                                 fontWeight: '600',
                                 animation: `waveLetter 2s ease-in-out ${i * 0.07}s infinite`,
@@ -323,7 +323,7 @@ const s = StyleSheet.create({
   cardProfile: { alignItems: 'center', gap: spacing.xs },
   cardAvatar: { width: 72, height: 72, borderRadius: 36 },
   cardName: { ...typography.body, fontWeight: '600', color: color.blue.light, textAlign: 'center' },
-  cardVenue: { ...typography.body, fontSize: 14, color: color.beige + '80', textAlign: 'center' },
+  cardVenue: { ...typography.caption, color: color.beige + '80', textAlign: 'center' },
   cardActions: { flexDirection: 'row', gap: spacing.sm, alignSelf: 'stretch' },
   cardAccept: { flex: 1, height: 36, borderRadius: 18, backgroundColor: color.green.light, alignItems: 'center', justifyContent: 'center' },
   cardDecline: { flex: 1, height: 36, borderRadius: 18, backgroundColor: color.orange.dark, alignItems: 'center', justifyContent: 'center' },

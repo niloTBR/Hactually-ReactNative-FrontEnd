@@ -560,7 +560,7 @@ const p = StyleSheet.create({
   heroBio: { ...typography.body, color: color.olive.dark, marginTop: spacing.sm },
   heroInterests: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.md },
   heroInterestTag: { backgroundColor: color.olive.dark + '14', borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
-  heroInterestText: { ...typography.caption, fontSize: 11, color: color.olive.dark },
+  heroInterestText: { ...typography.caption, fontSize: 12, color: color.olive.dark },
   subView: { ...StyleSheet.absoluteFillObject, zIndex: 20, backgroundColor: color.olive.light },
 
   // Headers
@@ -578,7 +578,7 @@ const p = StyleSheet.create({
   // Section labels
   // Settings section — light olive bg with dark text
   settingsSection: { paddingTop: spacing.sm },
-  sectionLabel: { fontSize: 11, fontWeight: '600', color: color.green.dark, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: spacing.md, paddingLeft: spacing.xs },
+  sectionLabel: { fontSize: 12, fontWeight: '600', color: color.green.dark, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: spacing.md, paddingLeft: spacing.xs },
 
   // Settings card
   settingsCard: { backgroundColor: color.beige + '40', borderRadius: radius.lg, overflow: 'hidden' },
@@ -588,13 +588,13 @@ const p = StyleSheet.create({
   settingsRowLabel: { ...typography.body, fontWeight: '500', color: color.charcoal },
   settingsRowDesc: { ...typography.caption, fontSize: 12, color: color.olive.dark + '80', marginTop: 1 },
   fieldRowBorder: { borderTopWidth: 1, borderTopColor: color.olive.light + '80' },
-  warningText: { ...typography.caption, fontSize: 11, color: color.orange.dark, marginTop: spacing.sm, paddingLeft: spacing.xs },
+  warningText: { ...typography.caption, fontSize: 12, color: color.orange.dark, marginTop: spacing.sm, paddingLeft: spacing.xs },
   faqAnswer: { ...typography.caption, color: color.olive.dark + '99', marginTop: spacing.sm, lineHeight: 20 },
 
   // Profile card
   profileCardWrap: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: spacing.xl },
   profileCard: { backgroundColor: color.white + '99', borderRadius: radius.lg, borderWidth: 1, borderColor: color.olive.light + '33', padding: spacing.xl, alignItems: 'center' },
-  avatarWrap: { marginTop: 40, marginBottom: spacing.md },
+  avatarWrap: { marginTop: spacing['3xl'], marginBottom: spacing.md },
   avatar: { width: 96, height: 96, borderRadius: 48, borderWidth: 3, borderColor: color.white },
   editAvatarBtn: { position: 'absolute', bottom: 0, right: 0, width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, backgroundColor: color.orange.dark, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: color.white },
   profileName: { ...typography.h3, color: color.charcoal },
@@ -604,7 +604,7 @@ const p = StyleSheet.create({
   bioText: { flex: 1, ...typography.caption, color: color.olive.dark + 'B3', textAlign: 'center' },
   interestTags: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.xs + 2, marginTop: spacing.md },
   interestTag: { backgroundColor: color.orange.dark + '1A', borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
-  interestTagText: { fontSize: 11, fontWeight: '500', color: color.orange.dark },
+  interestTagText: { fontSize: 12, fontWeight: '500', color: color.orange.dark },
 
   // Settings wrap
   settingsWrap: { paddingHorizontal: spacing.xl },
@@ -631,7 +631,7 @@ const p = StyleSheet.create({
   // Delete account
   deleteAccountBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.lg, borderRadius: radius.lg, backgroundColor: color.orange.dark + '0D' },
   deleteAccountLabel: { ...typography.body, fontWeight: '600', color: color.orange.dark },
-  deleteAccountDesc: { ...typography.caption, fontSize: 11, color: color.olive.dark + '80', marginTop: spacing.xs, lineHeight: 16 },
+  deleteAccountDesc: { ...typography.caption, fontSize: 12, color: color.olive.dark + '80', marginTop: spacing.xs, lineHeight: 16 },
   deleteOverlay: { ...StyleSheet.absoluteFillObject, zIndex: 30, backgroundColor: color.charcoal + 'B3', justifyContent: 'center', alignItems: 'center', padding: spacing.xl },
   deleteCard: { width: '100%', maxWidth: 340, backgroundColor: color.beige, borderRadius: radius.xl, padding: spacing.xl, paddingTop: spacing['2xl'], alignItems: 'center' },
   deleteTitle: { ...typography.h4, color: color.orange.dark, marginTop: spacing.lg, textAlign: 'center' },
@@ -647,7 +647,7 @@ const p = StyleSheet.create({
   photoSlotEmpty: { backgroundColor: color.white + '99', borderWidth: 2, borderStyle: 'dashed', borderColor: color.olive.dark + '26' },
   photoImage: { width: '100%', height: '100%' },
   mainBadge: { position: 'absolute', top: spacing.xs + 2, left: spacing.xs + 2, backgroundColor: color.orange.dark, borderRadius: spacing.xs + 2, paddingHorizontal: spacing.xs + 2, paddingVertical: 2 },
-  mainBadgeText: { fontSize: 9, fontWeight: '700', color: color.white, textTransform: 'uppercase' },
+  mainBadgeText: { fontSize: 10, fontWeight: '700', color: color.white, textTransform: 'uppercase' },
   photoPlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.xs },
   addPhotoCircle: { width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, backgroundColor: color.orange.dark + '1A', alignItems: 'center', justifyContent: 'center' },
   addPhotoText: { fontSize: 10, color: color.olive.dark + '4D' },
@@ -660,7 +660,7 @@ const p = StyleSheet.create({
   bioInput: { ...typography.body, color: color.charcoal, paddingHorizontal: spacing.lg, paddingVertical: spacing.md + 2, minHeight: 80, textAlignVertical: 'top' },
   bioCount: { fontSize: 10, color: color.olive.dark + '4D', textAlign: 'right', paddingHorizontal: spacing.lg, paddingBottom: spacing.sm },
   interestsHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: spacing.xs },
-  interestsCount: { fontSize: 11, color: color.olive.dark + '4D' },
+  interestsCount: { fontSize: 12, color: color.olive.dark + '4D' },
   interestsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   interestChip: { paddingHorizontal: spacing.md + 2, paddingVertical: spacing.sm, borderRadius: radius.full, backgroundColor: color.white + '99', borderWidth: 1, borderColor: color.olive.light + '33' },
   interestChipActive: { backgroundColor: color.orange.dark, borderColor: color.orange.dark },

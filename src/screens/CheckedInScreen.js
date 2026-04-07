@@ -1164,7 +1164,7 @@ const s = StyleSheet.create({
   },
   venueName: { ...typography.body, fontWeight: '700', color: color.charcoal, flex: 1 },
   leaveButton: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radius.full, backgroundColor: color.beige },
-  leaveText: { ...typography.caption, fontSize: 11, fontWeight: '700', color: color.olive.dark },
+  leaveText: { ...typography.caption, fontSize: 12, fontWeight: '700', color: color.olive.dark },
   heartButton: {
     width: spacing['3xl'], height: spacing['3xl'], borderRadius: spacing['3xl'] / 2,
     backgroundColor: color.white + 'CC', borderWidth: 1, borderColor: color.olive.light + '4D',
@@ -1218,7 +1218,7 @@ const s = StyleSheet.create({
   },
   pendingText: {
     ...typography.caption,
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '700',
     color: color.white,
     textAlign: 'center',
@@ -1264,7 +1264,7 @@ const s = StyleSheet.create({
     paddingHorizontal: spacing.xl, paddingBottom: spacing['2xl'],
   },
   focusNameRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
-  spottedYouLabel: { ...typography.caption, fontSize: 11, fontWeight: '700', color: color.green.light, letterSpacing: 1, textTransform: 'uppercase', textShadowColor: color.charcoal + '60', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
+  spottedYouLabel: { ...typography.caption, fontSize: 12, fontWeight: '700', color: color.green.light, letterSpacing: 1, textTransform: 'uppercase', textShadowColor: color.charcoal + '60', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   focusName: { ...typography.h2, color: color.white, textShadowColor: color.charcoal + '80', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8 },
   focusAge: { ...typography.body, color: color.white + 'CC', marginTop: spacing.xs, textShadowColor: color.charcoal + '60', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   focusInterests: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.sm },
@@ -1279,7 +1279,7 @@ const s = StyleSheet.create({
     width: '100%', height: spacing['3xl'], borderRadius: radius.full,
     backgroundColor: color.white + '26', alignItems: 'center', justifyContent: 'center',
   },
-  notInterestedText: { ...typography.caption, fontSize: 13, fontWeight: '500', color: color.white + 'CC' },
+  notInterestedText: { ...typography.caption, fontSize: 14, fontWeight: '500', color: color.white + 'CC' },
   waitingButton: {
     width: '100%', height: spacing['3xl'], borderRadius: radius.full,
     backgroundColor: color.white + '33', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -1329,7 +1329,7 @@ const s = StyleSheet.create({
   chatBubble: { maxWidth: '75%', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.md },
   chatBubbleOther: { backgroundColor: color.white + '1A', borderBottomLeftRadius: 0 },
   chatBubbleMe: { backgroundColor: color.orange.dark + 'CC', borderBottomRightRadius: 0 },
-  chatBubbleUser: { fontSize: 11, fontWeight: '600', color: color.orange.dark, marginBottom: 2 },
+  chatBubbleUser: { fontSize: 12, fontWeight: '600', color: color.orange.dark, marginBottom: 2 },
   chatBubbleBody: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm },
   chatBubbleText: { ...typography.body, color: color.white, flex: 1 },
   chatBubbleTime: { fontSize: 10, color: color.white + '66' },
@@ -1361,8 +1361,8 @@ const s = StyleSheet.create({
   spotInfo: { flex: 1 },
   spotNameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   spotName: { ...typography.body, fontWeight: '600', color: color.white },
-  spottedYouBadge: { fontSize: 9, fontWeight: '700', color: color.green.light, letterSpacing: 1, textTransform: 'uppercase' },
-  spotSubtext: { fontSize: 11, color: color.white + '66', marginTop: 2 },
+  spottedYouBadge: { fontSize: 10, fontWeight: '700', color: color.green.light, letterSpacing: 1, textTransform: 'uppercase' },
+  spotSubtext: { fontSize: 12, color: color.white + '66', marginTop: 2 },
   spotActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   spotActionBtnWhite: { width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: color.white + '26' },
   spotSpinnerCircle: { width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: color.white + '1A' },
@@ -1379,7 +1379,7 @@ const s = StyleSheet.create({
   dmHeaderAvatar: { width: 80, height: 80, borderRadius: 40 },
   dmHeaderName: { ...typography.body, fontWeight: '700', color: color.charcoal, marginBottom: 0 },
   dmViewProfileRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  dmViewProfile: { ...typography.body, fontSize: 13, fontWeight: '500', color: color.olive.dark },
+  dmViewProfile: { ...typography.body, fontSize: 14, fontWeight: '500', color: color.olive.dark },
   dmPatternContainer: {
     ...StyleSheet.absoluteFillObject, opacity: 0.04, overflow: 'hidden',
     flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xl, padding: spacing.lg,
@@ -1440,7 +1440,7 @@ const s = StyleSheet.create({
 
   spotsEmpty: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: spacing['3xl'] * 2 },
   spotsEmptyTitle: { ...typography.body, color: color.white + '80', marginTop: spacing.md },
-  spotsEmptySubtitle: { ...typography.caption, fontSize: 11, color: color.white + '4D', marginTop: spacing.xs },
+  spotsEmptySubtitle: { ...typography.caption, fontSize: 12, color: color.white + '4D', marginTop: spacing.xs },
 
   // Leave modal
   leaveOverlay: { ...StyleSheet.absoluteFillObject, zIndex: 80, backgroundColor: color.charcoal + 'B3', justifyContent: 'flex-end', padding: spacing.xl },

@@ -513,7 +513,7 @@ const ms = StyleSheet.create({
   bottomNavWrap: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.xl, paddingBottom: spacing.sm },
 
   // Header
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.xl, paddingTop: 40, paddingBottom: 40 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.xl, paddingTop: spacing['3xl'], paddingBottom: spacing['3xl'] },
   title: { ...typography.h4, fontSize: 36, lineHeight: 44, color: color.blue.light },
   closeBtn: { width: spacing['2xl'] + spacing.sm, height: spacing['2xl'] + spacing.sm, borderRadius: (spacing['2xl'] + spacing.sm) / 2, backgroundColor: color.green.light + '1A', alignItems: 'center', justifyContent: 'center' },
 
@@ -534,7 +534,7 @@ const ms = StyleSheet.create({
   // Tabs
   tabs: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.xl, marginBottom: spacing.md },
   tabsLeft: { flexDirection: 'row', gap: spacing.sm },
-  sentRequestsBtn: { ...typography.caption, fontSize: 13, fontWeight: '600', color: color.green.light + '80' },
+  sentRequestsBtn: { ...typography.caption, fontSize: 14, fontWeight: '600', color: color.green.light + '80' },
 
   // Sent requests
   sentActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
@@ -542,7 +542,7 @@ const ms = StyleSheet.create({
   sentCancel: { width: spacing['2xl'], height: spacing['2xl'], borderRadius: spacing.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: color.orange.dark },
   tab: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderRadius: radius.full, backgroundColor: color.green.light + '14' },
   tabActive: { backgroundColor: color.green.light },
-  tabText: { ...typography.body, fontSize: 13, fontWeight: '600', color: color.green.light + '80' },
+  tabText: { ...typography.body, fontSize: 14, fontWeight: '600', color: color.green.light + '80' },
   tabTextActive: { color: color.green.dark },
 
   // Match row
@@ -562,7 +562,7 @@ const ms = StyleSheet.create({
   // Empty
   empty: { alignItems: 'center', justifyContent: 'center', paddingTop: spacing['3xl'] * 2 },
   emptyTitle: { ...typography.body, color: color.green.light + '80', marginTop: spacing.md },
-  emptySubtitle: { ...typography.caption, fontSize: 11, color: color.green.light + '4D', marginTop: spacing.xs },
+  emptySubtitle: { ...typography.caption, fontSize: 12, color: color.green.light + '4D', marginTop: spacing.xs },
 
   // DM
   dmBg: { ...StyleSheet.absoluteFillObject, backgroundColor: color.beige },
@@ -611,7 +611,7 @@ const ms = StyleSheet.create({
   undoToast: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 200, paddingHorizontal: spacing.lg },
   undoInner: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: color.charcoal, borderRadius: radius.full, padding: spacing.sm, shadowColor: color.charcoal, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 8 },
   undoAvatar: { width: 32, height: 32, borderRadius: 16 },
-  undoText: { flex: 1, ...typography.body, fontSize: 13, color: color.white },
+  undoText: { flex: 1, ...typography.body, fontSize: 14, color: color.white },
   undoBtn: { backgroundColor: color.blue.dark, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radius.full },
   undoBtnText: { ...typography.caption, fontSize: 12, fontWeight: '700', color: color.white },
 });
