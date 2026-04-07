@@ -547,9 +547,9 @@ const ms = StyleSheet.create({
 
   // Match row
   matchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: color.green.light + '1A' },
-  matchAvatarRing: { padding: 2, borderRadius: spacing['2xl'], borderWidth: 2, borderColor: color.green.light },
-  matchAvatar: { width: spacing['3xl'], height: spacing['3xl'], borderRadius: spacing['3xl'] / 2 },
-  onlineDot: { position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: 6, backgroundColor: color.green.dark, borderWidth: 2, borderColor: color.charcoal },
+  matchAvatarRing: { width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: color.green.light, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  matchAvatar: { width: 48, height: 48, borderRadius: 24 },
+  onlineDot: { position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: 6, backgroundColor: color.green.dark, borderWidth: 2, borderColor: color.green.dark },
   matchInfo: { flex: 1 },
   matchTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   matchBottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 },
@@ -596,7 +596,7 @@ const ms = StyleSheet.create({
   focusBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.xl, paddingBottom: spacing.lg },
   focusNameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   focusName: { ...typography.h1, color: color.white },
-  focusAge: { ...typography.body, color: color.white, marginTop: spacing.xs },
+  focusAge: { ...typography.body, color: color.beige, marginTop: spacing.xs },
   notInterestedBtn: { alignItems: 'center', paddingVertical: spacing.md, borderWidth: 1, borderColor: color.white + '33', borderRadius: radius.full },
   notInterestedText: { ...typography.body, color: color.white + 'CC', fontWeight: '500' },
   focusSafetyRow: { marginTop: spacing.lg, gap: spacing.sm },
