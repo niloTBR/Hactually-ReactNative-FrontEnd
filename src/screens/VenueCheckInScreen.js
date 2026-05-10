@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { color, spacing, radius, typography } from '../theme';
-import { Button } from '../components';
+import { Button, GradientBackground } from '../components';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -130,18 +130,9 @@ export default function VenueCheckInScreen({ route, navigation }) {
     blurRef.current = Math.max(0, 3 - (marqueeSpeed - 1) * 3.2);
   }, [slideProgress]);
 
-  // Background: olive.light → orange.dark
-  const bgR = Math.round(197 + (224 - 197) * slideProgress);
-  const bgG = Math.round(198 + (90 - 198) * slideProgress);
-  const bgB = Math.round(173 + (61 - 173) * slideProgress);
-  const bgColor = `rgb(${bgR}, ${bgG}, ${bgB})`;
-
-  // Text: charcoal → beige
-  const txtR = Math.round(26 + (245 - 26) * slideProgress);
-  const txtG = Math.round(26 + (241 - 26) * slideProgress);
-  const txtB = Math.round(26 + (232 - 26) * slideProgress);
-  const textColor = `rgb(${txtR}, ${txtG}, ${txtB})`;
-  const textColorMuted = `rgba(${txtR}, ${txtG}, ${txtB}, 0.7)`;
+  // Dark canvas — text always beige
+  const textColor = color.beige;
+  const textColorMuted = color.beige + 'B3';
 
   const colorProgress = slideProgress;
   const imageScale = 1 + slideProgress * 0.15;
@@ -159,7 +150,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
   if (!venue) return null;
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
+    <GradientBackground style={styles.container}>
       <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
         {/* Top bar */}
         <View style={styles.topBar}>
@@ -241,10 +232,12 @@ export default function VenueCheckInScreen({ route, navigation }) {
         <View style={styles.checkinArea}>
           <Button
             variant="checkin"
-            color="orange"
+            color="dark"
             size="lg"
             fullWidth
-            fillColor={color.olive.light}
+            fillColor="transparent"
+            animated={false}
+            borderColors={[color.blue.light, color.orange.dark]}
             onPress={handleCheckIn}
             onSlideProgress={setSlideProgress}
             caption="1 credit"
@@ -257,7 +250,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
           </Text>
         </View>
       </SafeAreaView>
-    </View>
+    </GradientBackground>
   );
 }
 
@@ -285,7 +278,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: radius.full,
-    backgroundColor: color.charcoal + '14',
+    backgroundColor: color.beige + '14',
   },
   locationText: {
     ...typography.caption,
@@ -297,7 +290,7 @@ const styles = StyleSheet.create({
     borderRadius: (spacing['2xl'] + spacing.sm) / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: color.charcoal + '14',
+    backgroundColor: color.beige + '14',
   },
 
   // ─── Marquee rows ───
@@ -375,3 +368,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+

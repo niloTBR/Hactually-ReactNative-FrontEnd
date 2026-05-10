@@ -27,6 +27,7 @@ const GhostInput = ({
   themeColor, // Color for text/icons/border - auto-detected from context if not provided
   keyboardType = 'default',
   autoCapitalize = 'none',
+  autoComplete = 'off',
   style,
   containerStyle,
 }) => {
@@ -67,6 +68,7 @@ const GhostInput = ({
         placeholderTextColor={isDarkBg ? color.beige + '80' : color.charcoal + '80'}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        autoComplete={autoComplete}
         editable={!disabled}
         onSubmitEditing={onSubmit}
         style={[styles.input, { color: isDarkBg ? color.beige : color.charcoal }]}

@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, ChevronDown, Camera, X, Trash2, RefreshCw } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Button, Input, Chip, DatePicker, Logo } from '../../components';
+import { Button, Input, Chip, DatePicker, Logo, GradientBackground } from '../../components';
 import { color, spacing, typography, radius } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
 import { authService } from '../../services/authService';
@@ -43,7 +43,7 @@ const INTERESTS = [
   { label: 'Nightlife', emoji: '🌙' }, { label: 'Beach', emoji: '🏖️' },
 ];
 
-const themeColor = color.green.light;
+const themeColor = color.orange.dark;
 
 export default function ProfileSetupScreen({ navigation }) {
   const { user, updateProfile, isLoading } = useAuthStore();
@@ -135,14 +135,15 @@ export default function ProfileSetupScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <GradientBackground>
+      <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton} activeOpacity={0.8}>
           <ChevronLeft size={20} color={themeColor} />
         </TouchableOpacity>
         <View style={styles.headerSpacer} />
-        <Logo size={32} color={themeColor} />
+        <Logo size={32} color={color.orange.dark} />
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -155,7 +156,7 @@ export default function ProfileSetupScreen({ navigation }) {
               <Image source={{ uri: formData.photo }} style={styles.photoImage} />
             ) : (
               <View style={styles.photoPlaceholder}>
-                <Camera size={32} color={themeColor} strokeWidth={1.5} />
+                <Camera size={32} color={color.beige} strokeWidth={1.5} />
               </View>
             )}
           </TouchableOpacity>
@@ -279,7 +280,18 @@ export default function ProfileSetupScreen({ navigation }) {
 
       {/* Submit Button */}
       <View style={styles.bottomSection}>
-        <Button variant="outline-gradient" color="dark" fillColor={color.green.dark} size="lg" fullWidth onPress={handleSubmit} disabled={isLoading} loading={isLoading}>
+        <Button
+          variant="outline-gradient"
+          color="dark"
+          fillColor="transparent"
+          borderColors={[color.blue.light, color.orange.dark]}
+          animated={false}
+          size="lg"
+          fullWidth
+          onPress={handleSubmit}
+          disabled={isLoading}
+          loading={isLoading}
+        >
           Continue
         </Button>
       </View>
@@ -313,18 +325,19 @@ export default function ProfileSetupScreen({ navigation }) {
           />
         </SafeAreaView>
       </Modal>
-    </SafeAreaView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: color.green.dark },
+  container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.md },
   headerSpacer: { flex: 1 },
   backButton: { width: 40, height: 40, borderRadius: radius.full, backgroundColor: themeColor + '33', alignItems: 'center', justifyContent: 'center' },
   scrollView: { flex: 1 },
   scrollContent: { paddingHorizontal: spacing['2xl'], paddingBottom: spacing.lg },
-  title: { ...typography.h2, color: color.blue.light, marginBottom: spacing.xl },
+  title: { ...typography.h2, color: color.beige, marginBottom: spacing.xl },
 
   // Photo
   photoSection: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, marginBottom: spacing.xl },
@@ -332,7 +345,7 @@ const styles = StyleSheet.create({
   photoPlaceholder: { width: '100%', height: '100%', backgroundColor: themeColor + '1A', alignItems: 'center', justifyContent: 'center' },
   photoImage: { width: '100%', height: '100%' },
   photoText: { flex: 1 },
-  photoLabel: { ...typography.caption, fontWeight: '700', color: themeColor },
+  photoLabel: { ...typography.caption, fontWeight: '700', color: color.beige },
   photoActions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
   photoActionBtn: { width: 32, height: 32, borderRadius: radius.full, backgroundColor: themeColor + '33', alignItems: 'center', justifyContent: 'center' },
 
@@ -347,7 +360,7 @@ const styles = StyleSheet.create({
 
   // Bio
   bioSection: { marginTop: spacing.xl },
-  sectionLabel: { ...typography.caption, fontWeight: '700', color: color.blue.light, marginBottom: spacing.sm },
+  sectionLabel: { ...typography.caption, fontWeight: '700', color: color.beige, marginBottom: spacing.sm },
 
   // Interests
   interestsSection: { marginTop: spacing.xl },
@@ -360,7 +373,7 @@ const styles = StyleSheet.create({
   bottomSection: { paddingHorizontal: spacing['2xl'], paddingVertical: spacing['2xl'] },
 
   // Modal
-  modalContainer: { flex: 1, backgroundColor: color.green.dark },
+  modalContainer: { flex: 1, backgroundColor: color.charcoal },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: themeColor + '33' },
   modalTitle: { ...typography.h3, color: themeColor },
   countryItem: { paddingHorizontal: spacing.lg, paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: themeColor + '33' },

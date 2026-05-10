@@ -3,7 +3,7 @@
  * Main entry point
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
@@ -12,6 +12,27 @@ import AppNavigator from './src/navigation/AppNavigator';
 
 // Keep splash screen visible while loading fonts
 SplashScreen.preventAutoHideAsync();
+
+// Web: suppress Chrome's autofill background so it blends with the dark canvas
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  const id = '__hactually-autofill-fix';
+  if (!document.getElementById(id)) {
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = `
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus,
+      input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 1000px #1A1A1A inset !important;
+        -webkit-text-fill-color: #F5F1E8 !important;
+        caret-color: #F5F1E8 !important;
+        transition: background-color 9999s ease-in-out 0s !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false, error: null };

@@ -11,7 +11,7 @@ import { X, Eye, EyeOff, Ban, AlertTriangle } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { color, spacing, radius, typography } from '../theme';
-import { BottomNav, LogoMark, Button } from '../components';
+import { BottomNav, LogoMark, Button, GradientBackground } from '../components';
 import { useVenueStore } from '../store/venueStore';
 
 const PROFILE_IMAGES = [
@@ -97,7 +97,7 @@ export default function SpotsScreen({ navigation }) {
   };
 
   return (
-    <View style={s.container}>
+    <GradientBackground style={s.container}>
       {/* Inject wave keyframes once */}
       <style>{`
         @keyframes waveLetter {
@@ -108,6 +108,7 @@ export default function SpotsScreen({ navigation }) {
       <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1 }}>
         <View style={s.header}>
           <Text style={s.title}>Spots</Text>
+          <Text style={s.subtitle}>People you've spotted, or who've spotted you</Text>
         </View>
 
         {/* All spots in one grid */}
@@ -205,7 +206,7 @@ export default function SpotsScreen({ navigation }) {
           <Image source={focusedSpot.avatar} style={s.focusImage} />
           <LinearGradient colors={[color.charcoal + '4D', 'transparent', 'transparent', color.charcoal + 'B3']} locations={[0, 0.3, 0.5, 1]} style={StyleSheet.absoluteFill} />
           <SafeAreaView edges={['top']} style={s.focusHeader}>
-            <LogoMark size={48} color={color.blue.light} />
+            <LogoMark size={48} color={color.orange.dark} />
             <TouchableOpacity style={s.focusClose} onPress={() => setFocusedSpot(null)}>
               <X size={20} color={color.white} />
             </TouchableOpacity>
@@ -249,7 +250,7 @@ export default function SpotsScreen({ navigation }) {
           <Image source={focusedSent.avatar} style={s.focusImage} />
           <LinearGradient colors={[color.charcoal + '4D', 'transparent', 'transparent', color.charcoal + 'B3']} locations={[0, 0.3, 0.5, 1]} style={StyleSheet.absoluteFill} />
           <SafeAreaView edges={['top']} style={s.focusHeader}>
-            <LogoMark size={48} color={color.blue.light} />
+            <LogoMark size={48} color={color.orange.dark} />
             <TouchableOpacity style={s.focusClose} onPress={() => setFocusedSent(null)}>
               <X size={20} color={color.white} />
             </TouchableOpacity>
@@ -307,22 +308,23 @@ export default function SpotsScreen({ navigation }) {
           <TouchableOpacity onPress={handleUndo}><Text style={s.undoBtn}>Undo</Text></TouchableOpacity>
         </Animated.View>
       )}
-    </View>
+    </GradientBackground>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: color.green.dark },
+  container: { flex: 1 },
   header: { paddingHorizontal: spacing.xl, paddingTop: spacing['3xl'], paddingBottom: spacing['3xl'] },
-  title: { ...typography.h4, fontSize: 36, lineHeight: 44, color: color.blue.light },
+  title: { ...typography.h4, fontSize: 36, lineHeight: 44, color: color.orange.dark },
+  subtitle: { ...typography.caption, color: color.beige + '80', marginTop: spacing.xs },
 
 
-  cardsScroll: { paddingHorizontal: spacing.xl, paddingBottom: spacing['3xl'] },
+  cardsScroll: { paddingHorizontal: spacing.xl, paddingBottom: 120 },
   cardsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   card: { width: '47%', backgroundColor: color.green.light + '14', borderRadius: radius.xl, padding: spacing.lg, alignItems: 'center', gap: spacing.md },
   cardProfile: { alignItems: 'center', gap: spacing.xs },
   cardAvatar: { width: 72, height: 72, borderRadius: 36 },
-  cardName: { ...typography.body, fontWeight: '600', color: color.blue.light, textAlign: 'center' },
+  cardName: { ...typography.body, fontWeight: '600', color: color.orange.dark, textAlign: 'center' },
   cardVenue: { ...typography.caption, color: color.beige + '80', textAlign: 'center' },
   cardActions: { flexDirection: 'row', gap: spacing.sm, alignSelf: 'stretch' },
   cardAccept: { flex: 1, height: 36, borderRadius: 18, backgroundColor: color.green.light, alignItems: 'center', justifyContent: 'center' },
@@ -334,7 +336,7 @@ const s = StyleSheet.create({
   emptyTitle: { ...typography.body, fontWeight: '600', color: color.green.light, marginTop: spacing.md },
   emptySubtitle: { ...typography.caption, color: color.green.light + '80', marginTop: spacing.xs },
 
-  bottomNavWrap: { paddingHorizontal: spacing.lg, paddingBottom: spacing.sm },
+  bottomNavWrap: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.lg, paddingBottom: spacing.sm },
 
   // Focus overlay
   focusOverlay: { ...StyleSheet.absoluteFillObject, zIndex: 100, backgroundColor: color.charcoal },
@@ -360,3 +362,4 @@ const s = StyleSheet.create({
   undoText: { ...typography.body, color: color.white },
   undoBtn: { ...typography.body, color: color.orange.dark, fontWeight: '700' },
 });
+

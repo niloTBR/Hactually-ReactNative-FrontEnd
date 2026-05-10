@@ -77,6 +77,8 @@ const Button = ({
   fillColor,
   themeColor, // For ghost variant on dark backgrounds
   onSlideProgress, // Callback for checkin variant slide progress (0-1)
+  borderColors, // For outline-gradient: override the gradient color pair
+  animated = true, // For outline-gradient: set false for a static (non-rotating) border
   style,
   textStyle,
 }) => {
@@ -100,7 +102,9 @@ const Button = ({
 
   // Rotation animation for gradient border buttons
   useEffect(() => {
-    if ((variant === 'outline-gradient' || variant === 'checkin') && !disabled) {
+    const shouldAnimate =
+      (variant === 'outline-gradient' || variant === 'checkin') && animated;
+    if (shouldAnimate && !disabled) {
       rotation.value = 0;
       rotation.value = withRepeat(
         withTiming(360, { duration: 3000, easing: Easing.linear }),
@@ -108,7 +112,7 @@ const Button = ({
         false
       );
     }
-  }, [variant, disabled]);
+  }, [variant, animated, disabled]);
 
   const shimmerStyle = useAnimatedStyle(() => ({
     left: `${shimmerX.value * 2 - 50}%`,
@@ -256,9 +260,76 @@ const Button = ({
     const borderWidth = 2;
     const btnHeight = sizeConfig[size].height;
     const isDark = color === 'dark';
-    const innerBg = fillColor || (isDark ? colors.olive.dark : colors.olive.lighter);
+    const innerBg = fillColor !== undefined
+      ? fillColor
+      : (isDark ? colors.olive.dark : colors.olive.lighter);
     const txtColor = isDark ? colors.white : colors.olive.dark;
-    const borderColors = isDark ? gradients.borderDark : gradients.borderLight;
+    const resolvedBorderColors =
+      borderColors || (isDark ? gradients.borderDark : gradients.borderLight);
+    const isTransparent = innerBg === 'transparent';
+
+    // Web-only: true gradient ring with transparent center via CSS mask
+    if (Platform.OS === 'web' && !animated && isTransparent) {
+      const [c1, c2] = resolvedBorderColors;
+      return (
+        <TouchableOpacity
+          onPress={onPress}
+          disabled={disabled || loading}
+          activeOpacity={0.8}
+          style={[
+            {
+              height: btnHeight,
+              paddingHorizontal: sizeConfig[size].paddingHorizontal,
+              borderRadius: radius.full,
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+            },
+            fullWidth && styles.fullWidth,
+            disabled && styles.disabled,
+            style,
+          ]}
+        >
+          {/* Gradient ring overlay (mask cuts out the inner area) */}
+          <View
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              borderRadius: radius.full,
+              padding: borderWidth,
+              backgroundImage: `linear-gradient(135deg, ${c1}, ${c2})`,
+              WebkitMask:
+                'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+            }}
+          />
+          {loading ? (
+            <ActivityIndicator color={txtColor} size="small" />
+          ) : (
+            <View style={styles.content}>
+              {leftIcon && (
+                <View style={styles.iconLeft}>
+                  {React.cloneElement(leftIcon, { color: txtColor })}
+                </View>
+              )}
+              <Text style={[styles.text, { color: txtColor }, textSizeStyle, textStyle]}>
+                {children}
+              </Text>
+              {rightIcon && (
+                <View style={styles.iconRight}>
+                  {React.cloneElement(rightIcon, { color: txtColor })}
+                </View>
+              )}
+            </View>
+          )}
+        </TouchableOpacity>
+      );
+    }
 
     return (
       <TouchableOpacity
@@ -279,10 +350,19 @@ const Button = ({
           style,
         ]}
       >
-        {/* Rotating gradient background */}
-        <Animated.View style={[styles.gradientRotator, rotationStyle]}>
-          <AnimatedGradientFill colorPair={borderColors} />
-        </Animated.View>
+        {/* Gradient border background — animated rotation or static linear */}
+        {animated ? (
+          <Animated.View style={[styles.gradientRotator, rotationStyle]}>
+            <AnimatedGradientFill colorPair={resolvedBorderColors} />
+          </Animated.View>
+        ) : (
+          <LinearGradient
+            colors={resolvedBorderColors}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+        )}
 
         {/* Inner fill (creates border effect by covering center) */}
         <View
@@ -316,7 +396,8 @@ const Button = ({
     const innerBg = fillColor || (isDark ? colors.olive.dark : colors.olive.lighter);
     const txtColor = isDark ? colors.white : colors.olive.dark;
     const circleSize = btnHeight - borderWidth * 2 - 6;
-    const borderColors = isDark ? gradients.borderDark : gradients.borderLight;
+    const resolvedCheckinBorderColors =
+      borderColors || (isDark ? gradients.borderDark : gradients.borderLight);
 
     const [dragX, setDragX] = useState(0);
     const [containerWidth, setContainerWidth] = useState(defaultWidth);
@@ -374,11 +455,12 @@ const Button = ({
     };
 
     const fillWidth = dragX + circleSize + 8;
-    const dragFillColor = isDark ? colors.green.light + '66' : colors.blue.default + '80';
-    const circleColor = isDark ? colors.green.light : colors.orange.default;
-    const arrowColor = isDark ? colors.olive.dark : colors.white;
+    const dragFillColor = isDark ? colors.orange.default + '66' : colors.blue.default + '80';
+    const circleColor = isDark ? colors.orange.default : colors.orange.default;
+    const arrowColor = isDark ? colors.white : colors.white;
     const dragProgress = maxDrag > 0 ? dragX / maxDrag : 0;
     const dynamicTxtColor = isDark ? txtColor : (dragProgress > 0.3 ? colors.white : txtColor);
+    const isTransparentCheckin = innerBg === 'transparent';
 
     return (
       <View
@@ -390,10 +472,12 @@ const Button = ({
           style,
         ]}
       >
-        {/* Rotating gradient background */}
-        <Animated.View style={[styles.gradientRotator, rotationStyle]}>
-          <AnimatedGradientFill colorPair={borderColors} />
-        </Animated.View>
+        {/* Border layer: rotating gradient OR static masked ring (web) */}
+        {!animated && isTransparentCheckin && Platform.OS === 'web' ? null : (
+          <Animated.View style={[styles.gradientRotator, animated && rotationStyle]}>
+            <AnimatedGradientFill colorPair={resolvedCheckinBorderColors} />
+          </Animated.View>
+        )}
 
         {/* Inner content area */}
         <View
@@ -405,6 +489,7 @@ const Button = ({
               right: borderWidth,
               bottom: borderWidth,
               backgroundColor: innerBg,
+              overflow: 'hidden',
             },
           ]}
         >
@@ -468,6 +553,27 @@ const Button = ({
             )}
           </View>
         </View>
+
+        {/* Static masked gradient ring overlay (transparent center) */}
+        {!animated && isTransparentCheckin && Platform.OS === 'web' && (
+          <View
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              borderRadius: radius.full,
+              padding: borderWidth,
+              backgroundImage: `linear-gradient(135deg, ${resolvedCheckinBorderColors[0]}, ${resolvedCheckinBorderColors[1]})`,
+              WebkitMask:
+                'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+            }}
+          />
+        )}
       </View>
     );
   }

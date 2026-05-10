@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, RefreshCw } from 'lucide-react-native';
 import { color, spacing, typography, radius } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
-import { OTPInput, Logo } from '../../components';
+import { OTPInput, Logo, GradientBackground } from '../../components';
 
 export default function OTPScreen({ navigation, route }) {
   const { email, devOTP } = route.params || {};
@@ -59,7 +59,8 @@ export default function OTPScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <GradientBackground>
+      <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -67,10 +68,10 @@ export default function OTPScreen({ navigation, route }) {
           style={styles.backButton}
           activeOpacity={0.8}
         >
-          <ChevronLeft size={24} color={color.green.light} />
+          <ChevronLeft size={24} color={color.orange.dark} />
         </TouchableOpacity>
         <View style={styles.headerSpacer} />
-        <Logo size={32} color={color.green.light} />
+        <Logo size={32} color={color.orange.dark} />
       </View>
 
       {/* Content */}
@@ -94,7 +95,7 @@ export default function OTPScreen({ navigation, route }) {
             disabled={isLoading}
             error={!!error}
             variant="ghost"
-            themeColor={color.green.light}
+            themeColor={color.orange.dark}
           />
         </View>
 
@@ -112,7 +113,7 @@ export default function OTPScreen({ navigation, route }) {
               style={styles.resendButton}
               activeOpacity={0.7}
             >
-              <RefreshCw size={14} color={color.green.light} />
+              <RefreshCw size={14} color={color.orange.dark} />
               <Text style={styles.resendButtonText}>Resend Code</Text>
             </TouchableOpacity>
           )}
@@ -132,17 +133,17 @@ export default function OTPScreen({ navigation, route }) {
       {/* Loading overlay */}
       {isLoading && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={color.green.light} />
+          <ActivityIndicator size="large" color={color.orange.dark} />
         </View>
       )}
-    </SafeAreaView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: color.green.dark,
   },
   header: {
     flexDirection: 'row',
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: radius.full,
-    backgroundColor: color.green.light + '20',
+    backgroundColor: color.orange.dark + '20',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -168,18 +169,18 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.h2,
-    color: color.green.light,
+    color: color.beige,
     marginBottom: spacing.sm,
   },
   subtitle: {
     ...typography.caption,
-    color: color.green.light + '99',
+    color: color.beige + '80',
     marginBottom: spacing['2xl'],
   },
   devOtpContainer: {
-    backgroundColor: color.green.light + '20',
+    backgroundColor: color.orange.dark + '20',
     borderWidth: 1,
-    borderColor: color.green.light + '40',
+    borderColor: color.orange.dark + '40',
     borderRadius: radius.full,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
   },
   devOtpText: {
     ...typography.caption,
-    color: color.green.light,
+    color: color.orange.dark,
     textAlign: 'center',
   },
   devOtpCode: {
@@ -215,11 +216,11 @@ const styles = StyleSheet.create({
   },
   resendTimer: {
     ...typography.caption,
-    color: color.green.light + '80',
+    color: color.orange.dark + '80',
   },
   resendTimerBold: {
     fontWeight: '700',
-    color: color.green.light,
+    color: color.orange.dark,
   },
   resendButton: {
     flexDirection: 'row',
@@ -228,16 +229,16 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: radius.full,
-    backgroundColor: color.green.light + '20',
+    backgroundColor: color.orange.dark + '20',
   },
   resendButtonText: {
     ...typography.caption,
     fontWeight: '700',
-    color: color.green.light,
+    color: color.orange.dark,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: color.green.dark + 'E6',
+    backgroundColor: color.charcoal + 'E6',
     alignItems: 'center',
     justifyContent: 'center',
   },

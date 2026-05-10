@@ -17,7 +17,7 @@ import { X, ChevronRight, ChevronDown, ArrowUp, EyeOff, Ban, AlertTriangle } fro
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { color, spacing, radius, typography } from '../theme';
-import { BottomNav, LogoMark, Button } from '../components';
+import { BottomNav, LogoMark, Button, GradientBackground } from '../components';
 import { useVenueStore } from '../store/venueStore';
 
 // Reuse profile images from CheckedIn
@@ -182,7 +182,7 @@ export default function MatchesScreen({ navigation }) {
 
   // ─── MATCHES LIST ───
   return (
-    <View style={ms.container}>
+    <GradientBackground style={ms.container}>
       <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1 }}>
         {/* Header */}
         <View style={ms.header}>
@@ -270,7 +270,7 @@ export default function MatchesScreen({ navigation }) {
             style={StyleSheet.absoluteFill}
           />
           <SafeAreaView edges={['top']} style={ms.focusHeader}>
-            <LogoMark size={48} color={color.blue.light} />
+            <LogoMark size={48} color={color.orange.dark} />
             <TouchableOpacity style={ms.focusClose} onPress={() => setFocusedMatch(null)}>
               <X size={20} color={color.white} />
             </TouchableOpacity>
@@ -309,24 +309,24 @@ export default function MatchesScreen({ navigation }) {
         </View>
       )}
 
-    </View>
+    </GradientBackground>
   );
 }
 
 const ms = StyleSheet.create({
-  container: { flex: 1, backgroundColor: color.green.dark },
+  container: { flex: 1 },
   bottomNavWrap: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.xl, paddingBottom: spacing.sm },
 
   // Header
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.xl, paddingTop: spacing['3xl'], paddingBottom: spacing['3xl'] },
-  title: { ...typography.h4, fontSize: 36, lineHeight: 44, color: color.blue.light },
+  title: { ...typography.h4, fontSize: 36, lineHeight: 44, color: color.orange.dark },
   // Tabs
   tabs: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.xl, marginBottom: spacing.md },
   tabsLeft: { flexDirection: 'row', gap: spacing.sm },
-  tab: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderRadius: radius.full, backgroundColor: color.green.light + '14' },
-  tabActive: { backgroundColor: color.green.light },
-  tabText: { ...typography.body, fontSize: 14, fontWeight: '600', color: color.green.light + '80' },
-  tabTextActive: { color: color.green.dark },
+  tab: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderRadius: radius.full, backgroundColor: color.orange.dark + '14' },
+  tabActive: { backgroundColor: color.orange.dark },
+  tabText: { ...typography.body, fontSize: 14, fontWeight: '600', color: color.orange.dark + '80' },
+  tabTextActive: { color: color.charcoal },
 
   // Match row
   matchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: color.green.light + '1A' },
@@ -336,7 +336,7 @@ const ms = StyleSheet.create({
   matchInfo: { flex: 1 },
   matchTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   matchBottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 },
-  matchName: { ...typography.body, fontWeight: '600', color: color.blue.light },
+  matchName: { ...typography.body, fontWeight: '600', color: color.orange.dark },
   matchTime: { ...typography.caption, fontSize: 12, color: color.green.light + '66' },
   matchLastMsg: { ...typography.body, fontSize: 14, color: color.beige + '80', flex: 1 },
   matchLastMsgUnread: { color: color.beige },
@@ -385,3 +385,4 @@ const ms = StyleSheet.create({
   focusSafetyBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, paddingVertical: spacing.md, borderRadius: radius.full, borderWidth: 1, borderColor: color.white + '26' },
   focusSafetyLabel: { ...typography.body, color: color.white + 'CC' },
 });
+

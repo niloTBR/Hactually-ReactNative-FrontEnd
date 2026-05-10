@@ -66,6 +66,10 @@ export const gradients = {
    */
   borderLight: [colors.blue.default, colors.orange.default],
   borderDark: ['#A8D4F0', '#FFB5A7'], // light blue, peach (softer than brand colors)
+
+  // Dark peach-to-purple background gradient (auth screens)
+  // Uses the deepest red & blue shades for a moody auth canvas
+  dark: [colors.orange.dark, colors.blue.dark],
 };
 
 export default colors;

@@ -20,4 +20,5 @@ export { default as PeopleMarker } from './PeopleMarker';
 export { default as VenueCard } from './VenueCard';
 export { default as LocationDropdown } from './LocationDropdown';
 export { default as BottomNav } from './BottomNav';
+export { default as GradientBackground } from './GradientBackground';
 export { NearbyIcon, GroupChatIcon, HomeIcon, MatchesIcon, ProfileIcon, SpotsIcon } from './Icons';

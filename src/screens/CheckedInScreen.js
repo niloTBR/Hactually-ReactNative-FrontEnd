@@ -20,7 +20,7 @@ import { X, LogOut, ChevronUp, ChevronRight, ArrowUp, Eye, EyeOff, Ban, AlertTri
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle as SvgCircle } from 'react-native-svg';
 import { color, spacing, radius, typography } from '../theme';
-import { LogoMark, Button, BottomNav, GroupChatIcon, ShimmerText } from '../components';
+import { LogoMark, Button, BottomNav, GroupChatIcon, ShimmerText, GradientBackground } from '../components';
 import { useVenueStore } from '../store/venueStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -531,7 +531,7 @@ export default function CheckedInScreen({ route, navigation }) {
   };
 
   return (
-    <View style={s.container}>
+    <GradientBackground base={color.beige} style={s.container}>
       {/* ─── Focus Mode (full screen profile) ─── */}
       {isFocusMode && focusedPerson && (
         <View style={[
@@ -555,7 +555,7 @@ export default function CheckedInScreen({ route, navigation }) {
           />
           {/* Header */}
           <SafeAreaView edges={['top']} style={s.focusHeader}>
-            <LogoMark size={48} color={color.blue.light} />
+            <LogoMark size={48} color={color.orange.dark} />
             <TouchableOpacity style={s.focusClose} onPress={handleCloseFocus}>
               <X size={20} color={color.white} />
             </TouchableOpacity>
@@ -1132,7 +1132,7 @@ export default function CheckedInScreen({ route, navigation }) {
           </View>
         </View>
       )}
-    </View>
+    </GradientBackground>
   );
 }
 
@@ -1140,7 +1140,6 @@ export default function CheckedInScreen({ route, navigation }) {
 const s = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: color.beige,
     overflow: 'hidden',
   },
 
@@ -1386,3 +1385,4 @@ const s = StyleSheet.create({
   leaveModalCancel: { alignItems: 'center', paddingTop: spacing.lg },
   leaveModalCancelText: { ...typography.caption, color: color.olive.dark + '80', textDecorationLine: 'underline' },
 });
+

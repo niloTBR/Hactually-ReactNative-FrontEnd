@@ -12,7 +12,7 @@ import { Mail } from 'lucide-react-native';
 import { color, spacing, typography, radius, GhostTheme } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
 import { validateEmail } from '../../lib/utils';
-import { Logo, GoogleIcon, AppleIcon, ProfileMarquee, Button, GhostInput } from '../../components';
+import { Logo, GoogleIcon, AppleIcon, ProfileMarquee, Button, GhostInput, GradientBackground } from '../../components';
 
 const { width } = Dimensions.get('window');
 
@@ -60,12 +60,12 @@ export default function AuthOptionsScreen({ navigation, route }) {
   });
 
   return (
-    <View style={styles.container}>
+    <GradientBackground style={styles.container}>
       <SafeAreaView style={{ flex: 1 }}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
             <View style={styles.logoRow}>
-              <Logo size={44} color={color.green.light} />
+              <Logo size={44} color={color.orange.dark} />
               <Text style={styles.logoText}>hactually</Text>
             </View>
 
@@ -78,7 +78,7 @@ export default function AuthOptionsScreen({ navigation, route }) {
               <Text style={styles.title}>continue the moment</Text>
 
               <Animated.View style={animStyle(0)}>
-                <GhostTheme themeColor={color.green.light} isDark={true}>
+                <GhostTheme themeColor={color.orange.dark} isDark={true}>
                   <GhostInput
                     value={email}
                     onChangeText={(text) => { setEmail(text); setError(''); }}
@@ -100,7 +100,7 @@ export default function AuthOptionsScreen({ navigation, route }) {
               <Animated.View style={animStyle(2)}>
                 <Button
                   variant="ghost"
-                  themeColor={color.green.light}
+                  themeColor={color.orange.dark}
                   leftIcon={<GoogleIcon size={20} />}
                   onPress={() => handleOAuth('google')}
                   fullWidth
@@ -112,7 +112,7 @@ export default function AuthOptionsScreen({ navigation, route }) {
               <Animated.View style={[animStyle(3), { marginTop: spacing.md }]}>
                 <Button
                   variant="ghost"
-                  themeColor={color.green.light}
+                  themeColor={color.orange.dark}
                   leftIcon={<AppleIcon size={24} />}
                   onPress={() => handleOAuth('apple')}
                   fullWidth
@@ -137,7 +137,7 @@ export default function AuthOptionsScreen({ navigation, route }) {
               style={[
                 StyleSheet.absoluteFill,
                 {
-                  backgroundColor: [color.green.dark, color.green.dark, color.green.dark + 'CC', color.green.dark + '99', color.green.dark + '66'][i],
+                  backgroundColor: [color.charcoal, color.charcoal, color.charcoal + 'CC', color.charcoal + '99', color.charcoal + '66'][i],
                   zIndex: 5 - i,
                   transform: [{ translateX: a.interpolate({ inputRange: [0, 1], outputRange: [0, width] }) }]
                 }
@@ -146,21 +146,21 @@ export default function AuthOptionsScreen({ navigation, route }) {
           ))}
         </View>
       )}
-    </View>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: color.green.dark },
+  container: { flex: 1 },
   scroll: { flexGrow: 1 },
   logoRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing['2xl'], paddingTop: spacing['2xl'], gap: spacing.md },
-  logoText: { ...typography.h2, color: color.green.light, marginTop: spacing.xs },
+  logoText: { ...typography.h2, color: color.orange.dark, marginTop: spacing.xs },
   profiles: { flex: 1, justifyContent: 'center', gap: spacing.lg, paddingVertical: spacing.lg },
   bottom: { paddingHorizontal: spacing['2xl'], paddingBottom: spacing['2xl'] },
-  title: { ...typography.h2, color: color.green.light, marginBottom: spacing.xl },
+  title: { ...typography.h2, color: color.beige, marginBottom: spacing.xl },
   divider: { flexDirection: 'row', alignItems: 'center', marginVertical: spacing.lg, gap: spacing.lg },
-  line: { flex: 1, height: 1, backgroundColor: color.green.light + '50' },
-  or: { ...typography.caption, fontWeight: '700', color: color.green.light + '80', textTransform: 'uppercase', letterSpacing: 2 },
-  terms: { ...typography.caption, color: color.green.light + '80', textAlign: 'center', marginTop: spacing.xl },
+  line: { flex: 1, height: 1, backgroundColor: color.orange.dark + '50' },
+  or: { ...typography.caption, fontWeight: '700', color: color.orange.dark + '80', textTransform: 'uppercase', letterSpacing: 2 },
+  terms: { ...typography.caption, color: color.orange.dark + '80', textAlign: 'center', marginTop: spacing.xl },
   termsBold: { fontWeight: '700' },
 });

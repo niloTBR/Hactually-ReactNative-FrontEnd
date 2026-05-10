@@ -112,7 +112,7 @@ export default function LocationScreen({ navigation }) {
     'We never share your exact location',
   ];
 
-  const themeColor = color.green.light;
+  const themeColor = color.orange.dark;
 
   return (
     <Modal
@@ -130,7 +130,7 @@ export default function LocationScreen({ navigation }) {
 
           {/* Animated Logo */}
           <Animated.View style={[styles.logoSection, { opacity: fadeAnim }]}>
-            <LogoMark size="lg" colorScheme="light" colorVariant="green" />
+            <LogoMark size="lg" color={color.orange.dark} />
           </Animated.View>
 
           {/* Content */}
@@ -144,7 +144,7 @@ export default function LocationScreen({ navigation }) {
             {benefits.map((text, index) => (
               <View key={index} style={styles.benefitRow}>
                 <View style={styles.checkIcon}>
-                  <Check size={12} color={color.green.dark} strokeWidth={3} />
+                  <Check size={12} color={color.charcoal} strokeWidth={3} />
                 </View>
                 <Text style={styles.benefitText}>{text}</Text>
               </View>
@@ -162,7 +162,9 @@ export default function LocationScreen({ navigation }) {
               <Button
                 variant="outline-gradient"
                 color="dark"
-                fillColor={color.green.dark}
+                fillColor="transparent"
+                borderColors={[color.blue.light, color.orange.dark]}
+                animated={false}
                 size="lg"
                 fullWidth
                 onPress={handleOpenSettings}
@@ -173,7 +175,9 @@ export default function LocationScreen({ navigation }) {
               <Button
                 variant="outline-gradient"
                 color="dark"
-                fillColor={color.green.dark}
+                fillColor="transparent"
+                borderColors={[color.blue.light, color.orange.dark]}
+                animated={false}
                 size="lg"
                 fullWidth
                 onPress={handleRequestLocation}
@@ -207,7 +211,7 @@ const styles = StyleSheet.create({
   popup: {
     width: '100%',
     maxWidth: 340,
-    backgroundColor: color.green.dark,
+    backgroundColor: color.charcoal,
     borderRadius: radius.xl,
     paddingHorizontal: spacing.xl,
     paddingTop: spacing['3xl'],
@@ -231,13 +235,13 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.h2,
-    color: color.green.light,
+    color: color.orange.dark,
     marginBottom: spacing.sm,
     textAlign: 'center',
   },
   subtitle: {
     ...typography.body,
-    color: color.green.light + 'CC',
+    color: color.orange.dark + 'CC',
     marginBottom: spacing.xl,
     textAlign: 'center',
   },
@@ -255,13 +259,13 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: radius.md,
-    backgroundColor: color.green.light,
+    backgroundColor: color.orange.dark,
     alignItems: 'center',
     justifyContent: 'center',
   },
   benefitText: {
     ...typography.caption,
-    color: color.green.light,
+    color: color.orange.dark,
     flex: 1,
   },
   errorText: {
@@ -279,6 +283,6 @@ const styles = StyleSheet.create({
   },
   linkText: {
     ...typography.link,
-    color: color.green.light,
+    color: color.orange.dark,
   },
 });
