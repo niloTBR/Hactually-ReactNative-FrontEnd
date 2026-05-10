@@ -135,16 +135,18 @@ export default function VenueCheckInScreen({ route, navigation }) {
   const textColorMuted = color.beige + 'B3';
 
   const colorProgress = slideProgress;
-  // Image stays at its intrinsic size — no zoom on slide
-  const imageScale = 1;
 
   const maskWidth = SCREEN_WIDTH;
   const maskHeight = maskWidth * (128 / 252);
 
-  // Mask container grows in HEIGHT from default to ~80% of screen as
-  // user slides — wrapper centers it so growth happens both up and
-  // down. Image inside keeps its size; the mask reveals more of it.
-  const bannerHeight = maskHeight + slideProgress * (SCREEN_HEIGHT * 0.8 - maskHeight);
+  // Image is a fullscreen background with the SVG mask painted on top.
+  // Mask grows UNIFORMLY (preserving SVG shape) so curves never distort.
+  // At full slide it is enlarged enough that only its rectangular body
+  // covers the visible viewport — curves spill off-screen.
+  const maxMaskScale = SCREEN_HEIGHT / maskHeight;
+  const maskScale = 1 + slideProgress * (maxMaskScale - 1);
+  const currentMaskWidth = maskWidth * maskScale;
+  const currentMaskHeight = maskHeight * maskScale;
 
   // Get local image if available
   const venueImage = VENUE_IMAGES[venue?.id] || { uri: venue?.image };
@@ -155,9 +157,51 @@ export default function VenueCheckInScreen({ route, navigation }) {
 
   if (!venue) return null;
 
+  const maskStyle = {
+    maskImage: VENUE_MASK_URL,
+    WebkitMaskImage: VENUE_MASK_URL,
+    maskSize: `${currentMaskWidth}px ${currentMaskHeight}px`,
+    WebkitMaskSize: `${currentMaskWidth}px ${currentMaskHeight}px`,
+    maskPosition: 'center',
+    WebkitMaskPosition: 'center',
+    maskRepeat: 'no-repeat',
+    WebkitMaskRepeat: 'no-repeat',
+  };
+
   return (
     <GradientBackground style={styles.container}>
-      <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
+      {/* Fullscreen venue image, painted only inside the SVG mask shape.
+         Mask grows from a banner size to fill the screen as user slides. */}
+      <View style={[StyleSheet.absoluteFill, maskStyle, { zIndex: 5 }]} pointerEvents="none">
+        {/* Full-color layer */}
+        <Image
+          source={venueImage}
+          style={[styles.fullscreenImage, { opacity: colorProgress }]}
+        />
+        {/* Grayscale + blue tint layer */}
+        <View style={[StyleSheet.absoluteFill, { opacity: 1 - colorProgress }]}>
+          <Image source={venueImage} style={[styles.fullscreenImage, { filter: 'grayscale(1)' }]} />
+          <LinearGradient
+            colors={[color.blue.dark + '70', color.blue.dark + 'CC']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+        </View>
+        {/* Venue info text — sits on top of mask, visible inside the shape */}
+        <View style={styles.venueNameOverlay}>
+          <Text style={styles.bannerText}>It's{' '}
+            <Text style={{ color: color.blue.light }}>hactually</Text>
+            {' '}happening at
+          </Text>
+          <Text style={styles.bannerText}>{venue.name}</Text>
+          <Text style={styles.venuePeopleText}>
+            <Text style={{ fontWeight: '700', color: color.white }}>{venue.peopleCount}</Text> people checked in
+          </Text>
+        </View>
+      </View>
+
+      <SafeAreaView edges={['top', 'bottom']} style={[styles.safeArea, { zIndex: 10 }]}>
         {/* Top bar */}
         <View style={styles.topBar}>
           <View style={styles.locationPill}>
@@ -179,59 +223,6 @@ export default function VenueCheckInScreen({ route, navigation }) {
           <MarqueeRow photos={PROFILE_PHOTOS} reverse={false} speedRef={speedRef} blurRef={blurRef} />
           <View style={{ height: spacing.md }} />
           <MarqueeRow photos={PROFILE_PHOTOS.slice().reverse()} reverse={true} speedRef={speedRef} blurRef={blurRef} />
-        </View>
-
-        {/* Venue image in brand SVG shape — edge to edge, CSS mask */}
-        <View style={styles.maskedImageWrapper}>
-          <View
-            style={[
-              styles.maskedContainer,
-              {
-                width: maskWidth,
-                height: bannerHeight,
-                maskImage: VENUE_MASK_URL,
-                WebkitMaskImage: VENUE_MASK_URL,
-                maskSize: '100% 100%',
-                WebkitMaskSize: '100% 100%',
-                maskRepeat: 'no-repeat',
-                WebkitMaskRepeat: 'no-repeat',
-              },
-            ]}
-          >
-            {/* Image with zoom */}
-            <View style={[StyleSheet.absoluteFill, { transform: [{ scale: imageScale }] }]}>
-              {/* Full color layer */}
-              <Image
-                source={venueImage}
-                style={[styles.maskedImage, { width: maskWidth, height: maskHeight, opacity: colorProgress }]}
-              />
-              {/* Grayscale + blue tint layer */}
-              <View style={[StyleSheet.absoluteFill, { opacity: 1 - colorProgress }]}>
-                <Image
-                  source={venueImage}
-                  style={[styles.maskedImage, { width: maskWidth, height: maskHeight, filter: 'grayscale(1)' }]}
-                />
-                <LinearGradient
-                  colors={[color.blue.dark + '70', color.blue.dark + 'CC']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 0, y: 1 }}
-                  style={StyleSheet.absoluteFill}
-                />
-              </View>
-            </View>
-
-            {/* Venue info overlay */}
-            <View style={styles.venueNameOverlay}>
-              <Text style={styles.bannerText}>It's{' '}
-                <Text style={{ color: color.blue.light }}>hactually</Text>
-                {' '}happening at
-              </Text>
-              <Text style={styles.bannerText}>{venue.name}</Text>
-              <Text style={styles.venuePeopleText}>
-                <Text style={{ fontWeight: '700', color: color.white }}>{venue.peopleCount}</Text> people checked in
-              </Text>
-            </View>
-          </View>
         </View>
 
         {/* Check-in button (full width, light/orange variant) */}
@@ -325,22 +316,13 @@ const styles = StyleSheet.create({
     borderRadius: AVATAR_SIZE / 2,
   },
 
-  // ─── Masked venue image ───
-  maskedImageWrapper: {
-    flex: 1,
-    marginTop: spacing.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  maskedContainer: {
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  maskedImage: {
+  // ─── Fullscreen masked venue image ───
+  fullscreenImage: {
     position: 'absolute',
     top: 0,
     left: 0,
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
   },
   venueNameOverlay: {
     ...StyleSheet.absoluteFillObject,
