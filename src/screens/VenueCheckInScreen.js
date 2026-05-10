@@ -19,7 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { color, spacing, radius, typography } from '../theme';
 import { Button, GradientBackground } from '../components';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // SVG mask from Hactually 2.0 — used as CSS mask-image on web
 // Original SVG from Hactually 2.0
@@ -135,14 +135,16 @@ export default function VenueCheckInScreen({ route, navigation }) {
   const textColorMuted = color.beige + 'B3';
 
   const colorProgress = slideProgress;
-  const imageScale = 1 + slideProgress * 0.15;
-  // Grow the masked banner outward (top + bottom) as user slides.
-  // Uniform scale keeps the SVG curve shape intact — width spills off
-  // the edges and is clipped by the parent's overflow.
-  const bannerScale = 1 + slideProgress * 1.6;
+  // Image stays at its intrinsic size — no zoom on slide
+  const imageScale = 1;
 
   const maskWidth = SCREEN_WIDTH;
   const maskHeight = maskWidth * (128 / 252);
+
+  // Mask container grows in HEIGHT from default to ~80% of screen as
+  // user slides — wrapper centers it so growth happens both up and
+  // down. Image inside keeps its size; the mask reveals more of it.
+  const bannerHeight = maskHeight + slideProgress * (SCREEN_HEIGHT * 0.8 - maskHeight);
 
   // Get local image if available
   const venueImage = VENUE_IMAGES[venue?.id] || { uri: venue?.image };
@@ -186,8 +188,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
               styles.maskedContainer,
               {
                 width: maskWidth,
-                height: maskHeight,
-                transform: [{ scale: bannerScale }],
+                height: bannerHeight,
                 maskImage: VENUE_MASK_URL,
                 WebkitMaskImage: VENUE_MASK_URL,
                 maskSize: '100% 100%',
@@ -326,6 +327,7 @@ const styles = StyleSheet.create({
 
   // ─── Masked venue image ───
   maskedImageWrapper: {
+    flex: 1,
     marginTop: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
