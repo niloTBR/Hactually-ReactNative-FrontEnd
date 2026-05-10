@@ -136,6 +136,10 @@ export default function VenueCheckInScreen({ route, navigation }) {
 
   const colorProgress = slideProgress;
   const imageScale = 1 + slideProgress * 0.15;
+  // Grow the masked banner outward (top + bottom) as user slides.
+  // Uniform scale keeps the SVG curve shape intact — width spills off
+  // the edges and is clipped by the parent's overflow.
+  const bannerScale = 1 + slideProgress * 1.6;
 
   const maskWidth = SCREEN_WIDTH;
   const maskHeight = maskWidth * (128 / 252);
@@ -183,6 +187,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
               {
                 width: maskWidth,
                 height: maskHeight,
+                transform: [{ scale: bannerScale }],
                 maskImage: VENUE_MASK_URL,
                 WebkitMaskImage: VENUE_MASK_URL,
                 maskSize: '100% 100%',
@@ -322,6 +327,9 @@ const styles = StyleSheet.create({
   // ─── Masked venue image ───
   maskedImageWrapper: {
     marginTop: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   maskedContainer: {
     position: 'relative',
