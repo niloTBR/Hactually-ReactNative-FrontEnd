@@ -19,12 +19,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { color, spacing, radius, typography } from '../theme';
 import { Button, GradientBackground } from '../components';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// SVG mask from Hactually 2.0 — used as CSS mask-image on web
-// Original SVG from Hactually 2.0
-// Original shape, left edge extended to -60 so shape is wider on left, right-aligned
-const VENUE_MASK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 0 252 128"><path d="M160,8.58V0H-60v128h156c11.66,0,22.58-3.13,32-8.58v8.58h64V0c-11.66,0-22.58,3.13-32,8.58Z" fill="white"/></svg>`;
+// SVG mask from Hactually 2.0 — extended vertically so the mask shape is taller
+// without stretching the brand curves. Bottom edge bumped from y=128 to y=560.
+const VENUE_MASK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 0 252 560"><path d="M160,8.58V0H-60v560h156c11.66,0,22.58-3.13,32-8.58v8.58h64V0c-11.66,0-22.58,3.13-32,8.58Z" fill="white"/></svg>`;
 const VENUE_MASK_URL = `url("data:image/svg+xml,${encodeURIComponent(VENUE_MASK_SVG)}")`;
 
 // Venue images from Hactually 2.0 project
@@ -138,7 +137,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
   const imageScale = 1 + slideProgress * 0.15;
 
   const maskWidth = SCREEN_WIDTH;
-  const maskHeight = maskWidth * (128 / 252);
+  const maskHeight = maskWidth * (560 / 252);
 
   // Get local image if available
   const venueImage = VENUE_IMAGES[venue?.id] || { uri: venue?.image };
@@ -321,6 +320,7 @@ const styles = StyleSheet.create({
 
   // ─── Masked venue image ───
   maskedImageWrapper: {
+    flex: 1,
     marginTop: spacing.lg,
   },
   maskedContainer: {
