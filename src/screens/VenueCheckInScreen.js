@@ -231,7 +231,10 @@ export default function VenueCheckInScreen({ route, navigation }) {
           <MarqueeRow photos={PROFILE_PHOTOS.slice().reverse()} reverse={true} speedRef={speedRef} blurRef={blurRef} />
         </View>
 
-        {/* Check-in button (full width, light/orange variant) */}
+      </SafeAreaView>
+
+      {/* Check-in button — own layer, on top of the masked image */}
+      <SafeAreaView edges={['bottom']} style={styles.checkinLayer}>
         <View style={styles.checkinArea}>
           <Button
             variant="checkin"
@@ -355,11 +358,16 @@ const styles = StyleSheet.create({
   },
 
   // ─── Check-in area ───
+  checkinLayer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 20,
+  },
   checkinArea: {
-    marginTop: 'auto',
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xl,
-    zIndex: 10,
   },
   creditsText: {
     ...typography.caption,
