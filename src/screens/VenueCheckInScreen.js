@@ -148,6 +148,9 @@ export default function VenueCheckInScreen({ route, navigation }) {
   const currentMaskWidth = maskWidth * maskScale;
   const currentMaskHeight = maskHeight * maskScale;
 
+  // Subtle Ken-Burns zoom on the image as user slides
+  const imageZoom = 1 + slideProgress * 0.08;
+
   // Get local image if available
   const venueImage = VENUE_IMAGES[venue?.id] || { uri: venue?.image };
 
@@ -176,11 +179,14 @@ export default function VenueCheckInScreen({ route, navigation }) {
         {/* Full-color layer */}
         <Image
           source={venueImage}
-          style={[styles.fullscreenImage, { opacity: colorProgress }]}
+          style={[styles.fullscreenImage, { opacity: colorProgress, transform: [{ scale: imageZoom }] }]}
         />
         {/* Grayscale + blue tint layer */}
         <View style={[StyleSheet.absoluteFill, { opacity: 1 - colorProgress }]}>
-          <Image source={venueImage} style={[styles.fullscreenImage, { filter: 'grayscale(1)' }]} />
+          <Image
+            source={venueImage}
+            style={[styles.fullscreenImage, { filter: 'grayscale(1)', transform: [{ scale: imageZoom }] }]}
+          />
           <LinearGradient
             colors={[color.blue.dark + '70', color.blue.dark + 'CC']}
             start={{ x: 0, y: 0 }}
@@ -201,7 +207,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
         </View>
       </View>
 
-      <SafeAreaView edges={['top', 'bottom']} style={[styles.safeArea, { zIndex: 10 }]}>
+      <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
         {/* Top bar */}
         <View style={styles.topBar}>
           <View style={styles.locationPill}>
@@ -353,6 +359,7 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xl,
+    zIndex: 10,
   },
   creditsText: {
     ...typography.caption,
