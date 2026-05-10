@@ -13,7 +13,7 @@ import {
   Easing,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { color, spacing, radius, typography } from '../theme';
@@ -119,6 +119,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
   const venue = route?.params?.venue;
   const [slideProgress, setSlideProgress] = useState(0);
   const [credits] = useState(5);
+  const insets = useSafeAreaInsets();
   // Refs for marquee — start blurred, unblur on slide
   const speedRef = useRef(1);
   const blurRef = useRef(3); // Start blurred (matches React app: 2.5px)
@@ -234,7 +235,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
       </SafeAreaView>
 
       {/* Check-in button — own layer, on top of the masked image */}
-      <SafeAreaView edges={['bottom']} style={styles.checkinLayer}>
+      <View style={[styles.checkinLayer, { paddingBottom: insets.bottom }]} pointerEvents="box-none">
         <View style={styles.checkinArea}>
           <Button
             variant="checkin"
@@ -255,7 +256,7 @@ export default function VenueCheckInScreen({ route, navigation }) {
             You have <Text style={{ fontWeight: '700' }}>{credits}</Text> credits remaining
           </Text>
         </View>
-      </SafeAreaView>
+      </View>
     </GradientBackground>
   );
 }
@@ -363,7 +364,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 20,
+    zIndex: 999,
+    elevation: 999,
   },
   checkinArea: {
     paddingHorizontal: spacing.xl,
